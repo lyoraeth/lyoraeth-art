@@ -18,7 +18,13 @@ logs
 .fleet
 .idea
 
+# IDE
+.vscode
+
 # Local env files
 .env
 .env.*
 !.env.example
+
+# OTR
+darkstage-design-spec.md
