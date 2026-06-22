@@ -74,7 +74,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px clamp(20px, 5vw, 96px);
+  padding: 1.125rem clamp(1.25rem, 0.1538rem + 4.8718vw, 6rem);
 }
 
 /* ── Brand logo ──────────────────────────────────────────────────────────── */
@@ -86,7 +86,7 @@ onMounted(() => {
 }
 
 .brand-logo {
-  height: 11px;
+  height: 0.6875rem;
   width: auto;
   display: block;
   transition: opacity 0.3s var(--ease-silk);
@@ -99,7 +99,7 @@ onMounted(() => {
 /* ── Nav links ───────────────────────────────────────────────────────────── */
 .nav-links {
   display: flex;
-  gap: 24px;
+  gap: 1.5rem;
   align-items: center;
 }
 
@@ -107,8 +107,8 @@ onMounted(() => {
   position: relative;
   color: var(--mist);
   text-decoration: none;
-  font-size: 13.5px;
-  padding-bottom: 3px;
+  font-size: 0.84375rem;
+  padding-bottom: 0.1875rem;
   transition: color 0.3s var(--ease-silk);
 }
 
@@ -138,10 +138,10 @@ onMounted(() => {
 .avail {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 0.4375rem;
   color: var(--mist);
   text-decoration: none;
-  font-size: 13.5px;
+  font-size: 0.84375rem;
   transition: color 0.3s var(--ease-silk);
 }
 
@@ -150,8 +150,8 @@ onMounted(() => {
 }
 
 .avail-dot {
-  width: 6px;
-  height: 6px;
+  width: 0.375rem;
+  height: 0.375rem;
   border-radius: 50%;
   background: var(--ember);
   flex-shrink: 0;
@@ -169,19 +169,22 @@ onMounted(() => {
   display: flex;
   gap: 0;
   border: 1px solid var(--line);
-  border-radius: 7px;
-  padding: 2px;
+  border-radius: 0.4375rem;
+  padding: 0.125rem;
+  background: oklch(100% 0 0 / 3%);
+  backdrop-filter: blur(10px) saturate(1.45) brightness(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.45) brightness(1.05);
 }
 
 /* the pill that slides between EN and RU */
 .lang::before {
   content: '';
   position: absolute;
-  top: 2px;
-  bottom: 2px;
-  left: 2px;
-  width: calc(50% - 2px);
-  border-radius: 5px;
+  top: 0.125rem;
+  bottom: 0.125rem;
+  left: 0.125rem;
+  width: calc(50% - 0.125rem);
+  border-radius: 0.3125rem;
   background: var(--ember-bg);
   transition: transform 0.26s var(--ease-glide);
   pointer-events: none;
@@ -194,10 +197,10 @@ onMounted(() => {
 
 .lang-btn {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: var(--faint);
-  padding: 4px 8px;
-  border-radius: 5px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.3125rem;
   letter-spacing: 0.05em;
   text-decoration: none;
   transition: color 0.3s var(--ease-silk);
@@ -212,11 +215,14 @@ onMounted(() => {
 /* ── CV button ───────────────────────────────────────────────────────────── */
 .nav-cv {
   border: 1px solid var(--line);
-  border-radius: 7px;
-  padding: 7px 12px;
+  border-radius: 0.4375rem;
+  padding: 0.4375rem 0.75rem;
   color: var(--ink);
   text-decoration: none;
-  font-size: 13.5px;
+  font-size: 0.84375rem;
+  background: oklch(100% 0 0 / 3%);
+  backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
   transition:
     border-color 0.3s var(--ease-out-expo),
     background   0.3s var(--ease-out-expo);
@@ -232,9 +238,11 @@ onMounted(() => {
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
-@media (max-width: 760px) {
+@media (max-width: 47.5em) {
   .navlink,
-  .nav-cv {
+  .nav-cv,
+  .avail,
+  .lang {
     display: none;
   }
 }
