@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme inline {
+    /* Stage base surfaces */
+    --color-void:      #0A0C10; /* page background */
+    --color-deep:      #0E1218; /* nested dark surfaces */
+    --color-curtain:   #060708; /* footer curtain, darker than void */
+
+    /* Atmosphere blobs (background ellipses) */
+    --color-teal:      #15414F; /* cold far-field spot */
+    --color-indigo:    #25224A; /* cold far-field spot */
+    --color-warm-haze: #3A2A22; /* warm far-field spot, used sparingly */
+
+    /* Accent — single warm spark */
+    --color-ember:     #D69A6A; /* only accent; never floods large areas */
+
+    /* Text hierarchy */
+    --color-ink:       #E8EAEE; /* primary text */
+    --color-mist:      #8B95A3; /* secondary text */
+    --color-faint:     #5B6573; /* captions, meta, eyebrow labels */
+
+    /* Glass / lines — white-alpha overlays */
+    --color-line:           oklch(100% 0 0 / 10%);  /* main 1px borders */
+    --color-line-soft:      oklch(100% 0 0 / 5.5%); /* thin dividers */
+    --color-glass-fill:     oklch(100% 0 0 / 5%);   /* glass panel fill */
+    --color-glass-fill-hover: oklch(100% 0 0 / 7.5%); /* glass on hover */
+
+    /* Ember-tinted glass */
+    --color-ember-bg:     color-mix(in srgb, #D69A6A 8%,  transparent); /* ember panel tint */
+    --color-ember-border: color-mix(in srgb, #D69A6A 28%, transparent); /* ember border */
+
+    /* ── Spacing / radii ─────────────────────────────────────────────────── */
+    --radius-tag:     6px;
+    --radius-chip:    8px;
+    --radius-viewport: 12px;
+    --radius-card-sm: 16px;  /* approach cards */
+    --radius-card:    18px;  /* work cards */
+    --radius-contact: 20px;
+    --radius-curtain: 22px;  /* curtain top edge */
+
+    /* ── Motion ──────────────────────────────────────────────────────────── */
+    --ease-stage:     cubic-bezier(.2, .7, .2, 1); /* primary easing */
+
+    --duration-reveal:   900ms; /* section fade-in */
+    --duration-magnet:   300ms; /* CTA / link magnet */
+    --duration-tilt:     200ms; /* glass tilt return */
+    --duration-metaball: 240ms; /* cursor-follow inertia */
+    --duration-blob:     450ms; /* blob appear/disappear */
+}
+
+/* Keep bare CSS custom properties in sync for non-Tailwind consumers */
+:root {
+    --void:      var(--color-void);
+    --deep:      var(--color-deep);
+    --curtain:   var(--color-curtain);
+    --teal:      var(--color-teal);
+    --indigo:    var(--color-indigo);
+    --warm-haze: var(--color-warm-haze);
+    --ember:     var(--color-ember);
+    --ink:       var(--color-ink);
+    --mist:      var(--color-mist);
+    --faint:     var(--color-faint);
+
+    --ease-stage: cubic-bezier(.2, .7, .2, 1);
+    --duration-reveal: 900ms;
+    --duration-magnet: 300ms;
+    --duration-tilt: 200ms;
+    --duration-metaball: 240ms;
+    --duration-blob: 450ms;
+
+    --radius-card: 18px;
+    --radius-contact: 20px;
+    --radius-viewport: 12px;
+}
