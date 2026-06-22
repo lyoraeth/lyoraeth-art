@@ -3,16 +3,40 @@ const { t } = useI18n()
 const curtainEl = ref<HTMLElement | null>(null)
 let ro: ResizeObserver | null = null
 
+// Scroll pulls the curtain up from this offset before fully revealing it
+const RESIST = 44
+
+function updateMargin(page: HTMLElement) {
+  if (!curtainEl.value) return
+  page.style.marginBottom = `${curtainEl.value.offsetHeight + RESIST}px`
+}
+
+function updateTranslate() {
+  if (!curtainEl.value) return
+  const scrollY   = window.scrollY
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+  // Zone where resistance plays out: last RESIST px of scroll range
+  const zoneStart = maxScroll - RESIST
+  const progress  = Math.max(0, Math.min(1, (scrollY - zoneStart) / RESIST))
+  curtainEl.value.style.transform = `translateY(${RESIST * (1 - progress)}px)`
+}
+
 onMounted(() => {
   const page = document.querySelector('.page') as HTMLElement | null
   if (!page || !curtainEl.value) return
-  ro = new ResizeObserver(() => {
-    if (curtainEl.value) page.style.marginBottom = `${curtainEl.value.offsetHeight}px`
-  })
+
+  ro = new ResizeObserver(() => updateMargin(page))
   ro.observe(curtainEl.value)
+  updateMargin(page)
+
+  window.addEventListener('scroll', updateTranslate, { passive: true })
+  updateTranslate()
 })
 
-onUnmounted(() => ro?.disconnect())
+onUnmounted(() => {
+  ro?.disconnect()
+  window.removeEventListener('scroll', updateTranslate)
+})
 </script>
 
 <template>
@@ -55,6 +79,7 @@ onUnmounted(() => ro?.disconnect())
   border-top: 1px solid oklch(100% 0 0 / 6%);
   border-radius: var(--radius-curtain) var(--radius-curtain) 0 0;
   box-shadow: inset 0 1.5rem 2.5rem -1.875rem oklch(0% 0 0 / 90%);
+  will-change: transform;
   padding:
     clamp(3.75rem, 9vw, 8.125rem)
     clamp(1.25rem, 0.1538rem + 4.8718vw, 6rem)
