@@ -62,36 +62,11 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
     box-shadow      0.6s var(--ease-silk);
 }
 
-/* Caustic light wash — fades in with the glass state */
-.nav::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 140% 300% at 22% -120%, oklch(100% 0 0 / 8%)  0%, transparent 52%),
-    radial-gradient(ellipse  80% 250% at 82%  200%, oklch(60% 0.03 50 / 5%) 0%, transparent 50%);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  filter: url(#glass-caustic);
-  opacity: 0;
-  transition: opacity 0.6s var(--ease-silk);
-}
-
 .nav--glass {
-  background:
-    linear-gradient(to bottom, oklch(100% 0 0 / 4%) 0%, oklch(100% 0 0 / 0%) 100%),
-    oklch(13% 0.009 235 / 68%);
-  backdrop-filter: blur(22px) saturate(1.55) brightness(1.04);
-  -webkit-backdrop-filter: blur(22px) saturate(1.55) brightness(1.04);
-  border-bottom-color: oklch(100% 0 0 / 13%);
-  /* bottom specular only — full-width bar has no visible side edges */
-  box-shadow:
-    inset 0  0.5px 0 oklch(100% 0 0 / 8%),
-    inset 0 -1.5px 0 oklch(100% 0 0 / 18%);
-}
-
-.nav--glass::before {
-  opacity: 1;
+  background: oklch(13% 0.009 235 / 72%);
+  backdrop-filter: blur(18px) saturate(1.5) brightness(1.03);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5) brightness(1.03);
+  border-bottom-color: var(--line-soft);
 }
 
 .nav-inner {
