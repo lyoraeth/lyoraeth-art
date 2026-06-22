@@ -4,12 +4,10 @@ const switchLocalePath = useSwitchLocalePath()
 const localePath = useLocalePath()
 
 const scrolled = ref(false)
+const onScroll = () => { scrolled.value = window.scrollY > 24 }
 
-onMounted(() => {
-  const onScroll = () => { scrolled.value = window.scrollY > 24 }
-  window.addEventListener('scroll', onScroll, { passive: true })
-  onUnmounted(() => window.removeEventListener('scroll', onScroll))
-})
+onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
 </script>
 
 <template>
