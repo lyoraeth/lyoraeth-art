@@ -167,7 +167,7 @@ onMounted(() => {
 .lang {
   position: relative;
   display: flex;
-  gap: 2px;
+  gap: 0;
   border: 1px solid var(--line);
   border-radius: 7px;
   padding: 2px;
@@ -180,16 +180,16 @@ onMounted(() => {
   top: 2px;
   bottom: 2px;
   left: 2px;
-  width: calc(50% - 3px);
+  width: calc(50% - 2px);
   border-radius: 5px;
   background: var(--ember-bg);
-  transition: transform 0.38s var(--ease-glide);
+  transition: transform 0.26s var(--ease-glide);
   pointer-events: none;
 }
 
-/* slide pill to second button when RU is active */
+/* translateX(100%) = exactly one button width — no gap in the math */
 .lang:has(.lang-btn:nth-child(2).lang-btn--on)::before {
-  transform: translateX(calc(100% + 2px));
+  transform: translateX(100%);
 }
 
 .lang-btn {
