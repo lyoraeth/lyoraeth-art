@@ -36,7 +36,7 @@ useHead({
     <SiteNav />
     <div class="page">
       <Stage />
-      <NuxtPage :transition="{ name: 'page', mode: 'out-in' }" />
+      <NuxtPage />
     </div>
   </div>
 </template>
@@ -61,16 +61,6 @@ body {
   line-height: 1.5;
 }
 
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(6px);
-}
 
 .page {
   position: relative;
