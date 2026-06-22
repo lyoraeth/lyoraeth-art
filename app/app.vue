@@ -66,5 +66,6 @@ body {
   z-index: 1;
   background: var(--void);
   overflow: hidden;
+  min-height: 100svh;
 }
 </style>
