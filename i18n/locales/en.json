@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "work": "Work",
+    "stack": "Stack",
+    "writing": "Writing",
+    "available": "Available",
+    "cv": "CV",
+    "lang_toggle": "Language"
+  },
+
+  "hero": {
+    "eyebrow": "Role · Location · Availability",
+    "name": "Name Surname",
+    "subtitle": "Short tagline — {em} something something {acc}.",
+    "subtitle_em": "emphasized part",
+    "subtitle_acc": "accented part",
+    "meta": [
+      { "label": "Label", "value": "Meta value one" },
+      { "label": "Label", "value": "Meta value two" }
+    ],
+    "scroll": "scroll ↓"
+  },
+
+  "work": {
+    "title": "Work",
+    "subtitle": "project types",
+    "items": [
+      {
+        "kicker": "category · type",
+        "title": "Project title goes here",
+        "desc": "Short project description — what the problem was, what was done, what changed.",
+        "tags": ["tag one", "tag two", "tag three"],
+        "tag_warm": "highlight tag"
+      },
+      {
+        "kicker": "category · type",
+        "title": "Project title goes here",
+        "desc": "Short project description — what the problem was, what was done, what changed.",
+        "tags": ["tag one", "tag two", "tag three"],
+        "tag_warm": "highlight tag"
+      },
+      {
+        "kicker": "category · type",
+        "title": "Project title goes here",
+        "desc": "Short project description — what the problem was, what was done, what changed.",
+        "tags": ["tag one", "tag two", "tag three"],
+        "tag_warm": "highlight tag"
+      }
+    ]
+  },
+
+  "stack": {
+    "title": "Stack",
+    "label": "Tools and technologies",
+    "daily": "Daily",
+    "also": "Also",
+    "chips": {
+      "daily": [
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used", "warm": true },
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used" }
+      ],
+      "also": [
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used" },
+        { "name": "Tool name", "tip": "short note on how it's used" }
+      ]
+    }
+  },
+
+  "approach": {
+    "title": "How I work",
+    "steps": [
+      {
+        "num": "01",
+        "name": "step name",
+        "title": "Step title",
+        "desc": "Short description of this step in the process."
+      },
+      {
+        "num": "02",
+        "name": "step name",
+        "title": "Step title",
+        "desc": "Short description of this step in the process."
+      },
+      {
+        "num": "03",
+        "name": "step name",
+        "title": "Step title",
+        "desc": "Short description of this step in the process."
+      }
+    ]
+  },
+
+  "writing": {
+    "title": "Writing",
+    "see_all": "See all posts",
+    "read": "Read",
+    "min": "{n} min"
+  },
+
+  "contact": {
+    "heading": "Heading",
+    "heading_before_acc": "",
+    "heading_acc": "accented part.",
+    "lead": "A line or two about how to get in touch and what for.",
+    "cta": "Primary CTA",
+    "form_label": "or use the form",
+    "contact_placeholder": "Your contact",
+    "message_placeholder": "Your message",
+    "submit": "Send →",
+    "note_demo": "demo only",
+    "github": "GitHub",
+    "github_handle": "/handle",
+    "cv": "CV",
+    "cv_note": "pdf ↓"
+  },
+
+  "seo": {
+    "title": "Page title",
+    "description": "Page description for search engines.",
+    "og_title": "Open Graph title",
+    "og_description": "Open Graph description."
+  },
+
+  "footer": {
+    "copyright": "© 2026 Name Surname",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "hint": "keep scrolling ↓"
+  },
+
+  "curtain": {
+    "closing": "Closing line ",
+    "closing_acc": "accented part.",
+    "type_label": "Type",
+    "type_value": "Font names here",
+    "built_label": "Built",
+    "built_value": "how it was built",
+    "trackers_label": "Trackers",
+    "trackers_value": "none",
+    "lang_label": "Lang",
+    "lang_value": "EN · RU"
+  }
+}
