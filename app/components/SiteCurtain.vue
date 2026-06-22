@@ -1,24 +1,34 @@
 <script setup lang="ts">
 const { t } = useI18n()
+const { $lenis } = useNuxtApp() as any
+
 const curtainEl = ref<HTMLElement | null>(null)
 let ro: ResizeObserver | null = null
-
-// Scroll pulls the curtain up from this offset before fully revealing it
-const RESIST = 44
+let held = false
+const HOLD_MS = 350
 
 function updateMargin(page: HTMLElement) {
   if (!curtainEl.value) return
-  page.style.marginBottom = `${curtainEl.value.offsetHeight + RESIST}px`
+  page.style.marginBottom = `${curtainEl.value.offsetHeight}px`
 }
 
-function updateTranslate() {
+function onScroll() {
   if (!curtainEl.value) return
   const scrollY   = window.scrollY
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-  // Zone where resistance plays out: last RESIST px of scroll range
-  const zoneStart = maxScroll - RESIST
-  const progress  = Math.max(0, Math.min(1, (scrollY - zoneStart) / RESIST))
-  curtainEl.value.style.transform = `translateY(${RESIST * (1 - progress)}px)`
+  const threshold = maxScroll - curtainEl.value.offsetHeight
+
+  // reset if scrolled back above the curtain zone
+  if (scrollY < threshold - 40) {
+    held = false
+    return
+  }
+
+  if (!held && scrollY >= threshold) {
+    held = true
+    $lenis?.stop()
+    setTimeout(() => $lenis?.start(), HOLD_MS)
+  }
 }
 
 onMounted(() => {
@@ -29,13 +39,12 @@ onMounted(() => {
   ro.observe(curtainEl.value)
   updateMargin(page)
 
-  window.addEventListener('scroll', updateTranslate, { passive: true })
-  updateTranslate()
+  window.addEventListener('scroll', onScroll, { passive: true })
 })
 
 onUnmounted(() => {
   ro?.disconnect()
-  window.removeEventListener('scroll', updateTranslate)
+  window.removeEventListener('scroll', onScroll)
 })
 </script>
 
@@ -79,7 +88,6 @@ onUnmounted(() => {
   border-top: 1px solid oklch(100% 0 0 / 6%);
   border-radius: var(--radius-curtain) var(--radius-curtain) 0 0;
   box-shadow: inset 0 1.5rem 2.5rem -1.875rem oklch(0% 0 0 / 90%);
-  will-change: transform;
   padding:
     clamp(3.75rem, 9vw, 8.125rem)
     clamp(1.25rem, 0.1538rem + 4.8718vw, 6rem)
