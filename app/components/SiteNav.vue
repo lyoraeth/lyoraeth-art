@@ -53,8 +53,7 @@ const localePath = useLocalePath()
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* clamp(20px, 5vw, 96px) — min: 20px @ ~400px vw, max: 96px @ ~1920px vw */
-  padding: 18px clamp(20px, 5vw, 96px);
+  padding: 18px clamp(1.25rem, 0.1538rem + 4.8718vw, 6rem);
 }
 
 .brand {
