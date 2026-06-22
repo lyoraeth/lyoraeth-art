@@ -2,10 +2,18 @@
 const { t, locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 const localePath = useLocalePath()
+
+const scrolled = ref(false)
+
+onMounted(() => {
+  const onScroll = () => { scrolled.value = window.scrollY > 24 }
+  window.addEventListener('scroll', onScroll, { passive: true })
+  onUnmounted(() => window.removeEventListener('scroll', onScroll))
+})
 </script>
 
 <template>
-  <nav class="nav">
+  <nav class="nav" :class="{ 'nav--glass': scrolled }">
     <div class="nav-inner">
       <NuxtLink :to="localePath('/')" class="brand">
         <img src="/logo.svg" alt="lyoraeth" class="brand-logo" />
@@ -41,21 +49,35 @@ const localePath = useLocalePath()
 </template>
 
 <style scoped>
+/* ── Nav shell ───────────────────────────────────────────────────────────── */
 .nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 50;
+  border-bottom: 1px solid transparent;
+  transition:
+    background 0.5s ease,
+    backdrop-filter 0.5s ease,
+    border-color 0.5s ease;
+}
+
+.nav--glass {
+  background: oklch(100% 0 0 / 2.5%);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border-bottom-color: var(--line);
 }
 
 .nav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px clamp(1.25rem, 0.1538rem + 4.8718vw, 6rem);
+  padding: 18px clamp(20px, 5vw, 96px);
 }
 
+/* ── Brand logo ──────────────────────────────────────────────────────────── */
 .brand {
   display: flex;
   align-items: center;
@@ -67,8 +89,14 @@ const localePath = useLocalePath()
   height: 11px;
   width: auto;
   display: block;
+  transition: opacity 0.2s ease;
 }
 
+.brand:hover .brand-logo {
+  opacity: 0.65;
+}
+
+/* ── Nav links ───────────────────────────────────────────────────────────── */
 .nav-links {
   display: flex;
   gap: 24px;
@@ -76,15 +104,37 @@ const localePath = useLocalePath()
 }
 
 .navlink {
+  position: relative;
   color: var(--mist);
   text-decoration: none;
   font-size: 13.5px;
+  padding-bottom: 3px;
+  transition: color 0.22s ease;
+}
+
+/* ember underline — slides in from left on hover */
+.navlink::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--ember);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.28s var(--ease-stage);
 }
 
 .navlink:hover {
   color: var(--ink);
 }
 
+.navlink:hover::after {
+  transform: scaleX(1);
+}
+
+/* ── Available indicator ─────────────────────────────────────────────────── */
 .avail {
   display: flex;
   align-items: center;
@@ -92,6 +142,7 @@ const localePath = useLocalePath()
   color: var(--mist);
   text-decoration: none;
   font-size: 13.5px;
+  transition: color 0.22s ease;
 }
 
 .avail:hover {
@@ -104,14 +155,41 @@ const localePath = useLocalePath()
   border-radius: 50%;
   background: var(--ember);
   flex-shrink: 0;
+  animation: pulse 2.8s ease-in-out infinite;
 }
 
+@keyframes pulse {
+  0%, 100% { opacity: 1;    transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ── Lang switcher — sliding pill ───────────────────────────────────────── */
 .lang {
+  position: relative;
   display: flex;
   gap: 2px;
   border: 1px solid var(--line);
   border-radius: 7px;
   padding: 2px;
+}
+
+/* the pill that slides between EN and RU */
+.lang::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc(50% - 3px);
+  border-radius: 5px;
+  background: var(--ember-bg);
+  transition: transform 0.3s var(--ease-stage);
+  pointer-events: none;
+}
+
+/* slide pill to second button when RU is active */
+.lang:has(.lang-btn:nth-child(2).lang-btn--on)::before {
+  transform: translateX(calc(100% + 2px));
 }
 
 .lang-btn {
@@ -122,13 +200,16 @@ const localePath = useLocalePath()
   border-radius: 5px;
   letter-spacing: 0.05em;
   text-decoration: none;
+  transition: color 0.25s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .lang-btn--on {
   color: var(--ink);
-  background: var(--ember-bg);
 }
 
+/* ── CV button ───────────────────────────────────────────────────────────── */
 .nav-cv {
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -136,13 +217,26 @@ const localePath = useLocalePath()
   color: var(--ink);
   text-decoration: none;
   font-size: 13.5px;
+  transition:
+    border-color 0.22s ease,
+    background   0.22s ease,
+    box-shadow   0.22s ease,
+    transform    0.12s ease;
 }
 
 .nav-cv:hover {
   border-color: var(--ember-border);
   background: var(--ember-bg);
+  box-shadow:
+    0 0 0 1px var(--ember-border),
+    0 0 16px color-mix(in srgb, var(--ember) 12%, transparent);
 }
 
+.nav-cv:active {
+  transform: scale(0.95);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 760px) {
   .navlink,
   .nav-cv {
