@@ -50,17 +50,33 @@
 
 /* Keep bare CSS custom properties in sync for non-Tailwind consumers */
 :root {
+    /* Surfaces */
     --void:      var(--color-void);
     --deep:      var(--color-deep);
     --curtain:   var(--color-curtain);
+
+    /* Atmosphere */
     --teal:      var(--color-teal);
     --indigo:    var(--color-indigo);
     --warm-haze: var(--color-warm-haze);
+
+    /* Accent */
     --ember:     var(--color-ember);
+
+    /* Text */
     --ink:       var(--color-ink);
     --mist:      var(--color-mist);
     --faint:     var(--color-faint);
 
+    /* Glass / lines */
+    --line:           var(--color-line);
+    --line-soft:      var(--color-line-soft);
+    --glass-fill:     var(--color-glass-fill);
+    --glass-fill-hover: var(--color-glass-fill-hover);
+    --ember-bg:       var(--color-ember-bg);
+    --ember-border:   var(--color-ember-border);
+
+    /* Motion */
     --ease-stage: cubic-bezier(.2, .7, .2, 1);
     --duration-reveal: 900ms;
     --duration-magnet: 300ms;
@@ -68,7 +84,4 @@
     --duration-metaball: 240ms;
     --duration-blob: 450ms;
 
-    --radius-card: 18px;
-    --radius-contact: 20px;
-    --radius-viewport: 12px;
 }
