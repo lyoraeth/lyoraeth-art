@@ -45,9 +45,11 @@ useHead({
     <Grain />
     <SiteNav />
     <MobileDock />
+    <SiteCurtain />
     <div class="page">
       <Stage />
       <NuxtPage />
+      <SiteFooter />
     </div>
   </div>
 </template>
@@ -79,5 +81,7 @@ body {
   background: var(--void);
   overflow: hidden;
   min-height: 100svh;
+  /* scroll offset — shows void background before curtain starts revealing */
+  padding-bottom: clamp(2rem, 4vw, 3.5rem);
 }
 </style>
