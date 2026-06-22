@@ -39,7 +39,11 @@
     --radius-curtain: 22px;  /* curtain top edge */
 
     /* ── Motion ──────────────────────────────────────────────────────────── */
-    --ease-stage:     cubic-bezier(.2, .7, .2, 1); /* primary easing */
+    --ease-stage:     cubic-bezier(.2, .7, .2, 1);       /* blobs, large ambient motion */
+    --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);    /* hover-in, reveals — snappy settle */
+    --ease-in-expo:   cubic-bezier(0.7, 0, 0.84, 0);    /* hover-out, exits — smooth fade */
+    --ease-silk:      cubic-bezier(0.25, 0, 0, 1);       /* color, opacity — ultra-smooth decel */
+    --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1); /* interactive feedback — slight overshoot */
 
     --duration-reveal:   900ms; /* section fade-in */
     --duration-magnet:   300ms; /* CTA / link magnet */

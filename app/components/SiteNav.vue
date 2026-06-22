@@ -58,9 +58,9 @@ onMounted(() => {
   z-index: 50;
   border-bottom: 1px solid transparent;
   transition:
-    background 0.5s ease,
-    backdrop-filter 0.5s ease,
-    border-color 0.5s ease;
+    background      0.6s var(--ease-silk),
+    backdrop-filter 0.6s var(--ease-silk),
+    border-color    0.6s var(--ease-silk);
 }
 
 .nav--glass {
@@ -89,11 +89,11 @@ onMounted(() => {
   height: 11px;
   width: auto;
   display: block;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s var(--ease-silk);
 }
 
 .brand:hover .brand-logo {
-  opacity: 0.65;
+  opacity: 0.85;
 }
 
 /* ── Nav links ───────────────────────────────────────────────────────────── */
@@ -109,7 +109,7 @@ onMounted(() => {
   text-decoration: none;
   font-size: 13.5px;
   padding-bottom: 3px;
-  transition: color 0.22s ease;
+  transition: color 0.3s var(--ease-silk);
 }
 
 /* ember underline — slides in from left on hover */
@@ -123,7 +123,7 @@ onMounted(() => {
   background: var(--ember);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.28s var(--ease-stage);
+  transition: transform 0.35s var(--ease-out-expo);
 }
 
 .navlink:hover {
@@ -142,7 +142,7 @@ onMounted(() => {
   color: var(--mist);
   text-decoration: none;
   font-size: 13.5px;
-  transition: color 0.22s ease;
+  transition: color 0.3s var(--ease-silk);
 }
 
 .avail:hover {
@@ -160,7 +160,7 @@ onMounted(() => {
 
 @keyframes pulse {
   0%, 100% { opacity: 1;    transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.75); }
+  50%       { opacity: 0.8; transform: scale(0.9); }
 }
 
 /* ── Lang switcher — sliding pill ───────────────────────────────────────── */
@@ -183,7 +183,7 @@ onMounted(() => {
   width: calc(50% - 3px);
   border-radius: 5px;
   background: var(--ember-bg);
-  transition: transform 0.3s var(--ease-stage);
+  transition: transform 0.38s var(--ease-spring);
   pointer-events: none;
 }
 
@@ -200,7 +200,7 @@ onMounted(() => {
   border-radius: 5px;
   letter-spacing: 0.05em;
   text-decoration: none;
-  transition: color 0.25s ease;
+  transition: color 0.3s var(--ease-silk);
   position: relative;
   z-index: 1;
 }
@@ -218,22 +218,17 @@ onMounted(() => {
   text-decoration: none;
   font-size: 13.5px;
   transition:
-    border-color 0.22s ease,
-    background   0.22s ease,
-    box-shadow   0.22s ease,
-    transform    0.12s ease;
+    border-color 0.3s var(--ease-out-expo),
+    background   0.3s var(--ease-out-expo);
 }
 
 .nav-cv:hover {
   border-color: var(--ember-border);
   background: var(--ember-bg);
-  box-shadow:
-    0 0 0 1px var(--ember-border),
-    0 0 16px color-mix(in srgb, var(--ember) 12%, transparent);
 }
 
 .nav-cv:active {
-  transform: scale(0.95);
+  background: color-mix(in srgb, var(--ember) 18%, transparent);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
