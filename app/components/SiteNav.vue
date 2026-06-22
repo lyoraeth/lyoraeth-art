@@ -183,7 +183,7 @@ onMounted(() => {
   width: calc(50% - 3px);
   border-radius: 5px;
   background: var(--ember-bg);
-  transition: transform 0.38s var(--ease-spring);
+  transition: transform 0.38s var(--ease-glide);
   pointer-events: none;
 }
 
