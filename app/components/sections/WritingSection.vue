@@ -1,66 +1,28 @@
 <script setup lang="ts">
-/**
- * Writing section — placeholder data until API is wired.
- * Posts will be fetched per-locale and displayed with full pagination on /writing/*.
- * The featured post + 2 mini cards shown here represent the 3 most recent.
- */
+import type { PostItem } from '../../server/api/posts.get'
+
 const { t, locale } = useI18n()
 
-interface Post {
-  slug: string
-  date: string
-  readMin: number
-  title: { en: string; ru: string }
-  tags: string[]
+const { data: posts } = await useFetch('/api/posts', { default: () => [] as PostItem[] })
+
+const featured  = computed(() => posts.value[0] ?? null)
+const secondary = computed(() => posts.value.slice(1))
+
+function postTitle(post: PostItem) {
+  return locale.value === 'ru' && post.title.ru ? post.title.ru : post.title.en
 }
 
-const posts: Post[] = [
-  {
-    slug: 'dvh-fix',
-    date: '25.03.2026',
-    readMin: 5,
-    title: {
-      en: 'Why dvh is unreliable, and how I fixed it',
-      ru: 'Почему dvh ненадёжен и как я это починил',
-    },
-    tags: ['mobile', 'viewport', 'css'],
-  },
-  {
-    slug: 'design-system-no-build',
-    date: '18.02.2026',
-    readMin: 7,
-    title: {
-      en: 'A design system on a site with no build step',
-      ru: 'Дизайн-система на сайте без сборки',
-    },
-    tags: [],
-  },
-  {
-    slug: 'vue2-onboarding',
-    date: '19.06.2026',
-    readMin: 4,
-    title: {
-      en: 'Onboarding myself onto Vue 2 / Node 12 in three hours',
-      ru: 'Самостоятельный онбординг на Vue 2 / Node 12 за три часа',
-    },
-    tags: [],
-  },
-]
-
-const featured  = posts[0]
-const secondary = posts.slice(1)
-
-function postTitle(post: Post) {
-  return locale.value === 'ru' ? post.title.ru : post.title.en
+function formatDate(iso: string) {
+  const d = new Date(iso)
+  return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`
 }
 
-/* ── Template refs (shared between reveal + glow) ── */
+/* ── Template refs ── */
 const headRef = ref<HTMLElement | null>(null)
 const featRef = ref<HTMLElement | null>(null)
 const mini0   = ref<HTMLElement | null>(null)
 const mini1   = ref<HTMLElement | null>(null)
 
-/* ── Scroll reveal ── */
 const { observe } = useReveal()
 onMounted(() => {
   observe(headRef.value)
@@ -69,7 +31,6 @@ onMounted(() => {
   observe(mini1.value)
 })
 
-/* ── Glow cards ── */
 useGlowCard(featRef)
 useGlowCard(mini0)
 useGlowCard(mini1)
@@ -81,7 +42,7 @@ useGlowCard(mini1)
       <h2>{{ t('writing.title') }}</h2>
     </div>
 
-    <div class="writing-wrap">
+    <div v-if="featured" class="writing-wrap">
       <!-- Featured post -->
       <a
         :href="`/writing/${featured.slug}`"
@@ -91,24 +52,27 @@ useGlowCard(mini1)
         <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div><div class="glare-blob-2"></div></div></div>
 
         <div class="feat-thumb">
-          <svg viewBox="0 0 300 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <line x1="30" y1="200" x2="280" y2="200" stroke="#fff" stroke-opacity=".12"/>
-            <line x1="30" y1="40"  x2="30"  y2="200" stroke="#fff" stroke-opacity=".12"/>
-            <polyline points="30,150 70,90 90,150 120,70 150,160 180,80 210,150 250,100"
-              fill="none" stroke="#8B95A3" stroke-width="2" stroke-opacity=".5"/>
-            <polyline points="30,120 280,120"
-              fill="none" stroke="#D69A6A" stroke-width="2"/>
-            <text x="240" y="114" font-family="monospace" font-size="9" fill="#D69A6A">--real-vh</text>
-            <text x="180" y="64"  font-family="monospace" font-size="9" fill="#8B95A3">dvh</text>
+          <img
+            v-if="featured.coverUrl"
+            :src="featured.coverUrl"
+            alt=""
+            class="feat-thumb-img"
+            loading="lazy"
+            draggable="false"
+          />
+          <svg v-else viewBox="0 0 300 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <line x1="30" y1="200" x2="280" y2="200" stroke="#fff" stroke-opacity=".08"/>
+            <line x1="30" y1="40"  x2="30"  y2="200" stroke="#fff" stroke-opacity=".08"/>
+            <polyline points="30,160 80,100 130,140 180,80 230,120 280,70"
+              fill="none" stroke="#8B95A3" stroke-width="1.5" stroke-opacity=".35"/>
           </svg>
-          <span class="feat-thumb-caption mono">fig.01 — dvh vs --real-vh</span>
         </div>
 
         <div class="feat-body">
           <div class="feat-meta">
-            <span class="mono feat-date">{{ featured.date }}</span>
+            <span class="mono feat-date">{{ formatDate(featured.publishedAt) }}</span>
             <span class="feat-dot"></span>
-            <span class="mono">{{ t('writing.min', { n: featured.readMin }) }}</span>
+            <span class="mono">{{ t('writing.min', { n: featured.readingTime }) }}</span>
           </div>
           <h3 class="feat-title">{{ postTitle(featured) }}</h3>
           <div class="feat-tags">
@@ -124,16 +88,16 @@ useGlowCard(mini1)
       <div class="more-writing">
         <a
           v-for="(post, i) in secondary"
-          :key="post.slug"
+          :key="post._id"
           :href="`/writing/${post.slug}`"
           class="mini-card glass-card reveal rv-d2"
           :ref="(el) => { if (i === 0) mini0 = el as HTMLElement | null; else mini1 = el as HTMLElement | null }"
         >
           <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div></div></div>
           <div class="mini-meta">
-            <span class="mono mini-date">{{ post.date }}</span>
+            <span class="mono mini-date">{{ formatDate(post.publishedAt) }}</span>
             <span class="mini-dot"></span>
-            <span class="mono">{{ t('writing.min', { n: post.readMin }) }}</span>
+            <span class="mono">{{ t('writing.min', { n: post.readingTime }) }}</span>
           </div>
           <span class="mini-title">{{ postTitle(post) }}</span>
           <span class="mini-read">
@@ -142,6 +106,9 @@ useGlowCard(mini1)
         </a>
       </div>
     </div>
+
+    <!-- Empty state while Sanity is not yet configured -->
+    <p v-else class="empty-state">{{ t('writing.title') }}</p>
   </section>
 </template>
 
@@ -149,11 +116,14 @@ useGlowCard(mini1)
 .section-writing {
   padding: clamp(4.375rem, 9vw, 8.75rem) 0;
 }
-
 .writing-wrap {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+.empty-state {
+  color: var(--faint);
+  font-size: 0.875rem;
 }
 
 /* ── Featured post ─────────────────────────────────────────────────────────── */
@@ -164,9 +134,7 @@ useGlowCard(mini1)
   text-decoration: none;
   color: inherit;
 }
-.feat:hover {
-  border-color: oklch(72% 0.1 58 / 30%);
-}
+.feat:hover { border-color: oklch(72% 0.1 58 / 30%); }
 
 .feat-thumb {
   position: relative;
@@ -182,14 +150,13 @@ useGlowCard(mini1)
   width: 100%;
   height: 100%;
 }
-.feat-thumb-caption {
+.feat-thumb-img {
   position: absolute;
-  left: 1rem;
-  bottom: 0.875rem;
-  font-size: 0.65625rem;
-  color: var(--faint);
-  letter-spacing: 0.1em;
-  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .feat-body {
@@ -209,8 +176,7 @@ useGlowCard(mini1)
 }
 .feat-date { font-size: 0.6875rem; }
 .feat-dot {
-  width: 3px;
-  height: 3px;
+  width: 3px; height: 3px;
   border-radius: 50%;
   background: var(--faint);
   flex-shrink: 0;
@@ -250,13 +216,12 @@ useGlowCard(mini1)
 }
 .feat:hover .feat-arrow { transform: translateX(0.3125rem); }
 
-/* ── Secondary (mini) cards ────────────────────────────────────────────────── */
+/* ── Mini cards ────────────────────────────────────────────────────────────── */
 .more-writing {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
-
 .mini-card {
   display: flex;
   flex-direction: column;
@@ -265,7 +230,6 @@ useGlowCard(mini1)
   border-radius: var(--radius-card-sm);
   text-decoration: none;
   color: inherit;
-  /* opacity included so .reveal transition isn't overridden by scoped specificity */
   transition:
     opacity      var(--duration-reveal) var(--ease-out-expo),
     transform    0.25s var(--ease-out-expo),
@@ -275,7 +239,6 @@ useGlowCard(mini1)
   border-color: oklch(72% 0.1 58 / 30%);
   transform: translateY(-0.1875rem);
 }
-
 .mini-meta {
   display: flex;
   gap: 0.625rem;
@@ -286,8 +249,7 @@ useGlowCard(mini1)
 }
 .mini-date { font-size: 0.65625rem; }
 .mini-dot {
-  width: 3px;
-  height: 3px;
+  width: 3px; height: 3px;
   border-radius: 50%;
   background: var(--faint);
   flex-shrink: 0;
@@ -316,17 +278,12 @@ useGlowCard(mini1)
 }
 .mini-card:hover .mini-arrow { transform: translateX(0.25rem); }
 
-/* ── Responsive ────────────────────────────────────────────────────────────── */
 @media (max-width: 42.5em) {
-  .feat {
-    grid-template-columns: 1fr;
-  }
+  .feat { grid-template-columns: 1fr; }
   .feat-thumb {
     min-height: 9.375rem;
     border-radius: var(--radius-card) var(--radius-card) 0 0;
   }
-  .more-writing {
-    grid-template-columns: 1fr;
-  }
+  .more-writing { grid-template-columns: 1fr; }
 }
 </style>
