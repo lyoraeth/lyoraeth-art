@@ -9,12 +9,11 @@ export default defineNuxtConfig({
     sanityProjectId: process.env.NUXT_SANITY_PROJECT_ID ?? '',
     sanityDataset:   process.env.NUXT_SANITY_DATASET   ?? 'production',
     sanityToken:     process.env.NUXT_SANITY_TOKEN     ?? '',
-  },
-
-  nitro: {
-    storage: {
-      ratings: { driver: 'fs', base: './.data/ratings' },
-    },
+    mailerHost:      process.env.NUXT_MAILER_HOST      ?? '',
+    mailerPort:      process.env.NUXT_MAILER_PORT      ?? '587',
+    mailerUser:      process.env.NUXT_MAILER_USER      ?? '',
+    mailerPass:      process.env.NUXT_MAILER_PASS      ?? '',
+    mailerTo:        process.env.NUXT_MAILER_TO        ?? '',
   },
 
   vite: {

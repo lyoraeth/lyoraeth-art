@@ -1,10 +1,30 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
-const note = ref('')
+const contact = ref('')
+const message = ref('')
+const token   = ref('')
 
-function onSubmit() {
-  note.value = t('contact.note_demo')
+type State = 'idle' | 'loading' | 'success' | 'error'
+const state  = ref<State>('idle')
+const errMsg = ref('')
+
+async function onSubmit() {
+  if (!contact.value.trim() || !message.value.trim() || !token.value) return
+  state.value = 'loading'
+  errMsg.value = ''
+  try {
+    await $fetch('/api/contact', {
+      method: 'POST',
+      body: { token: token.value, contact: contact.value, message: message.value },
+    })
+    state.value = 'success'
+    contact.value = message.value = token.value = ''
+  } catch (e: any) {
+    errMsg.value = e?.data?.message ?? t('contact.error')
+    state.value = 'error'
+    token.value = ''
+  }
 }
 
 /* ── Glow card ── */
@@ -54,24 +74,36 @@ onMounted(() => observe(cardEl.value))
       </div>
 
       <!-- Right: form -->
-      <form class="contact-form" @submit.prevent="onSubmit">
-        <span class="eyebrow form-label">{{ t('contact.form_label') }}</span>
-        <input
-          type="text"
-          name="contact"
-          :placeholder="t('contact.contact_placeholder')"
-          autocomplete="off"
-          required
-        >
-        <textarea
-          name="msg"
-          rows="3"
-          :placeholder="t('contact.message_placeholder')"
-          required
-        ></textarea>
-        <button type="submit">{{ t('contact.submit') }}</button>
-        <p class="form-note mono" aria-live="polite">{{ note }}</p>
-      </form>
+      <div class="contact-form-wrap">
+        <div v-if="state === 'success'" class="form-success">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          {{ t('contact.success') }}
+          <button class="form-again" @click="state = 'idle'">{{ t('contact.send_another') }}</button>
+        </div>
+
+        <form v-else class="contact-form" @submit.prevent="onSubmit">
+          <span class="eyebrow form-label">{{ t('contact.form_label') }}</span>
+          <input
+            v-model="contact"
+            type="text"
+            :placeholder="t('contact.contact_placeholder')"
+            autocomplete="off"
+            required
+          >
+          <textarea
+            v-model="message"
+            rows="3"
+            :placeholder="t('contact.message_placeholder')"
+            required
+          ></textarea>
+          <NuxtTurnstile v-model="token" class="form-turnstile" />
+          <p v-if="state === 'error'" class="form-err" aria-live="polite">{{ errMsg }}</p>
+          <button type="submit" :disabled="state === 'loading' || !token">
+            <span v-if="state === 'loading'" class="loading-dot"></span>
+            <span v-else>{{ t('contact.submit') }}</span>
+          </button>
+        </form>
+      </div>
     </div>
   </section>
 </template>
@@ -191,11 +223,13 @@ onMounted(() => observe(cardEl.value))
 }
 
 /* ── Form ───────────────────────────────────────────────────────────────────── */
-.contact-form {
+.contact-form-wrap {
   position: relative;
   z-index: 2;
   border-left: 1px solid var(--line-soft);
   padding-left: clamp(0px, 2.5vw, 2rem);
+}
+.contact-form {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -259,11 +293,45 @@ onMounted(() => observe(cardEl.value))
   color: var(--ink);
 }
 
-.form-note {
-  font-size: 0.65625rem;
+.form-turnstile { margin-bottom: 0.25rem; }
+
+.form-err {
+  font-size: 0.8125rem;
+  color: oklch(65% 0.14 270);
+  margin: 0;
+}
+
+.contact-form button:disabled { opacity: 0.5; cursor: default; }
+
+.loading-dot {
+  display: inline-block;
+  width: 0.5rem; height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  animation: blink 0.8s ease-in-out infinite alternate;
+}
+@keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
+
+.form-success {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: oklch(72% 0.12 150);
+  font-size: 0.9375rem;
+  padding: 1rem 0;
+}
+.form-success svg { width: 1.5rem; height: 1.5rem; }
+
+.form-again {
   color: var(--faint);
-  min-height: 0.875rem;
-  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  font-family: inherit;
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────────────── */
@@ -271,7 +339,7 @@ onMounted(() => observe(cardEl.value))
   .contact-card {
     grid-template-columns: 1fr;
   }
-  .contact-form {
+  .contact-form-wrap {
     border-left: none;
     padding-left: 0;
     border-top: 1px solid var(--line-soft);
