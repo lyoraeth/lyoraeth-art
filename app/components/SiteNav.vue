@@ -6,6 +6,26 @@ const route = useRoute()
 
 const switchLocalePath = (code: string) => switchLocalePathRaw(code).split('#')[0] || '/'
 
+const { data: statusData } = useFetch('/api/status', { default: () => ({ availability: 'available' }) })
+const availability = computed(() => statusData.value?.availability ?? 'available')
+
+const DOT_COLORS: Record<string, string> = {
+  available:   '#D69A6A',           /* ember — оригинальный акцент */
+  part_time:   'oklch(78% 0.1 88)', /* тёплый золотисто-жёлтый */
+  busy:        'oklch(58% 0.12 22)',/* тёплый rust/кирпич */
+  unavailable: '#5B6573',           /* var(--faint) — приглушённый серый */
+}
+const DOT_ANIMATION: Record<string, string> = {
+  available:   'pulse 2.8s ease-in-out infinite',
+  part_time:   'pulse 4.5s ease-in-out infinite',
+  busy:        'none',
+  unavailable: 'none',
+}
+const dotStyle = computed(() => ({
+  background: DOT_COLORS[availability.value] ?? DOT_COLORS.available,
+  animation:  DOT_ANIMATION[availability.value] ?? 'none',
+}))
+
 const isHome = computed(() => {
   const home = localePath('/')
   return route.path === home || route.path === home.replace(/\/$/, '')
@@ -37,8 +57,8 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <NuxtLink :to="navTo('writing', '/writing')" class="navlink">{{ t('nav.writing') }}</NuxtLink>
 
         <NuxtLink :to="navTo('contact')" class="avail">
-          <span class="avail-dot" aria-hidden="true" />
-          <span>{{ t('nav.available') }}</span>
+          <span class="avail-dot" :style="dotStyle" aria-hidden="true" />
+          <span>{{ t(`nav.status.${availability}`) }}</span>
         </NuxtLink>
 
         <div class="lang" role="group" :aria-label="t('nav.lang_toggle')">
@@ -168,9 +188,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   width: 0.375rem;
   height: 0.375rem;
   border-radius: 50%;
-  background: var(--ember);
   flex-shrink: 0;
-  animation: pulse 2.8s ease-in-out infinite;
 }
 
 @keyframes pulse {

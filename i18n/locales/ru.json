@@ -4,6 +4,12 @@
     "stack": "Стек",
     "writing": "Блог",
     "available": "Свободен",
+    "status": {
+      "available":   "Свободен",
+      "part_time":   "Частично",
+      "busy":        "Занят",
+      "unavailable": "Недоступен"
+    },
     "contact": "Контакт",
     "cv": "CV",
     "lang_toggle": "Язык"
@@ -131,6 +137,7 @@
     "success": "Сообщение отправлено — спасибо!",
     "send_another": "Отправить ещё",
     "error": "Что-то пошло не так",
+    "privacy": "Отправляя форму, вы соглашаетесь с нашей политикой конфиденциальности.",
     "github": "GitHub",
     "github_handle": "/username",
     "cv": "CV",

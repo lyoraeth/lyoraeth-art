@@ -4,6 +4,12 @@
     "stack": "Stack",
     "writing": "Writing",
     "available": "Available",
+    "status": {
+      "available":   "Available",
+      "part_time":   "Part-time",
+      "busy":        "Busy",
+      "unavailable": "Unavailable"
+    },
     "contact": "Contact",
     "cv": "CV",
     "lang_toggle": "Language"
@@ -153,6 +159,7 @@
     "success": "Message sent — thanks!",
     "send_another": "Send another",
     "error": "Something went wrong",
+    "privacy": "By submitting you agree to our Privacy Policy.",
     "github": "GitHub",
     "github_handle": "/username",
     "cv": "CV",
