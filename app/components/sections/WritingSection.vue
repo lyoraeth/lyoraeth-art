@@ -92,7 +92,7 @@ useGlowCard(mini1)
           :key="post._id"
           :href="`/writing/${post.slug}`"
           class="mini-card glass-card reveal rv-d2"
-          :ref="(el) => { if (i === 0) mini0.value = el as HTMLElement | null; else mini1.value = el as HTMLElement | null }"
+          :ref="(el) => { if (i === 0) mini0 = el as HTMLElement | null; else mini1 = el as HTMLElement | null }"
           @click.prevent="navigateTo(`/writing/${post.slug}`)"
         >
           <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div></div></div>

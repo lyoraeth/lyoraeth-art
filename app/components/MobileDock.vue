@@ -1,8 +1,10 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
-const switchLocalePath = useSwitchLocalePath()
+const switchLocalePathRaw = useSwitchLocalePath()
 const localePath = useLocalePath()
 const route = useRoute()
+
+const switchLocalePath = (code: string) => switchLocalePathRaw(code).split('#')[0] || '/'
 
 const isHome = computed(() => {
   const home = localePath('/')
