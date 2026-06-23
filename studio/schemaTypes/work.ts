@@ -58,6 +58,19 @@ export default defineType({
       type: 'url',
     }),
     defineField({
+      name: 'year',
+      title: 'Year',
+      type: 'number',
+      description: 'e.g. 2025',
+    }),
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      description: 'URL identifier — generate from title',
+      options: { source: 'title.en', maxLength: 80 },
+    }),
+    defineField({
       name: 'order',
       title: 'Sort order',
       type: 'number',

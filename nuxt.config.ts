@@ -8,6 +8,13 @@ export default defineNuxtConfig({
   runtimeConfig: {
     sanityProjectId: process.env.NUXT_SANITY_PROJECT_ID ?? '',
     sanityDataset:   process.env.NUXT_SANITY_DATASET   ?? 'production',
+    sanityToken:     process.env.NUXT_SANITY_TOKEN     ?? '',
+  },
+
+  nitro: {
+    storage: {
+      ratings: { driver: 'fs', base: './.data/ratings' },
+    },
   },
 
   vite: {
@@ -43,7 +50,11 @@ export default defineNuxtConfig({
     { path: '~/components/sections', pathPrefix: false },
   ],
 
-  modules: ["@nuxtjs/google-fonts", "@nuxtjs/i18n"],
+  modules: ["@nuxtjs/google-fonts", "@nuxtjs/i18n", "@nuxtjs/turnstile"],
+
+  turnstile: {
+    siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA',
+  },
 
   googleFonts: {
     families: {
@@ -62,7 +73,7 @@ export default defineNuxtConfig({
     ],
     defaultLocale: "en",
     strategy: "prefix_except_default",
-    langDir: "locales/", /* resolved as i18n/locales/ by @nuxtjs/i18n v10 */
+    langDir: "locales/",
     baseUrl: "https://lyoraeth.art",
   },
 });
