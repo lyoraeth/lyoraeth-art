@@ -44,8 +44,10 @@ onUnmounted(() => {
   --my: 0;
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: -1;
   overflow: hidden;
+  pointer-events: none;
+  user-select: none;
   background: radial-gradient(120% 90% at 50% -10%, var(--deep) 0%, var(--void) 55%);
 }
 

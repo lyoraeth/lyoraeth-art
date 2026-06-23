@@ -36,7 +36,7 @@ useHead({
       <defs>
         <filter id="glass-caustic" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="linearRGB">
           <feTurbulence type="fractalNoise" baseFrequency="0.38 0.28" numOctaves="2" seed="9" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </defs>
     </svg>
@@ -70,7 +70,7 @@ body {
   color: var(--ink);
   font-family: 'Onest', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
   line-height: 1.5;
 }
 
@@ -79,7 +79,6 @@ body {
   position: relative;
   z-index: 1;
   background: var(--void);
-  overflow: hidden;
   min-height: 100svh;
 }
 </style>

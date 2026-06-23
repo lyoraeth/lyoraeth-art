@@ -1,6 +1,11 @@
 import Lenis from 'lenis'
 
 export default defineNuxtPlugin(() => {
+  // Prevent browser from restoring scroll position on reload —
+  // Lenis would animate from the restored offset instead of starting at 0.
+  if (history.scrollRestoration) history.scrollRestoration = 'manual'
+  window.scrollTo(0, 0)
+
   const lenis = new Lenis({
     lerp: 0.1,
     smoothWheel: true,

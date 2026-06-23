@@ -101,3 +101,155 @@
   opacity: 0;
   transform: translateY(6px);
 }
+
+/* ── Scroll reveal ───────────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(2rem) scale(0.985);
+  transition:
+    opacity   var(--duration-reveal) var(--ease-out-expo),
+    transform var(--duration-reveal) var(--ease-out-expo);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+/* Stagger helpers — add these classes alongside .reveal */
+.rv-d1 { transition-delay: 80ms  }
+.rv-d2 { transition-delay: 180ms }
+.rv-d3 { transition-delay: 280ms }
+.rv-d4 { transition-delay: 380ms }
+
+/* ── Hero entrance (.lo = lift-off) ─────────────────────────────────────── */
+.lo {
+  opacity: 0;
+  transform: translateY(1.25rem);
+}
+.hero-ready .lo {
+  animation: hero-rise 0.9s var(--ease-out-expo) forwards;
+}
+.d1 { animation-delay: 0.05s }
+.d2 { animation-delay: 0.18s }
+.d3 { animation-delay: 0.32s }
+.d4 { animation-delay: 0.46s }
+
+@keyframes hero-rise {
+  to { opacity: 1; transform: none; }
+}
+
+/* ── Glass card (island variant — full fluid glass with specular edges) ──── */
+.glass-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(160deg, oklch(100% 0 0 / 5.5%) 0%, oklch(100% 0 0 / 0%) 35%),
+    oklch(100% 0 0 / 4%);
+  border: 1px solid oklch(100% 0 0 / 10%);
+  backdrop-filter: blur(18px) saturate(1.5) brightness(1.05);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5) brightness(1.05);
+  box-shadow:
+    inset 0  1.5px 0   oklch(100% 0 0 / 20%),
+    inset 0 -0.5px 0   oklch(100% 0 0 / 5%),
+    inset  0.5px 0 0   oklch(100% 0 0 / 8%),
+    inset -0.5px 0 0   oklch(100% 0 0 / 8%),
+    0 2rem 4rem -2.5rem oklch(0% 0 0 / 85%);
+  transition:
+    opacity      var(--duration-reveal) var(--ease-out-expo),
+    transform    var(--duration-reveal) var(--ease-out-expo),
+    border-color 0.4s var(--ease-silk),
+    background   0.4s var(--ease-silk);
+}
+.glass-card:hover {
+  border-color: oklch(100% 0 0 / 15%);
+}
+
+/* Caustic light overlay — sits below card content */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 85% 65% at 30% -20%, oklch(100% 0 0 / 13%) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 78% 125%, oklch(65% 0.04 55 / 7%) 0%, transparent 55%);
+  mix-blend-mode: screen;
+  filter: url(#glass-caustic);
+}
+
+/* ── Glow spot cursor ────────────────────────────────────────────────────── */
+.card-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity var(--duration-blob) var(--ease-silk);
+}
+.glass-card:hover .card-glare {
+  opacity: 1;
+}
+/* Single blurred spot — centered on cursor via JS --gx/--gy */
+.glare-mb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 50%;
+  transform: translate(var(--gx, 11rem), var(--gy, 11rem)) translate(-50%, -50%);
+  background: radial-gradient(circle at center, oklch(72% 0.1 58 / 16%), transparent 62%);
+  filter: blur(1rem);
+}
+.glass-card:hover .glare-mb {
+  will-change: transform;
+}
+/* Legacy blob children — no longer used */
+.glare-blob, .glare-blob-2 { display: none; }
+
+/* ── Shared section layout ───────────────────────────────────────────────── */
+.wrap {
+  max-width: 87.5rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 0rem + 5vw, 6rem);
+}
+
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 2.875rem;
+  flex-wrap: wrap;
+}
+.sec-head h2 {
+  font-family: 'Golos Text', 'Onest', sans-serif;
+  font-size: clamp(1.375rem, 0.75rem + 1.5vw, 2.125rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 500;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .lo {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+  .glare-blob, .glare-blob-2 {
+    animation: none !important;
+  }
+}
