@@ -22,34 +22,6 @@
     "scroll": "scroll ↓"
   },
 
-  "work": {
-    "title": "Selected work",
-    "subtitle": "placeholder subtitle",
-    "items": [
-      {
-        "kicker": "kicker · placeholder",
-        "title": "Project title placeholder one",
-        "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "warm tag"
-      },
-      {
-        "kicker": "kicker · placeholder",
-        "title": "Project title placeholder two",
-        "desc": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-        "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "warm tag"
-      },
-      {
-        "kicker": "kicker · placeholder",
-        "title": "Project title placeholder three",
-        "desc": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-        "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "warm tag"
-      }
-    ]
-  },
-
   "stack": {
     "title": "Stack",
     "label": "Placeholder label",
@@ -103,7 +75,69 @@
     "title": "Writing",
     "see_all": "See all posts",
     "read": "Read",
-    "min": "{n} min"
+    "min": "{n} min",
+    "min_read": "{n} min read",
+    "posts": "{n} posts",
+    "back": "Writing",
+    "search": "Search",
+    "sort_by": "Sort by",
+    "not_found": "No posts found."
+  },
+
+  "work": {
+    "title": "Selected work",
+    "subtitle": "placeholder subtitle",
+    "see_all": "See all work",
+    "projects": "{n} projects",
+    "view_project": "View project",
+    "back": "Work",
+    "items": [
+      {
+        "kicker": "kicker · placeholder",
+        "title": "Project title placeholder one",
+        "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "tags": ["tag one", "tag two", "tag three"],
+        "tag_warm": "warm tag"
+      },
+      {
+        "kicker": "kicker · placeholder",
+        "title": "Project title placeholder two",
+        "desc": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+        "tags": ["tag one", "tag two", "tag three"],
+        "tag_warm": "warm tag"
+      },
+      {
+        "kicker": "kicker · placeholder",
+        "title": "Project title placeholder three",
+        "desc": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+        "tags": ["tag one", "tag two", "tag three"],
+        "tag_warm": "warm tag"
+      }
+    ]
+  },
+
+  "post": {
+    "rating": {
+      "prompt": "Was this useful?",
+      "voted": "Voted · thanks"
+    },
+    "comments": {
+      "count_one": "{n} comment",
+      "count_other": "{n} comments",
+      "reply": "Leave a reply",
+      "first": "Be the first to comment",
+      "name": "Name",
+      "name_placeholder": "Your name",
+      "email": "Email",
+      "email_hint": "(shown as {'@'}nick, never shared)",
+      "email_placeholder": "you{'@'}example.com",
+      "message": "Comment",
+      "message_placeholder": "Your thoughts…",
+      "submit": "Post comment",
+      "success": "Comment posted — thanks!",
+      "another": "Write another",
+      "error": "Something went wrong"
+    }
   },
 
   "contact": {

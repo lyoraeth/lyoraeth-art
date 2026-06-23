@@ -2,17 +2,23 @@ export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
   if (!sanityProjectId) return []
 
+  const { limit = '3' } = getQuery(event) as { limit?: string }
+  const n = parseInt(limit)
+  const slice = n > 0 ? `[0...${n}]` : ''
+
   const client = createSanityClient(sanityProjectId, sanityDataset)
 
   return client.fetch<WorkItem[]>(`
-    *[_type == "work"] | order(order asc, _createdAt desc) [0...3] {
+    *[_type == "work"] | order(order asc, _createdAt desc) ${slice} {
       _id,
+      "slug": coalesce(slug.current, _id),
       title,
       kicker,
       description,
       tags,
       tagWarm,
       url,
+      year,
       "coverUrl": cover.asset->url
     }
   `)
@@ -20,11 +26,13 @@ export default defineEventHandler(async (event) => {
 
 export interface WorkItem {
   _id:         string
+  slug:        string
   title:       { en: string; ru: string }
   kicker:      { en: string; ru: string }
   description: { en: string; ru: string }
   tags:        string[]
   tagWarm:     string
   url?:        string
+  year?:       number
   coverUrl:    string | null
 }

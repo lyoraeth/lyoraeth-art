@@ -105,10 +105,13 @@ useGlowCard(mini1)
           </span>
         </a>
       </div>
+      <div class="view-all-wrap">
+        <NuxtLink to="/writing" class="view-all">All posts <span class="va-arrow">→</span></NuxtLink>
+      </div>
     </div>
 
     <!-- Empty state while Sanity is not yet configured -->
-    <p v-else class="empty-state">{{ t('writing.title') }}</p>
+    <p v-else class="empty-state">{{ t('writing.not_found') }}</p>
   </section>
 </template>
 
@@ -125,6 +128,24 @@ useGlowCard(mini1)
   color: var(--faint);
   font-size: 0.875rem;
 }
+.view-all-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ember);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+.va-arrow {
+  display: inline-block;
+  transition: transform 0.3s var(--ease-out-expo);
+}
+.view-all:hover .va-arrow { transform: translateX(0.25rem); }
 
 /* ── Featured post ─────────────────────────────────────────────────────────── */
 .feat {
