@@ -47,7 +47,7 @@ useGlowCard(mini1)
       <NuxtLink
         :to="`/writing/${featured.slug}`"
         class="feat glass-card reveal rv-d1"
-        ref="featRef"
+        :ref="(el: any) => { featRef.value = el?.$el ?? el ?? null }"
       >
         <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div><div class="glare-blob-2"></div></div></div>
 
@@ -91,7 +91,7 @@ useGlowCard(mini1)
           :key="post._id"
           :to="`/writing/${post.slug}`"
           class="mini-card glass-card reveal rv-d2"
-          :ref="(el) => { if (i === 0) mini0 = el as HTMLElement | null; else mini1 = el as HTMLElement | null }"
+          :ref="(el: any) => { const node = el?.$el ?? el ?? null; if (i === 0) mini0.value = node; else mini1.value = node }"
         >
           <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div></div></div>
           <div class="mini-meta">

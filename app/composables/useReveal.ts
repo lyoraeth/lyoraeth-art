@@ -14,9 +14,9 @@ export function useReveal(threshold = 0.12) {
 
   onUnmounted(() => io?.disconnect())
 
-  function observe(...els: (HTMLElement | null | undefined)[]) {
+  function observe(...els: (Element | null | undefined)[]) {
     nextTick(() => {
-      els.forEach(el => { if (el && io) io.observe(el) })
+      els.forEach(el => { if (el instanceof Element && io) io.observe(el) })
     })
   }
 
