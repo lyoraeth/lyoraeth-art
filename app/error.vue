@@ -36,13 +36,6 @@ function handleError() {
           <button class="btn-home" @click="handleError">
             ← {{ t('error.go_home') }}
           </button>
-
-          <NuxtLink v-if="is404" to="/writing" class="btn-ghost">
-            {{ t('writing.title') }}
-          </NuxtLink>
-          <NuxtLink v-if="is404" to="/work" class="btn-ghost">
-            {{ t('work.title') }}
-          </NuxtLink>
         </div>
       </div>
     </main>
@@ -105,8 +98,7 @@ function handleError() {
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.05em;
-  color: transparent;
-  -webkit-text-stroke: 1px oklch(100% 0 0 / 10%);
+  color: oklch(100% 0 0 / 6%);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
   user-select: none;
@@ -164,18 +156,6 @@ function handleError() {
   text-decoration: none;
 }
 .btn-home:hover { background: oklch(72% 0.1 58 / 15%); }
-
-.btn-ghost {
-  padding: 0.5625rem 1.25rem;
-  background: transparent;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-tag);
-  color: var(--mist);
-  font-size: 0.875rem;
-  text-decoration: none;
-  transition: color 0.2s, border-color 0.2s;
-}
-.btn-ghost:hover { color: var(--snow, var(--ink)); border-color: var(--line); }
 
 /* ── Responsive ── */
 @media (max-width: 40rem) {
