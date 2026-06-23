@@ -25,14 +25,10 @@ export default defineEventHandler(async (event) => {
       .patch(ratingId, { inc: { [dir]: 1 } })
       .commit()
   } catch (e: any) {
-    const status = e?.statusCode ?? e?.response?.statusCode
+    const status = e?.statusCode ?? e?.response?.statusCode ?? e?.status
     if (status === 409) throw createError({ statusCode: 409, message: 'Already voted' })
     throw e
   }
 
-  const updated = await client.fetch<{ up: number; down: number }>(
-    `*[_id == $id][0] { up, down }`,
-    { id: ratingId },
-  )
-  return updated ?? { up: 0, down: 0 }
+  return { ok: true }
 })

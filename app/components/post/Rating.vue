@@ -2,9 +2,13 @@
 const { t } = useI18n()
 const props = defineProps<{ slug: string }>()
 
-const { data: rating, refresh } = await useFetch(`/api/rating/${props.slug}`)
+const { data: rating } = await useFetch(`/api/rating/${props.slug}`)
 
-const voted = useLocalStorage<'up' | 'down' | null>(`lyoraeth_vote_${props.slug}`, null)
+const storageKey = `lyoraeth_vote_${props.slug}`
+const voted = ref<'up' | 'down' | null>(null)
+onMounted(() => {
+  voted.value = (localStorage.getItem(storageKey) ?? null) as 'up' | 'down' | null
+})
 
 const up   = computed(() => rating.value?.up   ?? 0)
 const down = computed(() => rating.value?.down ?? 0)
@@ -20,9 +24,23 @@ const totalClass = computed(() => {
 
 async function vote(dir: 'up' | 'down') {
   if (voted.value) return
-  await $fetch(`/api/rating/${props.slug}`, { method: 'POST', body: { dir } })
-  voted.value = dir
-  await refresh()
+  try {
+    await $fetch(`/api/rating/${props.slug}`, { method: 'POST', body: { dir } })
+    voted.value = dir
+    localStorage.setItem(storageKey, dir)
+    if (rating.value) {
+      rating.value = {
+        up:   rating.value.up   + (dir === 'up'   ? 1 : 0),
+        down: rating.value.down + (dir === 'down' ? 1 : 0),
+      }
+    }
+  } catch (e: any) {
+    // 409 = уже проголосовал (IP dedup на сервере, но localStorage был сброшен)
+    if (e?.response?.status === 409 || e?.statusCode === 409) {
+      voted.value = dir
+      localStorage.setItem(storageKey, dir)
+    }
+  }
 }
 </script>
 
