@@ -13,10 +13,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'All fields are required' })
   }
 
-  const valid = await verifyTurnstileToken(token)
+  const { turnstileContactSecretKey, mailerHost, mailerPort, mailerUser, mailerPass, mailerTo } = useRuntimeConfig(event)
+  const valid = await verifyTurnstileToken(token, turnstileContactSecretKey || undefined)
   if (!valid) throw createError({ statusCode: 400, message: 'Captcha failed — please try again' })
-
-  const { mailerHost, mailerPort, mailerUser, mailerPass, mailerTo } = useRuntimeConfig(event)
 
   if (!mailerHost || !mailerUser || !mailerPass || !mailerTo) {
     throw createError({ statusCode: 503, message: 'Mailer not configured' })

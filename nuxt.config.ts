@@ -6,14 +6,18 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   runtimeConfig: {
-    sanityProjectId: process.env.NUXT_SANITY_PROJECT_ID ?? '',
-    sanityDataset:   process.env.NUXT_SANITY_DATASET   ?? 'production',
-    sanityToken:     process.env.NUXT_SANITY_TOKEN     ?? '',
-    mailerHost:      process.env.NUXT_MAILER_HOST      ?? '',
-    mailerPort:      process.env.NUXT_MAILER_PORT      ?? '587',
-    mailerUser:      process.env.NUXT_MAILER_USER      ?? '',
-    mailerPass:      process.env.NUXT_MAILER_PASS      ?? '',
-    mailerTo:        process.env.NUXT_MAILER_TO        ?? '',
+    sanityProjectId:            process.env.NUXT_SANITY_PROJECT_ID               ?? '',
+    sanityDataset:              process.env.NUXT_SANITY_DATASET                   ?? 'production',
+    sanityToken:                process.env.NUXT_SANITY_TOKEN                     ?? '',
+    mailerHost:                 process.env.NUXT_MAILER_HOST                      ?? '',
+    mailerPort:                 process.env.NUXT_MAILER_PORT                      ?? '587',
+    mailerUser:                 process.env.NUXT_MAILER_USER                      ?? '',
+    mailerPass:                 process.env.NUXT_MAILER_PASS                      ?? '',
+    mailerTo:                   process.env.NUXT_MAILER_TO                        ?? '',
+    turnstileContactSecretKey:  process.env.NUXT_TURNSTILE_SECRET_KEY_CONTACT     ?? '',
+    public: {
+      turnstileContactSiteKey:  process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY_CONTACT ?? '',
+    },
   },
 
   vite: {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
+const { public: { turnstileContactSiteKey } } = useRuntimeConfig()
 
 const contact = ref('')
 const message = ref('')
@@ -96,12 +97,17 @@ onMounted(() => observe(cardEl.value))
             :placeholder="t('contact.message_placeholder')"
             required
           ></textarea>
-          <NuxtTurnstile v-model="token" class="form-turnstile" />
+          <NuxtTurnstile
+            v-model="token"
+            :site-key="turnstileContactSiteKey || undefined"
+            appearance="invisible"
+          />
           <p v-if="state === 'error'" class="form-err" aria-live="polite">{{ errMsg }}</p>
           <button type="submit" :disabled="state === 'loading' || !token">
             <span v-if="state === 'loading'" class="loading-dot"></span>
             <span v-else>{{ t('contact.submit') }}</span>
           </button>
+          <p class="form-privacy">{{ t('contact.privacy') }}</p>
         </form>
       </div>
     </div>
@@ -293,7 +299,13 @@ onMounted(() => observe(cardEl.value))
   color: var(--ink);
 }
 
-.form-turnstile { margin-bottom: 0.25rem; }
+.form-privacy {
+  font-size: 0.75rem;
+  color: var(--faint);
+  margin: 0.5rem 0 0;
+  text-align: left;
+  line-height: 1.5;
+}
 
 .form-err {
   font-size: 0.8125rem;
