@@ -4,10 +4,7 @@ const props = defineProps<{ slug: string }>()
 
 const { data: rating, refresh } = await useFetch(`/api/rating/${props.slug}`)
 
-const voted = ref<'up' | 'down' | null>(null)
-onMounted(() => {
-  voted.value = localStorage.getItem(`lyoraeth_vote_${props.slug}`) as 'up' | 'down' | null
-})
+const voted = useLocalStorage<'up' | 'down' | null>(`lyoraeth_vote_${props.slug}`, null)
 
 const up   = computed(() => rating.value?.up   ?? 0)
 const down = computed(() => rating.value?.down ?? 0)
@@ -24,7 +21,6 @@ const totalClass = computed(() => {
 async function vote(dir: 'up' | 'down') {
   if (voted.value) return
   await $fetch(`/api/rating/${props.slug}`, { method: 'POST', body: { dir } })
-  localStorage.setItem(`lyoraeth_vote_${props.slug}`, dir)
   voted.value = dir
   await refresh()
 }
