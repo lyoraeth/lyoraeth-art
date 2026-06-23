@@ -98,7 +98,7 @@ function handleError() {
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.05em;
-  color: oklch(100% 0 0 / 6%);
+  color: var(--faint);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
   user-select: none;
