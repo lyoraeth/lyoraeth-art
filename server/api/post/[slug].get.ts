@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
   const client = createSanityClient(sanityProjectId, sanityDataset)
 
-  return client.fetch(`
+  const post = await client.fetch(`
     *[_type == "post" && slug.current == $slug][0] {
       _id,
       "slug": slug.current,
@@ -25,4 +25,7 @@ export default defineEventHandler(async (event) => {
       }
     }
   `, { slug })
+
+  if (!post) throw createError({ statusCode: 404, message: 'Post not found' })
+  return post
 })

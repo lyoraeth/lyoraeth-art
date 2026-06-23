@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     email:       email.trim().toLowerCase(),
     message:     message.trim(),
     publishedAt: new Date().toISOString(),
-    approved:    true,
+    approved:    false,
   })
 
   return { ok: true }

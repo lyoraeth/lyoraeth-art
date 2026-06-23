@@ -22,5 +22,6 @@ export default defineEventHandler(async (event) => {
     }
   `, { slug })
 
+  if (!result) throw createError({ statusCode: 404, message: 'Work item not found' })
   return result
 })
