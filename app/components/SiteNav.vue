@@ -2,6 +2,18 @@
 const { t, locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 const localePath = useLocalePath()
+const route = useRoute()
+
+const isHome = computed(() => {
+  const home = localePath('/')
+  return route.path === home || route.path === home.replace(/\/$/, '')
+})
+
+function navTo(hash: string, page?: string) {
+  if (isHome.value) return `#${hash}`
+  if (page) return localePath(page)
+  return localePath('/') + `#${hash}`
+}
 
 const scrolled = ref(false)
 const onScroll = () => { scrolled.value = window.scrollY > 24 }
@@ -18,14 +30,14 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       </NuxtLink>
 
       <div class="nav-links">
-        <a href="#work"    class="navlink">{{ t('nav.work') }}</a>
-        <a href="#stack"   class="navlink">{{ t('nav.stack') }}</a>
-        <a href="#writing" class="navlink">{{ t('nav.writing') }}</a>
+        <NuxtLink :to="navTo('work', '/work')"       class="navlink">{{ t('nav.work') }}</NuxtLink>
+        <NuxtLink :to="navTo('stack')"               class="navlink">{{ t('nav.stack') }}</NuxtLink>
+        <NuxtLink :to="navTo('writing', '/writing')" class="navlink">{{ t('nav.writing') }}</NuxtLink>
 
-        <a href="#contact" class="avail">
+        <NuxtLink :to="navTo('contact')" class="avail">
           <span class="avail-dot" aria-hidden="true" />
           <span>{{ t('nav.available') }}</span>
-        </a>
+        </NuxtLink>
 
         <div class="lang" role="group" :aria-label="t('nav.lang_toggle')">
           <NuxtLink
@@ -40,7 +52,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           >RU</NuxtLink>
         </div>
 
-        <a href="#contact" class="nav-cv">{{ t('nav.cv') }}</a>
+        <NuxtLink :to="navTo('contact')" class="nav-cv">{{ t('nav.cv') }}</NuxtLink>
       </div>
     </div>
   </nav>
