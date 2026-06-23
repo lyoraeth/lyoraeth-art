@@ -1,14 +1,26 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
+const localePath = useLocalePath()
+const route = useRoute()
+
+const isHome = computed(() => {
+  const home = localePath('/')
+  return route.path === home || route.path === home.replace(/\/$/, '')
+})
+
+function navTo(hash: string) {
+  if (isHome.value) return `#${hash}`
+  return localePath('/') + `#${hash}`
+}
 </script>
 
 <template>
   <nav class="dock" aria-label="Mobile navigation">
-    <a href="#work"    class="dock-link">{{ t('nav.work') }}</a>
-    <a href="#stack"   class="dock-link">{{ t('nav.stack') }}</a>
-    <a href="#writing" class="dock-link">{{ t('nav.writing') }}</a>
-    <a href="#contact" class="dock-link">{{ t('nav.contact') }}</a>
+    <NuxtLink :to="navTo('work')"    class="dock-link">{{ t('nav.work') }}</NuxtLink>
+    <NuxtLink :to="navTo('stack')"   class="dock-link">{{ t('nav.stack') }}</NuxtLink>
+    <NuxtLink :to="navTo('writing')" class="dock-link">{{ t('nav.writing') }}</NuxtLink>
+    <NuxtLink :to="navTo('contact')" class="dock-link">{{ t('nav.contact') }}</NuxtLink>
 
     <span class="dock-sep" aria-hidden="true" />
 

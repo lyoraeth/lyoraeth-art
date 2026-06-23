@@ -7,7 +7,7 @@
   const { observe } = useReveal()
   onMounted(() => observe(headRef.value))
 
-  const reversed = [false, true, false]
+
   </script>
 
   <template>
@@ -23,12 +23,12 @@
           :key="item._id"
           :item="item"
           :index="i"
-          :reverse="reversed[i] ?? false"
+          :reverse="i % 2 === 1"
         />
       </div>
 
       <div class="view-all-wrap">
-        <NuxtLink to="/work" class="view-all">All projects <span class="va-arrow">→</span></NuxtLink>
+        <NuxtLink to="/work" class="view-all">{{ t('work.see_all') }} <span class="va-arrow">→</span></NuxtLink>
       </div>
     </section>
   </template>

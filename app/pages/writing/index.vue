@@ -3,7 +3,7 @@ import type { PostItem } from '../../server/api/posts.get'
 
 const { t, locale } = useI18n()
 
-useSeoMeta({ title: 'Writing — lyoraeth' })
+useSeoMeta({ title: computed(() => `${t('writing.title')} — lyoraeth`) })
 
 const { data: allPosts } = await useFetch('/api/posts', {
   query: { limit: 0 },

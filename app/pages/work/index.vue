@@ -3,7 +3,7 @@ import type { WorkItem } from '../../server/api/work.get'
 
 const { t, locale } = useI18n()
 
-useSeoMeta({ title: 'Work — lyoraeth' })
+useSeoMeta({ title: computed(() => `${t('work.title')} — lyoraeth`) })
 
 const { data: allWork } = await useFetch('/api/work', {
   query: { limit: 0 },

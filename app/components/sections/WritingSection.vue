@@ -44,8 +44,8 @@ useGlowCard(mini1)
 
     <div v-if="featured" class="writing-wrap">
       <!-- Featured post -->
-      <a
-        :href="`/writing/${featured.slug}`"
+      <NuxtLink
+        :to="`/writing/${featured.slug}`"
         class="feat glass-card reveal rv-d1"
         ref="featRef"
       >
@@ -82,14 +82,14 @@ useGlowCard(mini1)
             {{ t('writing.read') }} <span class="feat-arrow">→</span>
           </span>
         </div>
-      </a>
+      </NuxtLink>
 
       <!-- Secondary posts -->
       <div class="more-writing">
-        <a
+        <NuxtLink
           v-for="(post, i) in secondary"
           :key="post._id"
-          :href="`/writing/${post.slug}`"
+          :to="`/writing/${post.slug}`"
           class="mini-card glass-card reveal rv-d2"
           :ref="(el) => { if (i === 0) mini0 = el as HTMLElement | null; else mini1 = el as HTMLElement | null }"
         >
@@ -103,10 +103,10 @@ useGlowCard(mini1)
           <span class="mini-read">
             {{ t('writing.read') }} <span class="mini-arrow">→</span>
           </span>
-        </a>
+        </NuxtLink>
       </div>
       <div class="view-all-wrap">
-        <NuxtLink to="/writing" class="view-all">All posts <span class="va-arrow">→</span></NuxtLink>
+        <NuxtLink to="/writing" class="view-all">{{ t('writing.see_all') }} <span class="va-arrow">→</span></NuxtLink>
       </div>
     </div>
 
