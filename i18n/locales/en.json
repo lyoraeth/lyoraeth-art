@@ -10,91 +10,91 @@
   },
 
   "hero": {
-    "eyebrow": "Role · Location · Availability",
-    "name": "Name Surname",
-    "subtitle": "Short tagline — {em} something something {acc}.",
-    "subtitle_em": "emphasized part",
-    "subtitle_acc": "accented part",
+    "eyebrow": "Role · Location · Timeline",
+    "name": "Full Name",
+    "subtitle": "Lorem ipsum {em} dolor sit amet {acc}.",
+    "subtitle_em": "emphasized placeholder",
+    "subtitle_acc": "accent placeholder",
     "meta": [
-      { "label": "Label", "value": "Meta value one" },
-      { "label": "Label", "value": "Meta value two" }
+      { "label": "Label one", "value": "Meta value placeholder one" },
+      { "label": "Label two", "value": "Meta value placeholder two" }
     ],
     "scroll": "scroll ↓"
   },
 
   "work": {
-    "title": "Work",
-    "subtitle": "project types",
+    "title": "Selected work",
+    "subtitle": "placeholder subtitle",
     "items": [
       {
-        "kicker": "category · type",
-        "title": "Project title goes here",
-        "desc": "Short project description — what the problem was, what was done, what changed.",
+        "kicker": "kicker · placeholder",
+        "title": "Project title placeholder one",
+        "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "highlight tag"
+        "tag_warm": "warm tag"
       },
       {
-        "kicker": "category · type",
-        "title": "Project title goes here",
-        "desc": "Short project description — what the problem was, what was done, what changed.",
+        "kicker": "kicker · placeholder",
+        "title": "Project title placeholder two",
+        "desc": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
         "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "highlight tag"
+        "tag_warm": "warm tag"
       },
       {
-        "kicker": "category · type",
-        "title": "Project title goes here",
-        "desc": "Short project description — what the problem was, what was done, what changed.",
+        "kicker": "kicker · placeholder",
+        "title": "Project title placeholder three",
+        "desc": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
         "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "highlight tag"
+        "tag_warm": "warm tag"
       }
     ]
   },
 
   "stack": {
     "title": "Stack",
-    "label": "Tools and technologies",
+    "label": "Placeholder label",
     "daily": "Daily",
     "also": "Also",
     "chips": {
       "daily": [
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used", "warm": true },
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used" }
+        { "name": "Tool one", "tip": "tooltip placeholder one" },
+        { "name": "Tool two", "tip": "tooltip placeholder two" },
+        { "name": "Tool three", "tip": "tooltip placeholder three" },
+        { "name": "Tool four", "tip": "tooltip placeholder four", "warm": true },
+        { "name": "Tool five", "tip": "tooltip placeholder five" },
+        { "name": "Tool six", "tip": "tooltip placeholder six" }
       ],
       "also": [
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used" },
-        { "name": "Tool name", "tip": "short note on how it's used" }
+        { "name": "Tool seven", "tip": "tooltip placeholder seven" },
+        { "name": "Tool eight", "tip": "tooltip placeholder eight" },
+        { "name": "Tool nine", "tip": "tooltip placeholder nine" },
+        { "name": "Tool ten", "tip": "tooltip placeholder ten" },
+        { "name": "Tool eleven", "tip": "tooltip placeholder eleven" },
+        { "name": "Tool twelve", "tip": "tooltip placeholder twelve" }
       ]
     }
   },
 
   "approach": {
-    "title": "How I work",
+    "title": "Placeholder title",
     "steps": [
       {
         "num": "01",
-        "name": "step name",
-        "title": "Step title",
-        "desc": "Short description of this step in the process."
+        "name": "step one",
+        "title": "Step title placeholder one",
+        "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor."
       },
       {
         "num": "02",
-        "name": "step name",
-        "title": "Step title",
-        "desc": "Short description of this step in the process."
+        "name": "step two",
+        "title": "Step title placeholder two",
+        "desc": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip."
       },
       {
         "num": "03",
-        "name": "step name",
-        "title": "Step title",
-        "desc": "Short description of this step in the process."
+        "name": "step three",
+        "title": "Step title placeholder three",
+        "desc": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore."
       }
     ]
   },
@@ -107,43 +107,43 @@
   },
 
   "contact": {
-    "heading": "Heading",
-    "heading_before_acc": "",
-    "heading_acc": "accented part.",
-    "lead": "A line or two about how to get in touch and what for.",
-    "cta": "Primary CTA",
-    "form_label": "or use the form",
-    "contact_placeholder": "Your contact",
-    "message_placeholder": "Your message",
-    "submit": "Send →",
-    "note_demo": "demo only",
+    "heading": "Placeholder",
+    "heading_before_acc": "heading ",
+    "heading_acc": "accent.",
+    "lead": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Placeholder contact lead text.",
+    "cta": "CTA placeholder",
+    "form_label": "form label placeholder",
+    "contact_placeholder": "Your Telegram / {'@'}handle",
+    "message_placeholder": "Message placeholder",
+    "submit": "Submit placeholder →",
+    "note_demo": "demo mode — no real submit",
     "github": "GitHub",
-    "github_handle": "/handle",
+    "github_handle": "/username",
     "cv": "CV",
     "cv_note": "pdf ↓"
   },
 
   "seo": {
-    "title": "Page title",
-    "description": "Page description for search engines.",
-    "og_title": "Open Graph title",
-    "og_description": "Open Graph description."
+    "title": "Name — Role",
+    "description": "Placeholder SEO description.",
+    "og_title": "Name — Role",
+    "og_description": "Placeholder OG description."
   },
 
   "footer": {
-    "copyright": "© 2026 Name Surname",
+    "copyright": "© 2026 Name",
     "privacy": "Privacy",
     "cookies": "Cookies",
     "hint": "keep scrolling ↓"
   },
 
   "curtain": {
-    "closing": "Closing line ",
-    "closing_acc": "accented part.",
+    "closing": "Placeholder closing line ",
+    "closing_acc": "accent part.",
     "type_label": "Type",
-    "type_value": "Font names here",
+    "type_value": "Font one · Font two · Font three",
     "built_label": "Built",
-    "built_value": "how it was built",
+    "built_value": "placeholder build note",
     "trackers_label": "Trackers",
     "trackers_value": "none",
     "lang_label": "Lang",
