@@ -56,7 +56,7 @@ async function submit() {
 
     <!-- Existing comments -->
     <div v-if="comments?.length" class="comment-list">
-      <h3 class="comments-title">{{ t('post.comments.count_other', { n: comments.length }) }}</h3>
+      <h3 class="comments-title">{{ t(comments.length === 1 ? 'post.comments.count_one' : 'post.comments.count_other', { n: comments.length }) }}</h3>
       <div v-for="c in comments" :key="c._id" class="comment-item">
         <div class="comment-header">
           <div class="comment-avatar" :aria-label="c.name">
