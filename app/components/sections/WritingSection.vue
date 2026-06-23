@@ -44,10 +44,11 @@ useGlowCard(mini1)
 
     <div v-if="featured" class="writing-wrap">
       <!-- Featured post -->
-      <NuxtLink
-        :to="`/writing/${featured.slug}`"
+      <a
+        :href="`/writing/${featured.slug}`"
         class="feat glass-card reveal rv-d1"
-        :ref="(el: any) => { featRef.value = el?.$el ?? el ?? null }"
+        ref="featRef"
+        @click.prevent="navigateTo(`/writing/${featured.slug}`)"
       >
         <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div><div class="glare-blob-2"></div></div></div>
 
@@ -82,16 +83,17 @@ useGlowCard(mini1)
             {{ t('writing.read') }} <span class="feat-arrow">→</span>
           </span>
         </div>
-      </NuxtLink>
+      </a>
 
       <!-- Secondary posts -->
       <div class="more-writing">
-        <NuxtLink
+        <a
           v-for="(post, i) in secondary"
           :key="post._id"
-          :to="`/writing/${post.slug}`"
+          :href="`/writing/${post.slug}`"
           class="mini-card glass-card reveal rv-d2"
-          :ref="(el: any) => { const node = el?.$el ?? el ?? null; if (i === 0) mini0.value = node; else mini1.value = node }"
+          :ref="(el) => { if (i === 0) mini0.value = el as HTMLElement | null; else mini1.value = el as HTMLElement | null }"
+          @click.prevent="navigateTo(`/writing/${post.slug}`)"
         >
           <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div></div></div>
           <div class="mini-meta">
@@ -103,7 +105,7 @@ useGlowCard(mini1)
           <span class="mini-read">
             {{ t('writing.read') }} <span class="mini-arrow">→</span>
           </span>
-        </NuxtLink>
+        </a>
       </div>
       <div class="view-all-wrap">
         <NuxtLink to="/writing" class="view-all">{{ t('writing.see_all') }} <span class="va-arrow">→</span></NuxtLink>
