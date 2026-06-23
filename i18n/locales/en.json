@@ -157,6 +157,14 @@
     "cv_note": "pdf ↓"
   },
 
+  "error": {
+    "404_title": "Page not found",
+    "404_message": "The page you're looking for doesn't exist or has been moved.",
+    "5xx_title": "Something went wrong",
+    "5xx_message": "An unexpected error occurred. Try refreshing or come back later.",
+    "go_home": "Go home"
+  },
+
   "seo": {
     "title": "Name — Role",
     "description": "Placeholder SEO description.",
