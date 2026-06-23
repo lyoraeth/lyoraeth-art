@@ -31,11 +31,13 @@ function navTo(hash: string) {
         :to="switchLocalePath('en')"
         class="dock-lang-btn"
         :class="{ 'dock-lang-btn--on': locale === 'en' }"
+        :aria-current="locale === 'en' ? 'true' : undefined"
       >EN</NuxtLink>
       <NuxtLink
         :to="switchLocalePath('ru')"
         class="dock-lang-btn"
         :class="{ 'dock-lang-btn--on': locale === 'ru' }"
+        :aria-current="locale === 'ru' ? 'true' : undefined"
       >RU</NuxtLink>
     </div>
   </nav>

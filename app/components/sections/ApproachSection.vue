@@ -31,7 +31,7 @@ onMounted(() => {
           <span class="cell-num mono">{{ step.num }}</span>
           <span class="eyebrow">{{ step.name }}</span>
         </div>
-        <h4 class="cell-title">{{ step.title }}</h4>
+        <h3 class="cell-title">{{ step.title }}</h3>
         <p class="cell-desc">{{ step.desc }}</p>
       </div>
     </div>

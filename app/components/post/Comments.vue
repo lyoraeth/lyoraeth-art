@@ -76,8 +76,8 @@ async function submit() {
     <div class="comment-form-wrap">
       <h3 class="comments-title">{{ comments?.length ? t('post.comments.reply') : t('post.comments.first') }}</h3>
 
-      <div v-if="state === 'success'" class="success-msg">
-        <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div v-if="state === 'success'" class="success-msg" aria-live="polite">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         {{ t('post.comments.success') }}
         <button class="another-btn" @click="state = 'idle'">{{ t('post.comments.another') }}</button>
       </div>
@@ -217,12 +217,12 @@ async function submit() {
   font-family: inherit;
   font-size: 0.9375rem;
   color: var(--snow);
-  outline: none;
   transition: border-color 0.2s;
   resize: none;
 }
 .field-input::placeholder { color: var(--faint); }
 .field-input:focus { border-color: oklch(72% 0.1 58 / 40%); }
+.field-input:focus-visible { outline: 2px solid oklch(72% 0.1 58 / 60%); outline-offset: -1px; }
 .field-textarea { min-height: 7rem; line-height: 1.6; }
 
 .turnstile { margin-top: 0.25rem; }

@@ -41,16 +41,17 @@ useHead({
       </defs>
     </svg>
 
+    <a href="#main-content" class="skip-link">{{ t('a11y.skip') }}</a>
     <NuxtRouteAnnouncer />
     <Grain />
     <SiteNav />
     <MobileDock />
     <SiteCurtain />
-    <div class="page">
+    <main id="main-content" class="page">
       <Stage />
       <NuxtPage />
       <SiteFooter />
-    </div>
+    </main>
   </div>
 </template>
 

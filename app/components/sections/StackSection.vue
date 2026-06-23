@@ -50,14 +50,17 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
             <span
               v-for="chip in daily"
               :key="chip.name"
+              role="button"
               class="chip"
               :class="{ 'chip--love': chip.warm, 'chip--open': openChip === chip.name }"
               tabindex="0"
+              :aria-expanded="openChip === chip.name"
+              :aria-label="`${chip.name} — ${chip.tip}`"
               @click="toggleChip(chip.name)"
               @keydown.enter.space.prevent="toggleChip(chip.name)"
             >
               {{ chip.name }}
-              <span class="tip">{{ chip.tip }}</span>
+              <span class="tip" aria-hidden="true">{{ chip.tip }}</span>
             </span>
           </div>
         </div>
@@ -68,14 +71,17 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
             <span
               v-for="chip in also"
               :key="chip.name"
+              role="button"
               class="chip"
               :class="{ 'chip--open': openChip === chip.name }"
               tabindex="0"
+              :aria-expanded="openChip === chip.name"
+              :aria-label="`${chip.name} — ${chip.tip}`"
               @click="toggleChip(chip.name)"
               @keydown.enter.space.prevent="toggleChip(chip.name)"
             >
               {{ chip.name }}
-              <span class="tip">{{ chip.tip }}</span>
+              <span class="tip" aria-hidden="true">{{ chip.tip }}</span>
             </span>
           </div>
         </div>
@@ -161,7 +167,10 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
   color: var(--ink);
   border-color: var(--line);
   transform: translateY(-0.125rem);
-  outline: none;
+}
+.chip:focus-visible {
+  outline: 2px solid oklch(72% 0.1 58 / 70%);
+  outline-offset: 2px;
 }
 .chip--love {
   color: var(--ember);

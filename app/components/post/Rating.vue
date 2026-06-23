@@ -51,7 +51,8 @@ async function vote(dir: 'up' | 'down') {
         class="vote-btn vote-up"
         :class="{ active: voted === 'up', disabled: !!voted }"
         :disabled="!!voted"
-        :aria-label="'Upvote'"
+        :aria-label="t('post.rating.upvote')"
+        :aria-pressed="voted === 'up'"
         @click="vote('up')"
       >
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -68,7 +69,8 @@ async function vote(dir: 'up' | 'down') {
         class="vote-btn vote-down"
         :class="{ active: voted === 'down', disabled: !!voted }"
         :disabled="!!voted"
-        :aria-label="'Downvote'"
+        :aria-label="t('post.rating.downvote')"
+        :aria-pressed="voted === 'down'"
         @click="vote('down')"
       >
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">

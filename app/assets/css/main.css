@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+/* ── Skip link ───────────────────────────────────────────────────────────── */
+.skip-link {
+  position: fixed;
+  top: -4rem;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--void);
+  color: var(--ember);
+  border: 1px solid var(--ember-border);
+  border-radius: var(--radius-chip);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: top 0.15s var(--ease-out-expo);
+}
+.skip-link:focus {
+  top: 1rem;
+  outline: 2px solid oklch(72% 0.1 58 / 70%);
+  outline-offset: 2px;
+}
+
+/* ── Global focus-visible ────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid oklch(72% 0.1 58 / 70%);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
 @theme inline {
     /* Stage base surfaces */
     --color-void:      #0A0C10; /* page background */
@@ -250,6 +278,14 @@
     animation: none !important;
   }
   .glare-blob, .glare-blob-2 {
+    animation: none !important;
+  }
+  /* dock entrance + loading dot */
+  .dock, .loading-dot {
+    animation: none !important;
+  }
+  /* availability pulse */
+  .avail-dot {
     animation: none !important;
   }
 }

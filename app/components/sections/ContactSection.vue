@@ -266,8 +266,12 @@ onMounted(() => observe(cardEl.value))
 }
 .contact-form input:focus,
 .contact-form textarea:focus {
-  outline: none;
   border-color: oklch(72% 0.1 58 / 45%);
+}
+.contact-form input:focus-visible,
+.contact-form textarea:focus-visible {
+  outline: 2px solid oklch(72% 0.1 58 / 60%);
+  outline-offset: -1px;
 }
 
 .contact-form button {

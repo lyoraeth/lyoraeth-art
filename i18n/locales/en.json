@@ -1,4 +1,8 @@
 {
+  "a11y": {
+    "skip": "Skip to content"
+  },
+
   "nav": {
     "work": "Work",
     "stack": "Stack",
@@ -12,7 +16,8 @@
     },
     "contact": "Contact",
     "cv": "CV",
-    "lang_toggle": "Language"
+    "lang_toggle": "Language",
+    "site_nav": "Site navigation"
   },
 
   "hero": {
@@ -125,7 +130,9 @@
   "post": {
     "rating": {
       "prompt": "Was this useful?",
-      "voted": "Voted · thanks"
+      "voted": "Voted · thanks",
+      "upvote": "Upvote",
+      "downvote": "Downvote"
     },
     "comments": {
       "count_one": "{n} comment",

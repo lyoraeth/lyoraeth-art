@@ -6,9 +6,11 @@ export default defineNuxtPlugin(() => {
   if (history.scrollRestoration) history.scrollRestoration = 'manual'
   window.scrollTo(0, 0)
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
   const lenis = new Lenis({
-    lerp: 0.1,
-    smoothWheel: true,
+    lerp: prefersReducedMotion ? 1 : 0.1,
+    smoothWheel: !prefersReducedMotion,
     syncTouch: false,  // native momentum on touch — don't override iOS rubber-band
   })
 

@@ -45,7 +45,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 </script>
 
 <template>
-  <nav class="nav" :class="{ 'nav--glass': scrolled }">
+  <nav class="nav" :class="{ 'nav--glass': scrolled }" :aria-label="t('nav.site_nav')">
     <div class="nav-inner">
       <NuxtLink :to="localePath('/')" class="brand">
         <img src="/logo.svg" alt="lyoraeth" class="brand-logo" />
@@ -66,11 +66,13 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
             :to="switchLocalePath('en')"
             class="lang-btn"
             :class="{ 'lang-btn--on': locale === 'en' }"
+            :aria-current="locale === 'en' ? 'true' : undefined"
           >EN</NuxtLink>
           <NuxtLink
             :to="switchLocalePath('ru')"
             class="lang-btn"
             :class="{ 'lang-btn--on': locale === 'ru' }"
+            :aria-current="locale === 'ru' ? 'true' : undefined"
           >RU</NuxtLink>
         </div>
 
