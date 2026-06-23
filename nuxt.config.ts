@@ -33,6 +33,11 @@ export default defineNuxtConfig({
     },
   },
 
+  components: [
+    { path: '~/components', pathPrefix: true, ignore: ['**/sections/**'] },
+    { path: '~/components/sections', pathPrefix: false },
+  ],
+
   modules: ["@nuxtjs/google-fonts", "@nuxtjs/i18n"],
 
   googleFonts: {

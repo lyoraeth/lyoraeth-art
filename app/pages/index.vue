@@ -1,3 +1,10 @@
 <template>
-  <div />
+  <main class="wrap">
+    <HeroSection />
+    <WorkSection />
+    <StackSection />
+    <ApproachSection />
+    <WritingSection />
+    <ContactSection />
+  </main>
 </template>
