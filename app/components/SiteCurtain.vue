@@ -55,6 +55,8 @@ onUnmounted(() => {
         {{ t('curtain.closing') }}<span class="curtain-acc">{{ t('curtain.closing_acc') }}</span>
       </p>
 
+      <div class="curtain-colophon-wrap">
+        <img src="/avatar.jpg" alt="" class="curtain-avatar" aria-hidden="true" />
       <dl class="curtain-colophon">
         <div class="curtain-row">
           <dt class="curtain-key">{{ t('curtain.type_label') }}</dt>
@@ -77,6 +79,7 @@ onUnmounted(() => {
           <dd>{{ t('curtain.lang_value') }}</dd>
         </div>
       </dl>
+      </div>
     </div>
   </div>
 </template>
@@ -145,6 +148,29 @@ onUnmounted(() => {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   flex-shrink: 0;
+}
+
+/* ── Avatar easter egg ───────────────────────────────────────────────────── */
+.curtain-colophon-wrap {
+  position: relative;
+}
+
+.curtain-avatar {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0.55;
+  transition: opacity 0.35s var(--ease-silk);
+  pointer-events: none;
+}
+
+.curtain-colophon-wrap:hover .curtain-avatar {
+  opacity: 1;
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
