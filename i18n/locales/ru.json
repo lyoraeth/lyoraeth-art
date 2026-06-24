@@ -93,7 +93,12 @@
     "posts_many": "{n} постов",
     "back": "Блог",
     "search": "Поиск",
+    "search_placeholder": "название, теги…",
     "sort_by": "Сортировка",
+    "sort_date_desc": "Новые",
+    "sort_date_asc": "Старые",
+    "sort_alpha": "А → Я",
+    "sort_popular": "Популярное",
     "not_found": "Пусто. Скоро допишу."
   },
 

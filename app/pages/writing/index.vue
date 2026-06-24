@@ -48,12 +48,12 @@ const filtered = computed<PostItem[]>(() => {
   }
 })
 
-const sorts: { key: SortKey; label: string }[] = [
-  { key: 'date-desc', label: 'Newest' },
-  { key: 'date-asc',  label: 'Oldest' },
-  { key: 'alpha',     label: 'A → Z'  },
-  { key: 'popular',   label: 'Popular' },
-]
+const sorts = computed(() => [
+  { key: 'date-desc' as SortKey, label: t('writing.sort_date_desc') },
+  { key: 'date-asc'  as SortKey, label: t('writing.sort_date_asc')  },
+  { key: 'alpha'     as SortKey, label: t('writing.sort_alpha')      },
+  { key: 'popular'   as SortKey, label: t('writing.sort_popular')    },
+])
 </script>
 
 <template>
@@ -78,7 +78,7 @@ const sorts: { key: SortKey; label: string }[] = [
               v-model="search"
               class="search-input"
               type="search"
-              placeholder="title, tag…"
+              :placeholder="t('writing.search_placeholder')"
               autocomplete="off"
             />
           </div>

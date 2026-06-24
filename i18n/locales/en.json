@@ -93,7 +93,12 @@
     "posts_many": "{n} posts",
     "back": "Writing",
     "search": "Search",
+    "search_placeholder": "title, tag…",
     "sort_by": "Sort by",
+    "sort_date_desc": "Newest",
+    "sort_date_asc": "Oldest",
+    "sort_alpha": "A → Z",
+    "sort_popular": "Popular",
     "not_found": "Nothing yet. Coming soon."
   },
 
