@@ -1,5 +1,6 @@
   <script setup lang="ts">
   const { t } = useI18n()
+  const localePath = useLocalePath()
 
   const { data: items } = await useFetch('/api/work', { default: () => [] })
 
@@ -28,7 +29,7 @@
       </div>
 
       <div class="view-all-wrap">
-        <NuxtLink to="/work" class="view-all">{{ t('work.see_all') }} <span class="va-arrow">→</span></NuxtLink>
+        <NuxtLink :to="localePath('/work')" class="view-all">{{ t('work.see_all') }} <span class="va-arrow">→</span></NuxtLink>
       </div>
     </section>
   </template>

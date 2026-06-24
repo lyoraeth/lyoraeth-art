@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { PostItem } from '../../../server/api/posts.get'
 
-const { t } = useI18n()
-const loc   = useLoc()
+const { t }        = useI18n()
+const loc          = useLoc()
+const localePath   = useLocalePath()
 
 const { data: posts } = await useFetch('/api/posts', { default: () => [] as PostItem[] })
 
@@ -105,7 +106,7 @@ useGlowCard(mini1)
         </a>
       </div>
       <div class="view-all-wrap">
-        <NuxtLink to="/writing" class="view-all">{{ t('writing.see_all') }} <span class="va-arrow">→</span></NuxtLink>
+        <NuxtLink :to="localePath('/writing')" class="view-all">{{ t('writing.see_all') }} <span class="va-arrow">→</span></NuxtLink>
       </div>
     </div>
 
