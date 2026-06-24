@@ -147,6 +147,7 @@ useSeoMeta({
   width: 100%;
   height: auto;
   display: block;
+  aspect-ratio: auto 16/9;
 }
 
 .work-desc {

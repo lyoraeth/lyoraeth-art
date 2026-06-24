@@ -80,7 +80,15 @@ async function vote(dir: 'up' | 'down') {
       </button>
     </div>
 
-    <div class="rating-bar" :title="`${up} up · ${down} down`">
+    <div
+      class="rating-bar"
+      role="meter"
+      :aria-valuenow="Math.round(upRatio * 100)"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      :aria-label="t('post.rating.meter', { pct: Math.round(upRatio * 100) })"
+      :title="`${up} up · ${down} down`"
+    >
       <div class="bar-fill" :style="{ width: `${upRatio * 100}%` }"></div>
     </div>
 

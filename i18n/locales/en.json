@@ -119,7 +119,8 @@
       "prompt": "Was this helpful?",
       "voted": "Vote cast · thanks!",
       "upvote": "Upvote",
-      "downvote": "Downvote"
+      "downvote": "Downvote",
+      "meter": "Post rating: {pct}% positive"
     },
     "comments": {
       "count_one": "{n} comment",

@@ -48,7 +48,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   <nav class="nav" :class="{ 'nav--glass': scrolled }" :aria-label="t('nav.site_nav')">
     <div class="nav-inner">
       <NuxtLink :to="localePath('/')" class="brand">
-        <img src="/logo.svg" alt="lyoraeth" class="brand-logo" />
+        <img src="/logo.svg" alt="lyoraeth" class="brand-logo" width="256" height="45" />
       </NuxtLink>
 
       <div class="nav-links">
