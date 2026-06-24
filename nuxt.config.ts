@@ -78,5 +78,6 @@ export default defineNuxtConfig({
     strategy: "prefix_except_default",
     langDir: "locales/",
     baseUrl: "https://lyoraeth.art",
+    vueI18n: "./i18n.config.ts",
   },
 });
