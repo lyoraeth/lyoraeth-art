@@ -196,7 +196,7 @@
     "s3_body": "If you leave a comment on a post, your name, optional email address, and the comment text are stored in Sanity (a cloud-based content platform, servers in the EU/US). Your email is shown only as {'@'}handle — the full address is not displayed publicly. Comments may be moderated or removed at my discretion.",
 
     "s4_title": "Cookies",
-    "s4_body": "I do not set any cookies. Cloudflare Turnstile may set a short-lived technical cookie as part of the challenge mechanism; it is cleared when the session ends.",
+    "s4_body": "This site sets one functional cookie — `i18n_locale` — to remember your language preference across visits. It contains no personal data and is never shared with third parties. Cloudflare Turnstile may also set a short-lived technical cookie as part of its challenge mechanism; it is cleared when the session ends. No tracking or advertising cookies are used.",
 
     "s5_title": "Your rights",
     "s5_body": "Under GDPR and equivalent laws you have the right to access, correct, or delete any personal data I hold. To exercise these rights, email me at {email}. I will respond within 30 days.",
