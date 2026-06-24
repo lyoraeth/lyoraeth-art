@@ -82,5 +82,12 @@ export default defineNuxtConfig({
     langDir: "locales/",
     baseUrl: "https://lyoraeth.art",
     vueI18n: "./i18n.config.ts",
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "i18n_locale",
+      cookieSecure: true,
+      alwaysRedirect: false,
+      fallbackLocale: "en",
+    },
   },
 });
