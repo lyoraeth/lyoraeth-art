@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
         _type == "image" => {
           ...,
           "url": asset->url,
+          "alt": alt,
           "width":  asset->metadata.dimensions.width,
           "height": asset->metadata.dimensions.height
         }

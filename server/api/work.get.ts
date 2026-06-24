@@ -32,7 +32,7 @@ export interface WorkItem {
   kicker:      { en: string; ru: string }
   description: { en: string; ru: string }
   tags:        string[]
-  tagWarm:     string
+  tagWarm:     string | null
   url?:        string
   year?:       number
   coverUrl:    string | null
