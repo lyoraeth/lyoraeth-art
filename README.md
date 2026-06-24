@@ -12,7 +12,7 @@ Personal site — work, writing, contact. The site itself is the demo.
 
 | | |
 |:---:|:---:|
-| ![Hero](public/readme/hero.png) | ![Mobile](public/readme/mobile.png) |
+| ![Hero](public/readme/hero.png) | <img src="public/readme/mobile.png" width="260"> |
 | ![Work](public/readme/work.png) | ![Work page](public/readme/work-page.png) |
 | ![Contact](public/readme/contact.png) | |
 
