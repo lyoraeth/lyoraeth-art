@@ -54,10 +54,11 @@ function navTo(hash: string) {
     align-items: center;
     gap: 0.125rem;
     position: fixed;
-    bottom: 1rem;
+    bottom: max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem));
     left: 50%;
     transform: translateX(-50%);
     z-index: 60;
+    max-width: calc(100vw - 2rem);
     padding: 0.375rem;
     border-radius: 1rem;
     overflow: hidden;

@@ -84,6 +84,7 @@ onUnmounted(() => {
   right: 0;
   bottom: 0;
   z-index: 0;
+  overflow: hidden;
   background: var(--curtain);
   border-top: 1px solid oklch(100% 0 0 / 6%);
   border-radius: var(--radius-curtain) var(--radius-curtain) 0 0;
@@ -92,6 +93,7 @@ onUnmounted(() => {
     clamp(3.75rem, 9vw, 8.125rem)
     clamp(1.25rem, 0.1538rem + 4.8718vw, 6rem)
     clamp(3.125rem, 7vw, 5.625rem);
+  padding-bottom: max(clamp(3.125rem, 7vw, 5.625rem), env(safe-area-inset-bottom));
 }
 
 .curtain-inner {

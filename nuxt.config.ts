@@ -26,6 +26,14 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
+  app: {
+    head: {
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+      ],
+    },
+  },
+
   devServer: {
     host: "0.0.0.0",
     port: 3000,
