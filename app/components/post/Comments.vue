@@ -239,10 +239,41 @@ async function submit() {
   cursor: pointer;
 }
 .consent-check {
+  appearance: none;
+  -webkit-appearance: none;
   flex-shrink: 0;
-  margin-top: 0.15rem;
-  accent-color: var(--ember);
+  margin-top: 0.2rem;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.1875rem;
+  background: transparent;
   cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  display: grid;
+  place-items: center;
+}
+.consent-check::before {
+  content: '';
+  width: 0.3125rem;
+  height: 0.5rem;
+  border: 1.5px solid #1a120b;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.15s ease;
+  margin-top: -0.0625rem;
+}
+.consent-check:checked {
+  background: var(--ember);
+  border-color: var(--ember);
+}
+.consent-check:checked::before {
+  transform: rotate(45deg) scale(1);
+}
+.consent-check:focus-visible {
+  outline: 2px solid rgba(214, 154, 106, 0.5);
+  outline-offset: 2px;
 }
 .consent-link {
   color: var(--ember);

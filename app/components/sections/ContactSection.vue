@@ -304,7 +304,7 @@ onMounted(() => observe(cardEl.value))
   color: var(--faint);
 }
 
-.contact-form input,
+.contact-form input:not(.consent-check),
 .contact-form textarea {
   width: 100%;
   background: rgba(255, 255, 255, 0.03);
@@ -323,12 +323,12 @@ onMounted(() => observe(cardEl.value))
 .contact-form textarea::placeholder {
   color: var(--faint);
 }
-.contact-form input:focus,
+.contact-form input:not(.consent-check):focus,
 .contact-form textarea:focus {
   border-color: rgba(214, 154, 106, 0.45);
   border-color: oklch(72% 0.1 58 / 45%);
 }
-.contact-form input:focus-visible,
+.contact-form input:not(.consent-check):focus-visible,
 .contact-form textarea:focus-visible {
   outline: 2px solid rgba(214, 154, 106, 0.6);
   outline: 2px solid oklch(72% 0.1 58 / 60%);
@@ -425,10 +425,41 @@ onMounted(() => observe(cardEl.value))
   cursor: pointer;
 }
 .consent-check {
+  appearance: none;
+  -webkit-appearance: none;
   flex-shrink: 0;
-  margin-top: 0.15rem;
-  accent-color: var(--ember);
+  margin-top: 0.2rem;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.1875rem;
+  background: transparent;
   cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  display: grid;
+  place-items: center;
+}
+.consent-check::before {
+  content: '';
+  width: 0.3125rem;
+  height: 0.5rem;
+  border: 1.5px solid #1a120b;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.15s ease;
+  margin-top: -0.0625rem;
+}
+.consent-check:checked {
+  background: var(--ember);
+  border-color: var(--ember);
+}
+.consent-check:checked::before {
+  transform: rotate(45deg) scale(1);
+}
+.consent-check:focus-visible {
+  outline: 2px solid rgba(214, 154, 106, 0.5);
+  outline-offset: 2px;
 }
 .consent-link {
   color: var(--ember);
