@@ -190,6 +190,7 @@ const ptComponents: any = {
   padding: 0.25rem 0.5rem;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
+  background: rgba(255, 255, 255, 0.02);
   background: oklch(100% 0 0 / 2%);
 }
 
@@ -249,6 +250,7 @@ const ptComponents: any = {
 :deep(.pt-inline-code) {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.875em;
+  background: rgba(255, 255, 255, 0.06);
   background: oklch(100% 0 0 / 6%);
   border: 1px solid var(--line-soft);
   border-radius: 0.25rem;
@@ -260,6 +262,7 @@ const ptComponents: any = {
 :deep(.pt-link) {
   color: var(--ember);
   text-decoration: underline;
+  text-decoration-color: rgba(214, 154, 106, 0.4);
   text-decoration-color: oklch(72% 0.1 58 / 40%);
   text-underline-offset: 2px;
   transition: text-decoration-color 0.2s;

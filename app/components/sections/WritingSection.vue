@@ -155,7 +155,7 @@ useGlowCard(mini1)
   text-decoration: none;
   color: inherit;
 }
-.feat:hover { border-color: oklch(72% 0.1 58 / 30%); }
+.feat:hover { border-color: rgba(214, 154, 106, 0.3); border-color: oklch(72% 0.1 58 / 30%); }
 
 .feat-thumb {
   position: relative;
@@ -221,6 +221,7 @@ useGlowCard(mini1)
   padding: 0.3125rem 0.625rem;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
+  background: rgba(255, 255, 255, 0.02);
   background: oklch(100% 0 0 / 2%);
 }
 .feat-read {
@@ -257,6 +258,7 @@ useGlowCard(mini1)
     border-color 0.3s  var(--ease-silk);
 }
 .mini-card:hover {
+  border-color: rgba(214, 154, 106, 0.3);
   border-color: oklch(72% 0.1 58 / 30%);
   transform: translateY(-0.1875rem);
 }

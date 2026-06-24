@@ -89,6 +89,7 @@ body {
   position: relative;
   z-index: 1;
   background: var(--void);
+  min-height: 100vh;
   min-height: 100svh;
 }
 </style>

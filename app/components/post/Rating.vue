@@ -120,6 +120,7 @@ async function vote(dir: 'up' | 'down') {
   padding: 0.375rem 0.625rem;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
+  background: rgba(255, 255, 255, 0.03);
   background: oklch(100% 0 0 / 3%);
   color: var(--mist);
   font-size: 0.6875rem;
@@ -133,11 +134,12 @@ async function vote(dir: 'up' | 'down') {
 .vote-btn:not(.disabled):hover {
   color: var(--snow);
   border-color: var(--line);
+  background: rgba(255, 255, 255, 0.06);
   background: oklch(100% 0 0 / 6%);
 }
 .vote-btn.disabled { cursor: default; opacity: 0.5; }
 .vote-up.active  { color: var(--ember); border-color: var(--ember-border); background: var(--ember-bg); opacity: 1; }
-.vote-down.active { color: oklch(65% 0.14 270); border-color: oklch(65% 0.14 270 / 30%); background: oklch(65% 0.14 270 / 8%); opacity: 1; }
+.vote-down.active { color: #7070CE; color: oklch(65% 0.14 270); border-color: rgba(112, 112, 206, 0.3); border-color: oklch(65% 0.14 270 / 30%); background: rgba(112, 112, 206, 0.08); background: oklch(65% 0.14 270 / 8%); opacity: 1; }
 
 .rating-total {
   font-size: 1.25rem;
@@ -149,12 +151,13 @@ async function vote(dir: 'up' | 'down') {
   transition: color 0.3s;
 }
 .rating-total.positive { color: var(--ember); }
-.rating-total.negative { color: oklch(65% 0.14 270); }
+.rating-total.negative { color: #7070CE; color: oklch(65% 0.14 270); }
 .rating-total.neutral  { color: var(--faint); }
 
 .rating-bar {
   width: 8rem;
   height: 3px;
+  background: rgba(112, 112, 206, 0.25);
   background: oklch(65% 0.14 270 / 25%);
   border-radius: 2px;
   overflow: hidden;

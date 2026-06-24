@@ -192,6 +192,7 @@ const sorts = computed(() => [
 }
 .search-input {
   width: 100%;
+  background: rgba(255, 255, 255, 0.03);
   background: oklch(100% 0 0 / 3%);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
@@ -203,7 +204,7 @@ const sorts = computed(() => [
   transition: border-color 0.2s;
 }
 .search-input::placeholder { color: var(--faint); }
-.search-input:focus { border-color: oklch(72% 0.1 58 / 40%); }
+.search-input:focus { border-color: rgba(214, 154, 106, 0.4); border-color: oklch(72% 0.1 58 / 40%); }
 .search-input::-webkit-search-cancel-button { display: none; }
 
 /* Sort */
@@ -219,7 +220,7 @@ const sorts = computed(() => [
   cursor: pointer;
   transition: color 0.15s, background 0.15s;
 }
-.sort-btn:hover  { color: var(--snow); background: oklch(100% 0 0 / 4%); }
+.sort-btn:hover  { color: var(--snow); background: rgba(255, 255, 255, 0.04); background: oklch(100% 0 0 / 4%); }
 .sort-btn.active { color: var(--ember); background: var(--ember-bg); }
 
 /* ── Post list ── */
@@ -239,7 +240,7 @@ const sorts = computed(() => [
     transform    var(--duration-reveal) var(--ease-out-expo),
     border-color 0.3s var(--ease-silk);
 }
-.post-row:hover { border-color: oklch(72% 0.1 58 / 30%); }
+.post-row:hover { border-color: rgba(214, 154, 106, 0.3); border-color: oklch(72% 0.1 58 / 30%); }
 
 .post-row-meta {
   display: flex;
@@ -275,6 +276,7 @@ const sorts = computed(() => [
   padding: 0.25rem 0.5rem;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
+  background: rgba(255, 255, 255, 0.02);
   background: oklch(100% 0 0 / 2%);
 }
 .row-read {

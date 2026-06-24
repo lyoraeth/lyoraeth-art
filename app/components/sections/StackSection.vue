@@ -153,6 +153,7 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
   padding: 0.3125rem 0.75rem;
   border-radius: var(--radius-chip);
   border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.02);
   background: oklch(100% 0 0 / 2%);
   cursor: default;
   transition:
@@ -169,6 +170,7 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
   transform: translateY(-0.125rem);
 }
 .chip:focus-visible {
+  outline: 2px solid rgba(214, 154, 106, 0.7);
   outline: 2px solid oklch(72% 0.1 58 / 70%);
   outline-offset: 2px;
 }
@@ -190,8 +192,10 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
   padding: 0.4375rem 0.6875rem;
   border-radius: 0.5rem;
   border: 1px solid var(--line);
+  background: rgba(14, 18, 26, 0.92);
   background: oklch(13% 0.009 235 / 92%);
   backdrop-filter: blur(10px);
+  box-shadow: 0 0.625rem 1.5rem -0.75rem rgba(0, 0, 0, 0.9);
   box-shadow: 0 0.625rem 1.5rem -0.75rem oklch(0% 0 0 / 90%);
   opacity: 0;
   pointer-events: none;
@@ -207,6 +211,7 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
   left: 50%;
   transform: translateX(-50%);
   border: 0.3125rem solid transparent;
+  border-top-color: rgba(14, 18, 26, 0.92);
   border-top-color: oklch(13% 0.009 235 / 92%);
 }
 .chip:hover .tip,

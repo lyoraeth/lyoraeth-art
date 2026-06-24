@@ -69,12 +69,24 @@ function navTo(hash: string) {
 
     /* Layered background: warm top wash + dark body + bottom depth tint */
     background:
+      linear-gradient(to bottom, transparent 55%, rgba(0, 0, 0, 0.18) 100%),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0) 35%),
+      rgba(14, 18, 26, 0.74);
+    background:
       linear-gradient(to bottom, transparent 55%, oklch(0% 0 0 / 18%) 100%),
       linear-gradient(160deg, oklch(100% 0 0 / 5.5%) 0%, oklch(100% 0 0 / 0%) 35%),
       oklch(13% 0.009 235 / 74%);
 
     /* Edge refraction simulation — sub-pixel values stay in px */
+    border: 1px solid rgba(255, 255, 255, 0.13);
     border: 1px solid oklch(100% 0 0 / 13%);
+    box-shadow:
+      inset 0  1.5px 0   rgba(255, 255, 255, 0.22),
+      inset 0 -0.5px 0   rgba(255, 255, 255, 0.07),
+      inset  0.5px 0 0   rgba(255, 255, 255, 0.09),
+      inset -0.5px 0 0   rgba(255, 255, 255, 0.09),
+      0  0.25rem 1rem    -0.25rem  rgba(0, 0, 0, 0.45),
+      0  1.5rem  3.5rem  -1.125rem rgba(0, 0, 0, 0.72);
     box-shadow:
       inset 0  1.5px 0   oklch(100% 0 0 / 22%),
       inset 0 -0.5px 0   oklch(100% 0 0 / 7%),
@@ -93,6 +105,9 @@ function navTo(hash: string) {
     position: absolute;
     inset: 0;
     border-radius: inherit;
+    background:
+      radial-gradient(ellipse 85% 65% at 32% -25%, rgba(255, 255, 255, 0.13) 0%, transparent 62%),
+      radial-gradient(ellipse 45% 30% at 75% 130%, rgba(178, 153, 116, 0.07) 0%, transparent 55%);
     background:
       radial-gradient(ellipse 85% 65% at 32% -25%, oklch(100% 0 0 / 13%) 0%, transparent 62%),
       radial-gradient(ellipse 45% 30% at 75% 130%, oklch(65% 0.04 55 / 7%) 0%, transparent 55%);
@@ -131,6 +146,7 @@ function navTo(hash: string) {
 .dock-link:hover,
 .dock-link:active {
   color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
   background: oklch(100% 0 0 / 5%);
 }
 

@@ -205,15 +205,19 @@ onMounted(() => observe(cardEl.value))
     transform 0.2s var(--ease-out-expo),
     box-shadow 0.25s var(--ease-silk),
     background 0.2s var(--ease-silk);
+  box-shadow: 0 0.75rem 1.875rem -0.75rem rgba(214, 154, 106, 0.5);
   box-shadow: 0 0.75rem 1.875rem -0.75rem oklch(72% 0.1 58 / 50%);
 }
 .contact-cta:hover {
   transform: translateY(-0.125rem);
+  box-shadow: 0 1rem 2.25rem -0.75rem rgba(214, 154, 106, 0.65);
   box-shadow: 0 1rem 2.25rem -0.75rem oklch(72% 0.1 58 / 65%);
+  background: #DDAA76;
   background: oklch(76% 0.1 58);
 }
 .contact-cta:active {
   transform: translateY(0.0625rem) scale(0.98);
+  box-shadow: 0 0.5rem 1.25rem -0.75rem rgba(214, 154, 106, 0.4);
   box-shadow: 0 0.5rem 1.25rem -0.75rem oklch(72% 0.1 58 / 40%);
 }
 .cta-arrow {
@@ -248,11 +252,13 @@ onMounted(() => observe(cardEl.value))
 .channel-link:hover {
   color: var(--ink);
   border-color: var(--line);
+  background: rgba(255, 255, 255, 0.04);
   background: oklch(100% 0 0 / 4%);
   transform: translateY(-0.0625rem);
 }
 .channel-link:active {
   transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.06);
   background: oklch(100% 0 0 / 6%);
 }
 .channel-handle {
@@ -286,6 +292,7 @@ onMounted(() => observe(cardEl.value))
 .contact-form input,
 .contact-form textarea {
   width: 100%;
+  background: rgba(255, 255, 255, 0.03);
   background: oklch(100% 0 0 / 3%);
   border: 1px solid var(--line-soft);
   border-radius: 0.625rem;
@@ -303,16 +310,19 @@ onMounted(() => observe(cardEl.value))
 }
 .contact-form input:focus,
 .contact-form textarea:focus {
+  border-color: rgba(214, 154, 106, 0.45);
   border-color: oklch(72% 0.1 58 / 45%);
 }
 .contact-form input:focus-visible,
 .contact-form textarea:focus-visible {
+  outline: 2px solid rgba(214, 154, 106, 0.6);
   outline: 2px solid oklch(72% 0.1 58 / 60%);
   outline-offset: -1px;
 }
 
 .contact-form button {
   width: 100%;
+  background: rgba(255, 255, 255, 0.04);
   background: oklch(100% 0 0 / 4%);
   border: 1px solid var(--line);
   border-radius: 0.625rem;
@@ -335,6 +345,7 @@ onMounted(() => observe(cardEl.value))
 }
 .contact-form button:active {
   transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.06);
   background: oklch(100% 0 0 / 6%);
   border-color: var(--line);
   color: var(--ink);
@@ -350,6 +361,7 @@ onMounted(() => observe(cardEl.value))
 
 .form-err {
   font-size: 0.8125rem;
+  color: #7070CE;
   color: oklch(65% 0.14 270);
   margin: 0;
 }
@@ -370,6 +382,7 @@ onMounted(() => observe(cardEl.value))
   flex-direction: column;
   align-items: flex-start;
   gap: 0.75rem;
+  color: #55B070;
   color: oklch(72% 0.12 150);
   font-size: 0.9375rem;
   padding: 1rem 0;

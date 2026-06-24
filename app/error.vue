@@ -44,6 +44,7 @@ function handleError() {
 
 <style scoped>
 .error-page {
+  min-height: 100vh;
   min-height: 100dvh;
   background: var(--void);
   display: flex;
@@ -155,7 +156,7 @@ function handleError() {
   transition: background 0.2s;
   text-decoration: none;
 }
-.btn-home:hover { background: oklch(72% 0.1 58 / 15%); }
+.btn-home:hover { background: rgba(214, 154, 106, 0.15); background: oklch(72% 0.1 58 / 15%); }
 
 /* ── Responsive ── */
 @media (max-width: 40rem) {

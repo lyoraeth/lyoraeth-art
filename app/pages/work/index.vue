@@ -127,7 +127,7 @@ const grouped = computed(() => {
     transform    var(--duration-reveal) var(--ease-out-expo),
     border-color 0.3s var(--ease-silk);
 }
-.work-compact:hover { border-color: oklch(72% 0.1 58 / 30%); }
+.work-compact:hover { border-color: rgba(214, 154, 106, 0.3); border-color: oklch(72% 0.1 58 / 30%); }
 
 .wc-top {
   display: flex;
@@ -161,6 +161,7 @@ const grouped = computed(() => {
   padding: 0.25rem 0.5rem;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
+  background: rgba(255, 255, 255, 0.02);
   background: oklch(100% 0 0 / 2%);
 }
 .tag--warm {

@@ -130,6 +130,7 @@ useSeoMeta({
   padding: 0.25rem 0.5rem;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
+  background: rgba(255, 255, 255, 0.02);
   background: oklch(100% 0 0 / 2%);
 }
 .tag--warm {
@@ -171,7 +172,7 @@ useSeoMeta({
   text-decoration: none;
   transition: background 0.2s;
 }
-.view-btn:hover { background: oklch(72% 0.1 58 / 15%); }
+.view-btn:hover { background: rgba(214, 154, 106, 0.15); background: oklch(72% 0.1 58 / 15%); }
 .btn-arrow {
   display: inline-block;
   transition: transform 0.3s var(--ease-out-expo);

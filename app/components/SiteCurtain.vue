@@ -90,8 +90,10 @@ onUnmounted(() => {
   z-index: 0;
   overflow: hidden;
   background: var(--curtain);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   border-top: 1px solid oklch(100% 0 0 / 6%);
   border-radius: var(--radius-curtain) var(--radius-curtain) 0 0;
+  box-shadow: inset 0 1.5rem 2.5rem -1.875rem rgba(0, 0, 0, 0.9);
   box-shadow: inset 0 1.5rem 2.5rem -1.875rem oklch(0% 0 0 / 90%);
   padding:
     clamp(3.75rem, 9vw, 8.125rem)
@@ -133,6 +135,7 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 0.875rem;
   padding: 0.6875rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   border-bottom: 1px solid oklch(100% 0 0 / 5%);
   font-size: 0.8125rem;
   color: var(--mist);

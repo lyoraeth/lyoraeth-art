@@ -121,6 +121,7 @@ onMounted(() => {
   padding: 0.3125rem 0.625rem;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
+  background: rgba(255, 255, 255, 0.02);
   background: oklch(100% 0 0 / 2%);
 }
 .tag--warm {
@@ -148,6 +149,7 @@ onMounted(() => {
   gap: 0.375rem;
   padding: 0 0.75rem;
   border-bottom: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.02);
   background: oklch(100% 0 0 / 2%);
   z-index: 2;
 }

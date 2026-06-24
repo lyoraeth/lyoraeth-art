@@ -211,6 +211,7 @@ async function submit() {
   opacity: 0.7;
 }
 .field-input {
+  background: rgba(255, 255, 255, 0.03);
   background: oklch(100% 0 0 / 3%);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-tag);
@@ -222,8 +223,8 @@ async function submit() {
   resize: none;
 }
 .field-input::placeholder { color: var(--faint); }
-.field-input:focus { border-color: oklch(72% 0.1 58 / 40%); }
-.field-input:focus-visible { outline: 2px solid oklch(72% 0.1 58 / 60%); outline-offset: -1px; }
+.field-input:focus { border-color: rgba(214, 154, 106, 0.4); border-color: oklch(72% 0.1 58 / 40%); }
+.field-input:focus-visible { outline: 2px solid rgba(214, 154, 106, 0.6); outline: 2px solid oklch(72% 0.1 58 / 60%); outline-offset: -1px; }
 .field-textarea { min-height: 7rem; line-height: 1.6; }
 
 .turnstile { margin-top: 0.25rem; }
@@ -240,15 +241,16 @@ async function submit() {
   cursor: pointer;
   transition: background 0.2s;
 }
-.submit-btn:hover:not(:disabled) { background: oklch(72% 0.1 58 / 15%); }
+.submit-btn:hover:not(:disabled) { background: rgba(214, 154, 106, 0.15); background: oklch(72% 0.1 58 / 15%); }
 .submit-btn:disabled { opacity: 0.5; cursor: default; }
 
-.err-msg { font-size: 0.8125rem; color: oklch(65% 0.14 270); }
+.err-msg { font-size: 0.8125rem; color: #7070CE; color: oklch(65% 0.14 270); }
 
 .success-msg {
   display: flex;
   align-items: center;
   gap: 0.625rem;
+  color: #55B070;
   color: oklch(72% 0.12 150);
   font-size: 0.9375rem;
   flex-wrap: wrap;

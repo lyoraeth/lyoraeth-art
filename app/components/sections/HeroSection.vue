@@ -37,6 +37,7 @@ const meta = computed(() =>
 
 <style scoped>
 .hero {
+  min-height: 100vh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;

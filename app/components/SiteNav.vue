@@ -99,6 +99,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 
 .nav--glass {
+  background: rgba(14, 18, 26, 0.72);
   background: oklch(13% 0.009 235 / 72%);
   backdrop-filter: blur(18px) saturate(1.5) brightness(1.03);
   -webkit-backdrop-filter: blur(18px) saturate(1.5) brightness(1.03);
@@ -206,6 +207,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   border: 1px solid var(--line);
   border-radius: 0.4375rem;
   padding: 0.125rem;
+  background: rgba(255, 255, 255, 0.03);
   background: oklch(100% 0 0 / 3%);
   backdrop-filter: blur(10px) saturate(1.45) brightness(1.05);
   -webkit-backdrop-filter: blur(10px) saturate(1.45) brightness(1.05);
@@ -255,6 +257,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
   color: var(--ink);
   text-decoration: none;
   font-size: 0.84375rem;
+  background: rgba(255, 255, 255, 0.03);
   background: oklch(100% 0 0 / 3%);
   backdrop-filter: blur(10px) saturate(1.3);
   -webkit-backdrop-filter: blur(10px) saturate(1.3);
@@ -269,6 +272,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 }
 
 .nav-cv:active {
+  background: rgba(214, 154, 106, 0.18);
   background: color-mix(in srgb, var(--ember) 18%, transparent);
 }
 
