@@ -7,7 +7,7 @@ const loc   = useLoc()
 const { data: posts } = await useFetch('/api/posts', { default: () => [] as PostItem[] })
 
 const featured  = computed(() => posts.value[0] ?? null)
-const secondary = computed(() => posts.value.slice(1))
+const secondary = computed(() => (posts.value ?? []).slice(1))
 
 const formatDate = useFormatDate()
 
