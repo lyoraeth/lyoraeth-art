@@ -423,6 +423,8 @@ onMounted(() => observe(cardEl.value))
   color: var(--faint);
   line-height: 1.5;
   cursor: pointer;
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
 }
 .consent-check {
   appearance: none;
@@ -431,14 +433,15 @@ onMounted(() => observe(cardEl.value))
   margin-top: 0.2rem;
   width: 1rem;
   height: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 0.1875rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 0.25rem;
   background: transparent;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
   display: grid;
   place-items: center;
 }
+.consent-check:hover { border-color: rgba(214, 154, 106, 0.45); border-color: oklch(72% 0.1 58 / 45%); }
 .consent-check::before {
   content: '';
   width: 0.3125rem;
@@ -458,7 +461,7 @@ onMounted(() => observe(cardEl.value))
   transform: rotate(45deg) scale(1);
 }
 .consent-check:focus-visible {
-  outline: 2px solid rgba(214, 154, 106, 0.5);
+  outline: 2px solid rgba(214, 154, 106, 0.4);
   outline-offset: 2px;
 }
 .consent-link {

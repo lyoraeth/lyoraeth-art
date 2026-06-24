@@ -92,7 +92,7 @@ async function submit() {
             required rows="4" :placeholder="t('post.comments.message_placeholder')" />
         </div>
 
-        <NuxtTurnstile v-model="token" class="turnstile" />
+        <NuxtTurnstile v-model="token" appearance="invisible" />
 
         <p v-if="state === 'error'" class="err-msg">{{ errMsg }}</p>
 
@@ -215,9 +215,8 @@ async function submit() {
 .field-input:focus-visible { outline: 2px solid rgba(214, 154, 106, 0.6); outline: 2px solid oklch(72% 0.1 58 / 60%); outline-offset: -1px; }
 .field-textarea { min-height: 7rem; line-height: 1.6; }
 
-.turnstile { margin-top: 0.25rem; }
-
 .submit-btn {
+  margin-top: 0.5rem;
   align-self: flex-start;
   padding: 0.5625rem 1.5rem;
   background: var(--ember-bg);
@@ -245,14 +244,15 @@ async function submit() {
   margin-top: 0.2rem;
   width: 1rem;
   height: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 0.1875rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 0.25rem;
   background: transparent;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
   display: grid;
   place-items: center;
 }
+.consent-check:hover { border-color: rgba(214, 154, 106, 0.45); border-color: oklch(72% 0.1 58 / 45%); }
 .consent-check::before {
   content: '';
   width: 0.3125rem;
@@ -272,7 +272,7 @@ async function submit() {
   transform: rotate(45deg) scale(1);
 }
 .consent-check:focus-visible {
-  outline: 2px solid rgba(214, 154, 106, 0.5);
+  outline: 2px solid rgba(214, 154, 106, 0.4);
   outline-offset: 2px;
 }
 .consent-link {
