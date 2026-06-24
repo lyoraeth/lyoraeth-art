@@ -188,9 +188,11 @@
     "type_label": "Шрифты",
     "type_value": "Golos Text · Onest · JetBrains Mono",
     "built_label": "Собрано",
-    "built_value": "вручную, на Nuxt",
-    "trackers_label": "Трекеры",
-    "trackers_value": "нет",
+    "built_value": "Nuxt · Vue · TypeScript",
+    "cms_label": "CMS",
+    "cms_value": "Sanity",
+    "trackers_label": "Аналитика",
+    "trackers_value": "Umami — без куков",
     "lang_label": "Язык",
     "lang_value": "EN · RU"
   }

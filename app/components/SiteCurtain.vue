@@ -65,6 +65,10 @@ onUnmounted(() => {
           <dd>{{ t('curtain.built_value') }}</dd>
         </div>
         <div class="curtain-row">
+          <dt class="curtain-key">{{ t('curtain.cms_label') }}</dt>
+          <dd>{{ t('curtain.cms_value') }}</dd>
+        </div>
+        <div class="curtain-row">
           <dt class="curtain-key">{{ t('curtain.trackers_label') }}</dt>
           <dd>{{ t('curtain.trackers_value') }}</dd>
         </div>

@@ -188,9 +188,11 @@
     "type_label": "Type",
     "type_value": "Golos Text · Onest · JetBrains Mono",
     "built_label": "Built",
-    "built_value": "by hand, on Nuxt",
-    "trackers_label": "Trackers",
-    "trackers_value": "none",
+    "built_value": "Nuxt · Vue · TypeScript",
+    "cms_label": "CMS",
+    "cms_value": "Sanity",
+    "trackers_label": "Analytics",
+    "trackers_value": "Umami — no cookies",
     "lang_label": "Lang",
     "lang_value": "EN · RU"
   }
