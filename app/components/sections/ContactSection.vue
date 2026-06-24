@@ -31,9 +31,6 @@ const state  = ref<State>('idle')
 const errMsg = ref('')
 
 const localePath = useLocalePath()
-const consentHref = computed(() =>
-  locale.value === 'ru' ? localePath('/personal-data') : localePath('/privacy')
-)
 
 async function onSubmit() {
   if (!contact.value.trim() || !message.value.trim() || !token.value || !consent.value) return
@@ -148,7 +145,15 @@ onMounted(() => observe(cardEl.value))
           <p v-if="state === 'error'" class="form-err" aria-live="polite">{{ errMsg }}</p>
           <label class="consent-label">
             <input type="checkbox" v-model="consent" class="consent-check" required />
-            {{ t('contact.consent_pre') }}<NuxtLink :to="consentHref" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
+            <span v-if="locale === 'ru'">
+              Я даю согласие на обработку данных и трансграничную передачу —
+              <NuxtLink :to="localePath('/personal-data')" target="_blank" class="consent-link">согласие</NuxtLink>
+              и
+              <NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">политика</NuxtLink>
+            </span>
+            <span v-else>
+              {{ t('contact.consent_pre') }}<NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
+            </span>
           </label>
           <button type="submit" :disabled="state === 'loading' || !token || !consent">
             <span v-if="state === 'loading'" class="loading-dot"></span>

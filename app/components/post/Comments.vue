@@ -24,9 +24,6 @@ function formatDate(iso: string) {
 
 const localePath = useLocalePath()
 const { locale } = useI18n()
-const consentHref = computed(() =>
-  locale.value === 'ru' ? localePath('/personal-data') : localePath('/privacy')
-)
 
 async function submit() {
   if (!nick.value.trim() || !message.value.trim() || !token.value || !consent.value) return
@@ -101,7 +98,15 @@ async function submit() {
 
         <label class="consent-label">
           <input type="checkbox" v-model="consent" class="consent-check" required />
-          {{ t('contact.consent_pre') }}<NuxtLink :to="consentHref" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
+          <span v-if="locale === 'ru'">
+            Я даю согласие на обработку никнейма и публикацию комментария —
+            <NuxtLink :to="localePath('/personal-data')" target="_blank" class="consent-link">согласие</NuxtLink>
+            и
+            <NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">политика</NuxtLink>
+          </span>
+          <span v-else>
+            {{ t('contact.consent_pre') }}<NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
+          </span>
         </label>
 
         <button type="submit" class="submit-btn" :disabled="state === 'loading' || !token || !consent">
