@@ -17,7 +17,7 @@ useSeoMeta({ title: computed(() => `${t('privacy.title')} — lyoraeth`) })
         <h2 class="privacy-section-title">{{ t(`privacy.s${n}_title`) }}</h2>
         <p class="privacy-section-body">
           <template v-if="n === 5">
-            {{ t('privacy.s5_body', { email: 'sarthriles@gmail.com' }) }}
+            {{ t('privacy.s5_body', { email: 'lyoraeth@gmail.com' }) }}
           </template>
           <template v-else>
             {{ t(`privacy.s${n}_body`) }}
