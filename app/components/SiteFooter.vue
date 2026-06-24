@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const { t } = useI18n()
+const { t }           = useI18n()
+const localePath      = useLocalePath()
 </script>
 
 <template>
@@ -7,8 +8,7 @@ const { t } = useI18n()
     <div class="footer-inner">
       <div class="footer-left">
         <span class="footer-copy">{{ t('footer.copyright') }}</span>
-        <a href="#" class="footer-link">{{ t('footer.privacy') }}</a>
-        <a href="#" class="footer-link">{{ t('footer.cookies') }}</a>
+        <NuxtLink :to="localePath('/privacy')" class="footer-link">{{ t('footer.privacy') }}</NuxtLink>
       </div>
       <span class="footer-hint">{{ t('footer.hint') }}</span>
     </div>
