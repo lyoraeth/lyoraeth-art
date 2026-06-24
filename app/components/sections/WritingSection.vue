@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PostItem } from '../../server/api/posts.get'
+import type { PostItem } from '../../../server/api/posts.get'
 
 const { t } = useI18n()
 const loc   = useLoc()

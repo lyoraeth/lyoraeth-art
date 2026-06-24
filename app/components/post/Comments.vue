@@ -61,7 +61,7 @@ async function submit() {
       <div v-for="c in comments" :key="c._id" class="comment-item">
         <div class="comment-header">
           <div class="comment-avatar" :aria-label="c.name">
-            {{ c.name[0].toUpperCase() }}
+            {{ (c.name[0] ?? '?').toUpperCase() }}
           </div>
           <div class="comment-meta">
             <span class="comment-name">{{ c.name }}</span>

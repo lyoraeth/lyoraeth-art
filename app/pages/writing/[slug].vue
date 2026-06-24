@@ -20,7 +20,8 @@ useSeoMeta({ title: computed(() => `${title.value} — lyoraeth`) })
 const formatDate = useFormatDate()
 
 /* ── Portable Text custom components ── */
-const ptComponents = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ptComponents: any = {
   types: {
     image: defineComponent({
       props: ['value'],

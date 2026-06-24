@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WorkItem } from '../../server/api/work.get'
+import type { WorkItem } from '../../../server/api/work.get'
 
 const { t } = useI18n()
 const plural = usePlural()

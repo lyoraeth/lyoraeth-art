@@ -4,7 +4,7 @@ const switchLocalePathRaw = useSwitchLocalePath()
 const localePath = useLocalePath()
 const route = useRoute()
 
-const switchLocalePath = (code: string) => switchLocalePathRaw(code).split('#')[0] || '/'
+const switchLocalePath = (code: string) => switchLocalePathRaw(code as 'en' | 'ru').split('#')[0] || '/'
 
 const isHome = computed(() => {
   const home = localePath('/')
