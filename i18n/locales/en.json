@@ -159,6 +159,11 @@
     "cv_note": "pdf ↓"
   },
 
+  "form": {
+    "required": "Required",
+    "required_consent": "Accept to continue"
+  },
+
   "error": {
     "404_title": "Nothing here",
     "404_message": "This page doesn't exist or has moved.",

@@ -7,14 +7,21 @@ const props = defineProps<{ slug: string; postTitle: string }>()
 
 const { data: comments, refresh } = await useFetch<CommentItem[]>(`/api/comments/${props.slug}`)
 
-const token   = ref('')
-const nick    = ref('')
-const message = ref('')
-const consent = ref(false)
+const token    = ref('')
+const nick     = ref('')
+const message  = ref('')
+const consent  = ref(false)
 
 type State = 'idle' | 'loading' | 'success' | 'error'
-const state  = ref<State>('idle')
-const errMsg = ref('')
+const state    = ref<State>('idle')
+const errMsg   = ref('')
+const attempted = ref(false)
+
+const ve = computed(() => ({
+  nick:    attempted.value && !nick.value.trim(),
+  message: attempted.value && !message.value.trim(),
+  consent: attempted.value && !consent.value,
+}))
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', {
@@ -26,7 +33,9 @@ const localePath = useLocalePath()
 const { locale } = useI18n()
 
 async function submit() {
+  attempted.value = true
   if (!nick.value.trim() || !message.value.trim() || !token.value || !consent.value) return
+  attempted.value = false
   state.value = 'loading'
   errMsg.value = ''
   try {
@@ -79,25 +88,29 @@ async function submit() {
         <button class="another-btn" @click="state = 'idle'">{{ t('post.comments.another') }}</button>
       </div>
 
-      <form v-else class="comment-form" @submit.prevent="submit">
+      <form v-else class="comment-form" novalidate @submit.prevent="submit">
         <div class="field">
           <label class="field-label" for="c-nick">{{ t('post.comments.nick') }}</label>
           <input id="c-nick" v-model="nick" class="field-input" type="text"
-            autocomplete="nickname" required :placeholder="t('post.comments.nick_placeholder')" />
+            :class="{ 'is-error': ve.nick }"
+            autocomplete="nickname" :placeholder="t('post.comments.nick_placeholder')" />
+          <p v-if="ve.nick" class="field-err" aria-live="polite">{{ t('form.required') }}</p>
         </div>
 
         <div class="field">
           <label class="field-label" for="c-msg">{{ t('post.comments.message') }}</label>
           <textarea id="c-msg" v-model="message" class="field-input field-textarea"
-            required rows="4" :placeholder="t('post.comments.message_placeholder')" />
+            :class="{ 'is-error': ve.message }"
+            rows="4" :placeholder="t('post.comments.message_placeholder')" />
+          <p v-if="ve.message" class="field-err" aria-live="polite">{{ t('form.required') }}</p>
         </div>
 
         <NuxtTurnstile v-model="token" appearance="invisible" />
 
         <p v-if="state === 'error'" class="err-msg">{{ errMsg }}</p>
 
-        <label class="consent-label">
-          <input type="checkbox" v-model="consent" class="consent-check" required />
+        <label class="consent-label" :class="{ 'consent-error': ve.consent }">
+          <input type="checkbox" v-model="consent" class="consent-check" />
           <span v-if="locale === 'ru'">
             Я даю согласие на обработку никнейма и публикацию комментария —
             <NuxtLink :to="localePath('/personal-data')" target="_blank" class="consent-link">согласие</NuxtLink>
@@ -108,8 +121,9 @@ async function submit() {
             {{ t('contact.consent_pre') }}<NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
           </span>
         </label>
+        <p v-if="ve.consent" class="field-err" aria-live="polite">{{ t('form.required_consent') }}</p>
 
-        <button type="submit" class="submit-btn" :disabled="state === 'loading' || !token || !consent">
+        <button type="submit" class="submit-btn" :disabled="state === 'loading' || !token">
           <span v-if="state === 'loading'" class="loading-dot"></span>
           <span v-else>{{ t('post.comments.submit') }}</span>
         </button>
@@ -213,7 +227,18 @@ async function submit() {
 .field-input::placeholder { color: var(--faint); }
 .field-input:focus { border-color: rgba(214, 154, 106, 0.4); border-color: oklch(72% 0.1 58 / 40%); }
 .field-input:focus-visible { outline: 2px solid rgba(214, 154, 106, 0.6); outline: 2px solid oklch(72% 0.1 58 / 60%); outline-offset: -1px; }
+.field-input.is-error { border-color: rgba(112, 112, 206, 0.5); border-color: oklch(65% 0.14 270 / 50%); }
 .field-textarea { min-height: 7rem; line-height: 1.6; }
+
+.field-err {
+  font-size: 0.6875rem;
+  color: #7070CE;
+  color: oklch(65% 0.14 270);
+  margin: 0.25rem 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+.consent-error { color: var(--ink); }
 
 .submit-btn {
   margin-top: 0.5rem;

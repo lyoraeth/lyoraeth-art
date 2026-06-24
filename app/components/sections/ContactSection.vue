@@ -27,13 +27,22 @@ const token   = ref('')
 const consent = ref(false)
 
 type State = 'idle' | 'loading' | 'success' | 'error'
-const state  = ref<State>('idle')
-const errMsg = ref('')
+const state    = ref<State>('idle')
+const errMsg   = ref('')
+const attempted = ref(false)
+
+const ve = computed(() => ({
+  contact: attempted.value && !contact.value.trim(),
+  message: attempted.value && !message.value.trim(),
+  consent: attempted.value && !consent.value,
+}))
 
 const localePath = useLocalePath()
 
 async function onSubmit() {
+  attempted.value = true
   if (!contact.value.trim() || !message.value.trim() || !token.value || !consent.value) return
+  attempted.value = false
   state.value = 'loading'
   errMsg.value = ''
   try {
@@ -122,29 +131,31 @@ onMounted(() => observe(cardEl.value))
           <button class="form-again" @click="state = 'idle'">{{ t('contact.send_another') }}</button>
         </div>
 
-        <form v-else class="contact-form" @submit.prevent="onSubmit">
+        <form v-else class="contact-form" novalidate @submit.prevent="onSubmit">
           <span class="eyebrow form-label">{{ t('contact.form_label') }}</span>
           <input
             v-model="contact"
             type="text"
             :placeholder="t('contact.contact_placeholder')"
+            :class="{ 'is-error': ve.contact }"
             autocomplete="off"
-            required
           >
+          <p v-if="ve.contact" class="field-err" aria-live="polite">{{ t('form.required') }}</p>
           <textarea
             v-model="message"
             rows="3"
             :placeholder="t('contact.message_placeholder')"
-            required
+            :class="{ 'is-error': ve.message }"
           ></textarea>
+          <p v-if="ve.message" class="field-err" aria-live="polite">{{ t('form.required') }}</p>
           <NuxtTurnstile
             v-model="token"
             :site-key="turnstileContactSiteKey || undefined"
             appearance="invisible"
           />
           <p v-if="state === 'error'" class="form-err" aria-live="polite">{{ errMsg }}</p>
-          <label class="consent-label">
-            <input type="checkbox" v-model="consent" class="consent-check" required />
+          <label class="consent-label" :class="{ 'consent-error': ve.consent }">
+            <input type="checkbox" v-model="consent" class="consent-check" />
             <span v-if="locale === 'ru'">
               Я даю согласие на обработку данных и трансграничную передачу —
               <NuxtLink :to="localePath('/personal-data')" target="_blank" class="consent-link">согласие</NuxtLink>
@@ -155,7 +166,8 @@ onMounted(() => observe(cardEl.value))
               {{ t('contact.consent_pre') }}<NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
             </span>
           </label>
-          <button type="submit" :disabled="state === 'loading' || !token || !consent">
+          <p v-if="ve.consent" class="field-err consent-field-err" aria-live="polite">{{ t('form.required_consent') }}</p>
+          <button type="submit" :disabled="state === 'loading' || !token">
             <span v-if="state === 'loading'" class="loading-dot"></span>
             <span v-else>{{ t('contact.submit') }}</span>
           </button>
@@ -379,6 +391,21 @@ onMounted(() => observe(cardEl.value))
   color: #7070CE;
   color: oklch(65% 0.14 270);
   margin: 0;
+}
+
+.field-err {
+  font-size: 0.75rem;
+  color: #7070CE;
+  color: oklch(65% 0.14 270);
+  margin: -0.375rem 0 0.375rem;
+}
+.consent-field-err { margin-top: 0; margin-bottom: 0.25rem; }
+.consent-error { color: var(--ink); }
+
+.contact-form input:not(.consent-check).is-error,
+.contact-form textarea.is-error {
+  border-color: rgba(112, 112, 206, 0.5);
+  border-color: oklch(65% 0.14 270 / 50%);
 }
 
 .contact-form button:disabled { opacity: 0.5; cursor: default; }
