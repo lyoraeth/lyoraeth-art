@@ -12,9 +12,9 @@ Personal site — work, writing, contact. The site itself is the demo.
 
 | | |
 |:---:|:---:|
-| ![Hero](public/readme/hero.png) | <img src="public/readme/mobile.png" width="260"> |
-| ![Work](public/readme/work.png) | ![Work page](public/readme/work-page.png) |
-| ![Contact](public/readme/contact.png) | |
+| <img src="public/readme/hero.png" height="220"> | <img src="public/readme/mobile.png" height="220"> |
+| <img src="public/readme/work.png" height="220"> | <img src="public/readme/work-page.png" height="220"> |
+| <img src="public/readme/contact.png" height="220"> | |
 
 ---
 
