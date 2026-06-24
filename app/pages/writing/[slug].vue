@@ -17,12 +17,7 @@ const title = computed(() =>
 
 useSeoMeta({ title: computed(() => `${title.value} — lyoraeth`) })
 
-function formatDate(iso: string) {
-  const d = new Date(iso)
-  return d.toLocaleDateString(locale.value === 'ru' ? 'ru-RU' : 'en-GB', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
-}
+const formatDate = useFormatDate()
 
 /* ── Portable Text custom components ── */
 const ptComponents = {
@@ -76,7 +71,7 @@ const ptComponents = {
     <!-- Header -->
     <header class="post-header">
       <div class="post-meta">
-        <span class="mono meta-date">{{ formatDate(post.publishedAt) }}</span>
+        <span class="mono meta-date">{{ formatDate(post.publishedAt, 'long') }}</span>
         <span class="meta-dot"></span>
         <span class="mono">{{ t('writing.min_read', { n: post.readingTime }) }}</span>
       </div>

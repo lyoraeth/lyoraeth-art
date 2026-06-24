@@ -9,10 +9,7 @@ const { data: posts } = await useFetch('/api/posts', { default: () => [] as Post
 const featured  = computed(() => posts.value[0] ?? null)
 const secondary = computed(() => posts.value.slice(1))
 
-function formatDate(iso: string) {
-  const d = new Date(iso)
-  return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`
-}
+const formatDate = useFormatDate()
 
 /* ── Template refs ── */
 const headRef = ref<HTMLElement | null>(null)
