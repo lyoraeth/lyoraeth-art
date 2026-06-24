@@ -15,7 +15,17 @@ const title = computed(() =>
   post.value ? (locale.value === 'ru' && post.value.title.ru ? post.value.title.ru : post.value.title.en) : ''
 )
 
-useSeoMeta({ title: computed(() => `${title.value} — lyoraeth`) })
+const ogImage = computed(() => post.value?.coverUrl ?? 'https://lyoraeth.art/og-image.png')
+
+useSeoMeta({
+  title:            computed(() => `${title.value} — lyoraeth`),
+  ogTitle:          computed(() => title.value),
+  ogDescription:    computed(() => post.value?.title.en ?? ''),
+  ogImage:          ogImage,
+  ogType:           'article',
+  twitterCard:      'summary_large_image',
+  twitterImage:     ogImage,
+})
 
 const formatDate = useFormatDate()
 

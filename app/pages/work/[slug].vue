@@ -14,7 +14,17 @@ if (!item.value) {
 
 const title = computed(() => loc(item.value?.title))
 
-useSeoMeta({ title: computed(() => `${title.value} — lyoraeth`) })
+const ogImage = computed(() => item.value?.coverUrl ?? 'https://lyoraeth.art/og-image.png')
+
+useSeoMeta({
+  title:         computed(() => `${title.value} — lyoraeth`),
+  ogTitle:       computed(() => title.value),
+  ogDescription: computed(() => loc(item.value?.description)),
+  ogImage:       ogImage,
+  ogType:        'article',
+  twitterCard:   'summary_large_image',
+  twitterImage:  ogImage,
+})
 </script>
 
 <template>

@@ -7,7 +7,9 @@ useSeoMeta({
   ogTitle: () => t('seo.og_title'),
   ogDescription: () => t('seo.og_description'),
   ogType: 'website',
-  twitterCard: 'summary',
+  ogImage: 'https://lyoraeth.art/og-image.png',
+  twitterCard: 'summary_large_image',
+  twitterImage: 'https://lyoraeth.art/og-image.png',
 })
 
 useHead({
