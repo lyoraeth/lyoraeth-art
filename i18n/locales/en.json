@@ -21,63 +21,63 @@
   },
 
   "hero": {
-    "eyebrow": "Frontend · SPb / remote · from July 2026",
+    "eyebrow": "Frontend · Remote · Available July 2026",
     "name": "Danil Klimov",
-    "subtitle": "I take a problem and {em} {acc}",
-    "subtitle_em": "see it through.",
-    "subtitle_acc": "On my own.",
+    "subtitle": "I take a task and {em} {acc}",
+    "subtitle_em": "get it",
+    "subtitle_acc": "done.",
     "meta": [
-      { "label": "Now", "value": "Open to work, from July" },
-      { "label": "Stack", "value": "Vue · TypeScript · motion" }
+      { "label": "Now", "value": "Open to projects, from July" },
+      { "label": "Stack", "value": "Vue · TypeScript · Animation" }
     ],
     "scroll": "scroll ↓"
   },
 
   "stack": {
     "title": "Stack",
-    "label": "What I work with",
-    "daily": "Daily",
-    "also": "Also",
+    "label": "My toolkit",
+    "daily": "Daily driver",
+    "also": "Also use",
     "chips": {
       "daily": [
-        { "name": "Vue 3", "tip": "main framework, most things run on it" },
-        { "name": "TypeScript", "tip": "default for anything past a snippet" },
+        { "name": "Vue 3", "tip": "my go-to framework, powers almost everything" },
+        { "name": "TypeScript", "tip": "default for anything bigger than a snippet" },
         { "name": "Nuxt", "tip": "SSR, routing, backend right in the project" },
-        { "name": "Tailwind", "tip": "love it, daily driver", "warm": true },
-        { "name": "GSAP", "tip": "motion, scroll, all the hard animation" },
+        { "name": "Tailwind", "tip": "love it, use it every single day", "warm": true },
+        { "name": "GSAP", "tip": "animations, scroll effects, complex motion" },
         { "name": "SCSS", "tip": "when there's no utility layer" }
       ],
       "also": [
-        { "name": "React", "tip": "happy to use it when the project calls for it" },
-        { "name": "Pinia", "tip": "state without the boilerplate" },
-        { "name": "Motion", "tip": "declarative animation, no manual lifecycle" },
-        { "name": "Lenis", "tip": "smooth scroll" },
-        { "name": "Node", "tip": "bots, forms, small backends" },
-        { "name": "Figma", "tip": "I read the design and build straight from it" }
+        { "name": "React", "tip": "happy to use it if the project requires it" },
+        { "name": "Pinia", "tip": "state management without the boilerplate" },
+        { "name": "Motion", "tip": "declarative animations without manual lifecycle" },
+        { "name": "Lenis", "tip": "smooth scrolling" },
+        { "name": "Node", "tip": "bots, forms, lightweight backend" },
+        { "name": "Figma", "tip": "inspecting designs and building straight from them" }
       ]
     }
   },
 
   "approach": {
-    "title": "How I work",
+    "title": "My Approach",
     "steps": [
       {
         "num": "01",
-        "name": "figure out",
-        "title": "Figure it out",
-        "desc": "I read the design and the task, and decide what needs doing and what doesn't."
+        "name": "dive in",
+        "title": "What's actually needed",
+        "desc": "I study the task and design to figure out what matters. I don't wait for hand-holding — I ask the right questions and keep moving."
       },
       {
         "num": "02",
         "name": "build",
-        "title": "Build it",
-        "desc": "I write it cleanly and clearly — so the code is still alive six months from now."
+        "title": "No corners cut",
+        "desc": "I don't just check off the ticket — I test across devices and hunt down places where the UI might break."
       },
       {
         "num": "03",
-        "name": "finish",
-        "title": "Finish it",
-        "desc": "I test it on real devices and the small stuff, and hand it over so it's easy to pick up."
+        "name": "ship",
+        "title": "Production-ready, for real",
+        "desc": "I deliver a product that works exactly as intended. With documentation if needed."
       }
     ]
   },
@@ -93,18 +93,18 @@
     "posts_many": "{n} posts",
     "back": "Writing",
     "search": "Search",
-    "search_placeholder": "title, tag…",
+    "search_placeholder": "title, tags…",
     "sort_by": "Sort by",
     "sort_date_desc": "Newest",
     "sort_date_asc": "Oldest",
     "sort_alpha": "A → Z",
     "sort_popular": "Popular",
-    "not_found": "Nothing yet. Coming soon."
+    "not_found": "Nothing here yet. Writing soon."
   },
 
   "work": {
-    "title": "Selected work",
-    "subtitle": "what I've shipped so far",
+    "title": "Featured",
+    "subtitle": "things I've built",
     "see_all": "All projects",
     "projects_one": "{n} project",
     "projects_few": "{n} projects",
@@ -116,45 +116,45 @@
 
   "post": {
     "rating": {
-      "prompt": "Was this useful?",
-      "voted": "Voted · thanks",
-      "upvote": "Yes",
-      "downvote": "No"
+      "prompt": "Was this helpful?",
+      "voted": "Vote cast · thanks!",
+      "upvote": "Upvote",
+      "downvote": "Downvote"
     },
     "comments": {
       "count_one": "{n} comment",
       "count_few": "{n} comments",
       "count_many": "{n} comments",
-      "reply": "Leave a reply",
-      "first": "Be the first",
+      "reply": "Reply",
+      "first": "Be the first to comment",
       "name": "Name",
       "name_placeholder": "Your name",
       "email": "Email",
-      "email_hint": "(shown as {'@'}handle)",
-      "email_placeholder": "you{'@'}mail.com",
+      "email_hint": "(will show as {'@'}handle)",
+      "email_placeholder": "you{'@'}example.com",
       "message": "Comment",
       "message_placeholder": "Your thoughts…",
-      "submit": "Send",
-      "success": "Comment sent — thanks!",
+      "submit": "Submit",
+      "success": "Comment submitted — thank you!",
       "another": "Write another",
       "error": "Something went wrong"
     }
   },
 
   "contact": {
-    "heading": "Got something?",
-    "heading_before_acc": "Got something? ",
+    "heading": "Got a project?",
+    "heading_before_acc": "Got a project? ",
     "heading_acc": "Let's talk.",
-    "lead": "A vague brief, a legacy mess, or just an idea — all fine. We'll sort it out.",
-    "cta": "On Telegram",
+    "lead": "Vague specs, a half-finished project, or just an idea? No worries. We'll figure it out.",
+    "cta": "Via Telegram",
     "form_label": "or right here",
     "contact_placeholder": "Your Telegram / {'@'}handle",
-    "message_placeholder": "In a line or two, what you need",
+    "message_placeholder": "Briefly, what do you need?",
     "submit": "Send →",
-    "success": "Message sent — thanks!",
+    "success": "Message sent — thank you!",
     "send_another": "Send another",
     "error": "Something went wrong",
-    "privacy": "By submitting, you agree to the privacy policy.",
+    "privacy": "By submitting this form, you agree to the privacy policy.",
     "github": "GitHub",
     "cv": "CV",
     "cv_note": "pdf ↓"
@@ -164,15 +164,15 @@
     "404_title": "Nothing here",
     "404_message": "This page doesn't exist or has moved.",
     "5xx_title": "Something broke",
-    "5xx_message": "The cats are already on it. Refresh, or come back in a bit.",
-    "go_home": "Go home"
+    "5xx_message": "The tech cats are already fixing it. Refresh the page or try again shortly.",
+    "go_home": "Back home"
   },
 
   "seo": {
     "title": "Danil Klimov — Frontend",
-    "description": "Frontend developer. I take a problem and see it through. Vue, TypeScript, motion. SPb / remote.",
+    "description": "Frontend Developer. I take a task and get it done. Vue, TypeScript, animation. Remote.",
     "og_title": "Danil Klimov — Frontend",
-    "og_description": "I take a problem and see it through. On my own. Vue · TypeScript · motion."
+    "og_description": "I take a task and get it done. Vue · TypeScript · animation."
   },
 
   "footer": {
@@ -183,17 +183,17 @@
   },
 
   "curtain": {
-    "closing": "Since you're here — let's {acc}",
-    "closing_acc": "get acquainted.",
-    "type_label": "Type",
+    "closing": "Since you're here, let's {acc}",
+    "closing_acc": "connect.",
+    "type_label": "Fonts",
     "type_value": "Golos Text · Onest · JetBrains Mono",
-    "built_label": "Built",
+    "built_label": "Built with",
     "built_value": "Nuxt · Vue · TypeScript",
     "cms_label": "CMS",
     "cms_value": "Sanity",
     "trackers_label": "Analytics",
-    "trackers_value": "Umami — no cookies",
-    "lang_label": "Lang",
+    "trackers_value": "Umami — cookie-free",
+    "lang_label": "Language",
     "lang_value": "EN · RU"
   }
 }
