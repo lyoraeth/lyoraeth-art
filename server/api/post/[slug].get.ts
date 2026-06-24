@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
       readingTime,
       tags,
       "coverUrl": cover.asset->url,
+      "coverAlt": cover.alt,
       body[] {
         ...,
         _type == "image" => {

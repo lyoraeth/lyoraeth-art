@@ -17,7 +17,8 @@ export default defineEventHandler(async (event) => {
       popularity,
       tags,
       title,
-      "coverUrl": cover.asset->url
+      "coverUrl": cover.asset->url,
+      "coverAlt": cover.alt
     }
   `)
 })
@@ -31,4 +32,5 @@ export interface PostItem {
   tags:        string[]
   title:       { en: string; ru: string }
   coverUrl:    string | null
+  coverAlt:    string | null
 }

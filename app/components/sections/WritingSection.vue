@@ -50,7 +50,7 @@ useGlowCard(mini1)
           <img
             v-if="featured.coverUrl"
             :src="featured.coverUrl"
-            alt=""
+            :alt="featured.coverAlt ?? loc(featured.title)"
             class="feat-thumb-img"
             loading="lazy"
             draggable="false"

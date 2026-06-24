@@ -83,7 +83,7 @@ const ptComponents = {
 
     <!-- Cover -->
     <div v-if="post.coverUrl" class="post-cover">
-      <img :src="post.coverUrl" :alt="title" loading="eager" />
+      <img :src="post.coverUrl" :alt="post.coverAlt ?? title" loading="eager" />
     </div>
 
     <!-- Body -->

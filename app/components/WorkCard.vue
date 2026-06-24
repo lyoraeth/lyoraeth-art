@@ -51,7 +51,7 @@ onMounted(() => {
       <img
         v-if="item.coverUrl"
         :src="item.coverUrl"
-        alt=""
+        :alt="item.coverAlt ?? loc(item.title)"
         class="viewport-img"
         loading="lazy"
         draggable="false"

@@ -19,7 +19,8 @@ export default defineEventHandler(async (event) => {
       tagWarm,
       url,
       year,
-      "coverUrl": cover.asset->url
+      "coverUrl": cover.asset->url,
+      "coverAlt": cover.alt
     }
   `)
 })
@@ -35,4 +36,5 @@ export interface WorkItem {
   url?:        string
   year?:       number
   coverUrl:    string | null
+  coverAlt:    string | null
 }

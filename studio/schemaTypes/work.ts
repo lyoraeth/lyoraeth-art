@@ -51,6 +51,9 @@ export default defineType({
       type: 'image',
       description: 'Screenshot shown in the mock browser frame',
       options: { hotspot: true },
+      fields: [
+        { name: 'alt', title: 'Alt text', type: 'string' },
+      ],
     }),
     defineField({
       name: 'url',
