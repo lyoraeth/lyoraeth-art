@@ -5,7 +5,7 @@
 <style scoped>
 .grain {
   position: fixed;
-  inset: -50%;
+  inset: -20px;
   z-index: 9999;
   pointer-events: none;
   opacity: 0.085;

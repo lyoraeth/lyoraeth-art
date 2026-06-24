@@ -66,6 +66,7 @@ useHead({
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -73,7 +74,7 @@ body {
   color: var(--ink);
   font-family: 'Onest', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  overflow-x: clip;
+  overflow-x: hidden;
   line-height: 1.5;
 }
 
