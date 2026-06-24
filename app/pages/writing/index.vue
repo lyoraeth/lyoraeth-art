@@ -2,6 +2,7 @@
 import type { PostItem } from '../../server/api/posts.get'
 
 const { t, locale } = useI18n()
+const plural = usePlural()
 
 useSeoMeta({ title: computed(() => `${t('writing.title')} — lyoraeth`) })
 
@@ -59,7 +60,7 @@ const sorts: { key: SortKey; label: string }[] = [
   <div class="writing-page">
     <header class="page-head">
       <h1>{{ t('writing.title') }}</h1>
-      <span class="eyebrow">{{ t('writing.posts', { n: filtered.length }) }}</span>
+      <span class="eyebrow">{{ t(`writing.posts_${plural(filtered.length)}`, { n: filtered.length }) }}</span>
     </header>
 
     <div class="writing-layout">

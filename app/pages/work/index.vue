@@ -2,6 +2,7 @@
 import type { WorkItem } from '../../server/api/work.get'
 
 const { t, locale } = useI18n()
+const plural = usePlural()
 
 useSeoMeta({ title: computed(() => `${t('work.title')} — lyoraeth`) })
 
@@ -35,7 +36,7 @@ const grouped = computed(() => {
   <div class="work-page">
     <header class="page-head">
       <h1>{{ t('work.title') }}</h1>
-      <span class="eyebrow">{{ t('work.projects', { n: (allWork ?? []).length }) }}</span>
+      <span class="eyebrow">{{ t(`work.projects_${plural((allWork ?? []).length)}`, { n: (allWork ?? []).length }) }}</span>
     </header>
 
     <div v-for="[year, items] in grouped" :key="String(year)" class="year-group">

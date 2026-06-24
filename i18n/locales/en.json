@@ -21,187 +21,170 @@
   },
 
   "hero": {
-    "eyebrow": "Role · Location · Timeline",
-    "name": "Full Name",
-    "subtitle": "Lorem ipsum {em} dolor sit amet {acc}.",
-    "subtitle_em": "emphasized placeholder",
-    "subtitle_acc": "accent placeholder",
+    "eyebrow": "Frontend · SPb / remote · from July 2026",
+    "name": "Danil Klimov",
+    "subtitle": "I take a problem and {em} {acc}",
+    "subtitle_em": "see it through.",
+    "subtitle_acc": "On my own.",
     "meta": [
-      { "label": "Label one", "value": "Meta value placeholder one" },
-      { "label": "Label two", "value": "Meta value placeholder two" }
+      { "label": "Now", "value": "Open to work, from July" },
+      { "label": "Stack", "value": "Vue · TypeScript · motion" }
     ],
     "scroll": "scroll ↓"
   },
 
   "stack": {
     "title": "Stack",
-    "label": "Placeholder label",
+    "label": "What I work with",
     "daily": "Daily",
     "also": "Also",
     "chips": {
       "daily": [
-        { "name": "Tool one", "tip": "tooltip placeholder one" },
-        { "name": "Tool two", "tip": "tooltip placeholder two" },
-        { "name": "Tool three", "tip": "tooltip placeholder three" },
-        { "name": "Tool four", "tip": "tooltip placeholder four", "warm": true },
-        { "name": "Tool five", "tip": "tooltip placeholder five" },
-        { "name": "Tool six", "tip": "tooltip placeholder six" }
+        { "name": "Vue 3", "tip": "main framework, most things run on it" },
+        { "name": "TypeScript", "tip": "default for anything past a snippet" },
+        { "name": "Nuxt", "tip": "SSR, routing, backend right in the project" },
+        { "name": "Tailwind", "tip": "love it, daily driver", "warm": true },
+        { "name": "GSAP", "tip": "motion, scroll, all the hard animation" },
+        { "name": "SCSS", "tip": "when there's no utility layer" }
       ],
       "also": [
-        { "name": "Tool seven", "tip": "tooltip placeholder seven" },
-        { "name": "Tool eight", "tip": "tooltip placeholder eight" },
-        { "name": "Tool nine", "tip": "tooltip placeholder nine" },
-        { "name": "Tool ten", "tip": "tooltip placeholder ten" },
-        { "name": "Tool eleven", "tip": "tooltip placeholder eleven" },
-        { "name": "Tool twelve", "tip": "tooltip placeholder twelve" }
+        { "name": "React", "tip": "happy to use it when the project calls for it" },
+        { "name": "Pinia", "tip": "state without the boilerplate" },
+        { "name": "Motion", "tip": "declarative animation, no manual lifecycle" },
+        { "name": "Lenis", "tip": "smooth scroll" },
+        { "name": "Node", "tip": "bots, forms, small backends" },
+        { "name": "Figma", "tip": "I read the design and build straight from it" }
       ]
     }
   },
 
   "approach": {
-    "title": "Placeholder title",
+    "title": "How I work",
     "steps": [
       {
         "num": "01",
-        "name": "step one",
-        "title": "Step title placeholder one",
-        "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor."
+        "name": "figure out",
+        "title": "Figure it out",
+        "desc": "I read the design and the task, and decide what needs doing and what doesn't."
       },
       {
         "num": "02",
-        "name": "step two",
-        "title": "Step title placeholder two",
-        "desc": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip."
+        "name": "build",
+        "title": "Build it",
+        "desc": "I write it cleanly and clearly — so the code is still alive six months from now."
       },
       {
         "num": "03",
-        "name": "step three",
-        "title": "Step title placeholder three",
-        "desc": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore."
+        "name": "finish",
+        "title": "Finish it",
+        "desc": "I test it on real devices and the small stuff, and hand it over so it's easy to pick up."
       }
     ]
   },
 
   "writing": {
     "title": "Writing",
-    "see_all": "See all posts",
+    "see_all": "All posts",
     "read": "Read",
     "min": "{n} min",
     "min_read": "{n} min read",
-    "posts": "{n} posts",
+    "posts_one": "{n} post",
+    "posts_few": "{n} posts",
+    "posts_many": "{n} posts",
     "back": "Writing",
     "search": "Search",
     "sort_by": "Sort by",
-    "not_found": "No posts found."
+    "not_found": "Nothing yet. Coming soon."
   },
 
   "work": {
     "title": "Selected work",
-    "subtitle": "placeholder subtitle",
-    "see_all": "See all work",
-    "projects": "{n} projects",
+    "subtitle": "what I've shipped so far",
+    "see_all": "All projects",
+    "projects_one": "{n} project",
+    "projects_few": "{n} projects",
+    "projects_many": "{n} projects",
     "view_project": "View project",
     "back": "Work",
-    "items": [
-      {
-        "kicker": "kicker · placeholder",
-        "title": "Project title placeholder one",
-        "desc": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "warm tag"
-      },
-      {
-        "kicker": "kicker · placeholder",
-        "title": "Project title placeholder two",
-        "desc": "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-        "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "warm tag"
-      },
-      {
-        "kicker": "kicker · placeholder",
-        "title": "Project title placeholder three",
-        "desc": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-        "tags": ["tag one", "tag two", "tag three"],
-        "tag_warm": "warm tag"
-      }
-    ]
+    "items": []
   },
 
   "post": {
     "rating": {
       "prompt": "Was this useful?",
       "voted": "Voted · thanks",
-      "upvote": "Upvote",
-      "downvote": "Downvote"
+      "upvote": "Yes",
+      "downvote": "No"
     },
     "comments": {
       "count_one": "{n} comment",
-      "count_other": "{n} comments",
+      "count_few": "{n} comments",
+      "count_many": "{n} comments",
       "reply": "Leave a reply",
-      "first": "Be the first to comment",
+      "first": "Be the first",
       "name": "Name",
       "name_placeholder": "Your name",
       "email": "Email",
-      "email_hint": "(shown as {'@'}nick, never shared)",
-      "email_placeholder": "you{'@'}example.com",
+      "email_hint": "(shown as {'@'}handle)",
+      "email_placeholder": "you{'@'}mail.com",
       "message": "Comment",
       "message_placeholder": "Your thoughts…",
-      "submit": "Post comment",
-      "success": "Comment posted — thanks!",
+      "submit": "Send",
+      "success": "Comment sent — thanks!",
       "another": "Write another",
       "error": "Something went wrong"
     }
   },
 
   "contact": {
-    "heading": "Placeholder",
-    "heading_before_acc": "heading ",
-    "heading_acc": "accent.",
-    "lead": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Placeholder contact lead text.",
-    "cta": "CTA placeholder",
-    "form_label": "form label placeholder",
+    "heading": "Got something?",
+    "heading_before_acc": "Got something? ",
+    "heading_acc": "Let's talk.",
+    "lead": "A vague brief, a legacy mess, or just an idea — all fine. We'll sort it out.",
+    "cta": "On Telegram",
+    "form_label": "or right here",
     "contact_placeholder": "Your Telegram / {'@'}handle",
-    "message_placeholder": "Message placeholder",
-    "submit": "Submit placeholder →",
+    "message_placeholder": "In a line or two, what you need",
+    "submit": "Send →",
     "success": "Message sent — thanks!",
     "send_another": "Send another",
     "error": "Something went wrong",
-    "privacy": "By submitting you agree to our Privacy Policy.",
+    "privacy": "By submitting, you agree to the privacy policy.",
     "github": "GitHub",
-    "github_handle": "/username",
+    "github_handle": "/lyoraeth",
     "cv": "CV",
     "cv_note": "pdf ↓"
   },
 
   "error": {
-    "404_title": "Page not found",
-    "404_message": "The page you're looking for doesn't exist or has been moved.",
-    "5xx_title": "Something went wrong",
-    "5xx_message": "An unexpected error occurred. Try refreshing or come back later.",
+    "404_title": "Nothing here",
+    "404_message": "This page doesn't exist or has moved.",
+    "5xx_title": "Something broke",
+    "5xx_message": "The cats are already on it. Refresh, or come back in a bit.",
     "go_home": "Go home"
   },
 
   "seo": {
-    "title": "Name — Role",
-    "description": "Placeholder SEO description.",
-    "og_title": "Name — Role",
-    "og_description": "Placeholder OG description."
+    "title": "Danil Klimov — Frontend",
+    "description": "Frontend developer. I take a problem and see it through. Vue, TypeScript, motion. SPb / remote.",
+    "og_title": "Danil Klimov — Frontend",
+    "og_description": "I take a problem and see it through. On my own. Vue · TypeScript · motion."
   },
 
   "footer": {
-    "copyright": "© 2026 Name",
+    "copyright": "© 2026 Danil Klimov",
     "privacy": "Privacy",
     "cookies": "Cookies",
     "hint": "keep scrolling ↓"
   },
 
   "curtain": {
-    "closing": "Placeholder closing line ",
-    "closing_acc": "accent part.",
+    "closing": "Since you're here — let's {acc}",
+    "closing_acc": "get acquainted.",
     "type_label": "Type",
-    "type_value": "Font one · Font two · Font three",
+    "type_value": "Golos Text · Onest · JetBrains Mono",
     "built_label": "Built",
-    "built_value": "placeholder build note",
+    "built_value": "by hand, on Nuxt",
     "trackers_label": "Trackers",
     "trackers_value": "none",
     "lang_label": "Lang",
