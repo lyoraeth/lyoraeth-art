@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import type { SiteSettings } from '../../../server/api/settings.get'
+
 const { t } = useI18n()
 const { public: { turnstileContactSiteKey } } = useRuntimeConfig()
+
+const { data: settings } = await useFetch<SiteSettings>('/api/settings')
 
 const contact = ref('')
 const message = ref('')
@@ -58,16 +62,33 @@ onMounted(() => observe(cardEl.value))
         </h2>
         <p class="contact-lead">{{ t('contact.lead') }}</p>
 
-        <a href="#" class="contact-cta">
+        <a
+          :href="settings?.telegramHandle ? `https://t.me/${settings.telegramHandle}` : undefined"
+          class="contact-cta"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {{ t('contact.cta') }} <span class="cta-arrow">→</span>
         </a>
 
         <div class="contact-channels">
-          <a href="https://github.com/lyoraeth" class="channel-link" target="_blank" rel="noopener">
+          <a
+            :href="settings?.githubHandle ? `https://github.com/${settings.githubHandle}` : undefined"
+            class="channel-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span>{{ t('contact.github') }}</span>
-            <span class="channel-handle mono">{{ t('contact.github_handle') }}</span>
+            <span class="channel-handle mono">/{{ settings?.githubHandle }}</span>
           </a>
-          <a href="#" class="channel-link">
+          <a
+            v-if="settings?.cvUrl"
+            :href="settings.cvUrl"
+            class="channel-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+          >
             <span>{{ t('contact.cv') }}</span>
             <span class="channel-handle mono">{{ t('contact.cv_note') }}</span>
           </a>
