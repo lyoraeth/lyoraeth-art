@@ -259,6 +259,7 @@ onMounted(() => observe(cardEl.value))
   color: var(--faint);
   font-size: 0.6875rem;
   transition: color 0.25s var(--ease-silk);
+  user-select: all;
 }
 .channel-link:hover .channel-handle {
   color: var(--mist);
