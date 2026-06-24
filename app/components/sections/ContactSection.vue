@@ -13,9 +13,13 @@ const githubUrl = computed(() =>
   settings.value?.githubHandle ? `https://github.com/${settings.value.githubHandle}` : undefined
 )
 const githubHandle = computed(() => settings.value?.githubHandle ?? '')
-const cvUrl = computed(() =>
-  (locale.value === 'ru' ? settings.value?.cvUrlRu : settings.value?.cvUrlEn) ?? undefined
-)
+const cvUrl = computed(() => {
+  const s = settings.value
+  if (!s) return undefined
+  return locale.value === 'ru'
+    ? (s.cvUrlRu ?? s.cvUrlEn ?? undefined)
+    : (s.cvUrlEn ?? s.cvUrlRu ?? undefined)
+})
 
 const contact = ref('')
 const message = ref('')
