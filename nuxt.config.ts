@@ -9,10 +9,8 @@ export default defineNuxtConfig({
     sanityProjectId:            process.env.NUXT_SANITY_PROJECT_ID               ?? '',
     sanityDataset:              process.env.NUXT_SANITY_DATASET                   ?? 'production',
     sanityToken:                process.env.NUXT_SANITY_TOKEN                     ?? '',
-    mailerHost:                 process.env.NUXT_MAILER_HOST                      ?? '',
-    mailerPort:                 process.env.NUXT_MAILER_PORT                      ?? '587',
-    mailerUser:                 process.env.NUXT_MAILER_USER                      ?? '',
-    mailerPass:                 process.env.NUXT_MAILER_PASS                      ?? '',
+    resendApiKey:               process.env.NUXT_RESEND_API_KEY                   ?? '',
+    mailerFrom:                 process.env.NUXT_MAILER_FROM                      ?? 'lyoraeth.art <hello@lyoraeth.art>',
     mailerTo:                   process.env.NUXT_MAILER_TO                        ?? '',
     turnstileContactSecretKey:  process.env.NUXT_TURNSTILE_SECRET_KEY_CONTACT     ?? '',
     public: {

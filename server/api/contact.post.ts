@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
 interface ContactBody {
   token:   string
@@ -13,23 +13,18 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'All fields are required' })
   }
 
-  const { turnstileContactSecretKey, mailerHost, mailerPort, mailerUser, mailerPass, mailerTo } = useRuntimeConfig(event)
+  const { turnstileContactSecretKey, resendApiKey, mailerFrom, mailerTo } = useRuntimeConfig(event)
   const valid = await verifyTurnstileToken(token, event)
   if (!valid) throw createError({ statusCode: 400, message: 'Captcha failed — please try again' })
 
-  if (!mailerHost || !mailerUser || !mailerPass || !mailerTo) {
+  if (!resendApiKey || !mailerTo) {
     throw createError({ statusCode: 503, message: 'Mailer not configured' })
   }
 
-  const transporter = nodemailer.createTransport({
-    host:   mailerHost,
-    port:   Number(mailerPort) || 587,
-    secure: Number(mailerPort) === 465,
-    auth: { user: mailerUser, pass: mailerPass },
-  })
+  const resend = new Resend(resendApiKey)
 
-  await transporter.sendMail({
-    from:    `"lyoraeth.art" <${mailerUser}>`,
+  await resend.emails.send({
+    from:    mailerFrom || 'lyoraeth.art <hello@lyoraeth.art>',
     to:      mailerTo,
     subject: 'New message — lyoraeth.art',
     text:    `From: ${contact.trim()}\n\n${message.trim()}`,
