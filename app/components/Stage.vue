@@ -48,6 +48,7 @@ onUnmounted(() => {
   overflow: hidden;
   pointer-events: none;
   user-select: none;
+  contain: layout style paint;
   background: radial-gradient(120% 90% at 50% -10%, var(--deep) 0%, var(--void) 55%);
 }
 
