@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import type { SiteSettings } from '../../../server/api/settings.get'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { public: { turnstileContactSiteKey } } = useRuntimeConfig()
 
 const { data: settings } = await useFetch<SiteSettings>('/api/settings')
+
+const telegramUrl = computed(() =>
+  settings.value?.telegramHandle ? `https://t.me/${settings.value.telegramHandle}` : undefined
+)
+const githubUrl = computed(() =>
+  settings.value?.githubHandle ? `https://github.com/${settings.value.githubHandle}` : undefined
+)
+const githubHandle = computed(() => settings.value?.githubHandle ?? '')
+const cvUrl = computed(() =>
+  (locale.value === 'ru' ? settings.value?.cvUrlRu : settings.value?.cvUrlEn) ?? undefined
+)
 
 const contact = ref('')
 const message = ref('')
@@ -63,7 +74,7 @@ onMounted(() => observe(cardEl.value))
         <p class="contact-lead">{{ t('contact.lead') }}</p>
 
         <a
-          :href="settings?.telegramHandle ? `https://t.me/${settings.telegramHandle}` : undefined"
+          :href="telegramUrl"
           class="contact-cta"
           target="_blank"
           rel="noopener noreferrer"
@@ -73,17 +84,17 @@ onMounted(() => observe(cardEl.value))
 
         <div class="contact-channels">
           <a
-            :href="settings?.githubHandle ? `https://github.com/${settings.githubHandle}` : undefined"
+            :href="githubUrl"
             class="channel-link"
             target="_blank"
             rel="noopener noreferrer"
           >
             <span>{{ t('contact.github') }}</span>
-            <span class="channel-handle mono">/{{ settings?.githubHandle }}</span>
+            <span class="channel-handle mono">/{{ githubHandle }}</span>
           </a>
           <a
-            v-if="settings?.cvUrl"
-            :href="settings.cvUrl"
+            v-if="cvUrl"
+            :href="cvUrl"
             class="channel-link"
             target="_blank"
             rel="noopener noreferrer"

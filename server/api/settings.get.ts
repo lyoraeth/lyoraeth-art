@@ -1,13 +1,15 @@
 export interface SiteSettings {
   telegramHandle: string
   githubHandle:   string
-  cvUrl:          string | null
+  cvUrlEn:        string | null
+  cvUrlRu:        string | null
 }
 
 const DEFAULTS: SiteSettings = {
   telegramHandle: 'lyoraeth',
   githubHandle:   'lyoraeth',
-  cvUrl:          null,
+  cvUrlEn:        null,
+  cvUrlRu:        null,
 }
 
 export default defineEventHandler(async (event) => {
@@ -20,7 +22,8 @@ export default defineEventHandler(async (event) => {
     *[_type == "siteSettings"][0] {
       telegramHandle,
       githubHandle,
-      "cvUrl": cv.asset->url
+      "cvUrlEn": cvEn.asset->url,
+      "cvUrlRu": cvRu.asset->url
     }
   `)
 

@@ -20,8 +20,14 @@ export default defineType({
       validation: Rule => Rule.required(),
     }),
     defineField({
-      name: 'cv',
-      title: 'CV (PDF)',
+      name: 'cvEn',
+      title: 'CV — English (PDF)',
+      type: 'file',
+      options: { accept: '.pdf' },
+    }),
+    defineField({
+      name: 'cvRu',
+      title: 'CV — Русский (PDF)',
       type: 'file',
       options: { accept: '.pdf' },
     }),
