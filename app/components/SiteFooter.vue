@@ -7,6 +7,7 @@ const localePath      = useLocalePath()
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-left">
+        <img src="/avatar.jpg" alt="" class="footer-avatar" aria-hidden="true" />
         <span class="footer-copy">{{ t('footer.copyright') }}</span>
         <NuxtLink :to="localePath('/privacy')" class="footer-link">{{ t('footer.privacy') }}</NuxtLink>
       </div>
@@ -36,6 +37,20 @@ const localePath      = useLocalePath()
   align-items: center;
   gap: 1.125rem;
   flex-wrap: wrap;
+}
+
+.footer-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0.45;
+  transition: opacity 0.3s var(--ease-silk);
+}
+
+.footer-avatar:hover {
+  opacity: 1;
 }
 
 .footer-copy {
