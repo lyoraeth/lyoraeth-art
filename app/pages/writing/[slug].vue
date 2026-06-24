@@ -26,12 +26,16 @@ const ptComponents = {
       props: ['value'],
       setup(props) {
         return () => h('figure', { class: 'pt-figure' }, [
-          h('img', {
-            src:     props.value.url,
-            alt:     props.value.alt ?? '',
-            loading: 'lazy',
-            class:   'pt-img',
-          }),
+          h('picture', { style: 'display: contents' }, [
+            h('source', { srcset: sanityFmt(props.value.url, 'avif', { w: 800, q: 80 }), type: 'image/avif' }),
+            h('source', { srcset: sanityFmt(props.value.url, 'webp', { w: 800, q: 80 }), type: 'image/webp' }),
+            h('img', {
+              src:     props.value.url,
+              alt:     props.value.alt ?? '',
+              loading: 'lazy',
+              class:   'pt-img',
+            }),
+          ]),
           props.value.caption
             ? h('figcaption', { class: 'pt-caption' }, props.value.caption)
             : null,
@@ -83,7 +87,12 @@ const ptComponents = {
 
     <!-- Cover -->
     <div v-if="post.coverUrl" class="post-cover">
-      <img :src="post.coverUrl" :alt="post.coverAlt ?? title" loading="eager" />
+      <SanityPicture
+        :src="post.coverUrl"
+        :alt="post.coverAlt ?? title"
+        loading="eager"
+        :width="900"
+      />
     </div>
 
     <!-- Body -->

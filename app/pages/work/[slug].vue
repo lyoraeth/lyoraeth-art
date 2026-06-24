@@ -41,7 +41,12 @@ useSeoMeta({ title: computed(() => `${title.value} — lyoraeth`) })
     </header>
 
     <div v-if="item.coverUrl" class="work-cover">
-      <img :src="item.coverUrl" :alt="item.coverAlt ?? title" loading="eager" />
+      <SanityPicture
+        :src="item.coverUrl"
+        :alt="item.coverAlt ?? title"
+        loading="eager"
+        :width="1100"
+      />
     </div>
 
     <p class="work-desc">{{ loc(item.description) }}</p>

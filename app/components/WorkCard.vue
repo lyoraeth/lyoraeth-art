@@ -17,7 +17,7 @@ useGlowCard(cardRef, tiltReady)
 onMounted(() => {
   if (!cardRef.value) return
   const io = new IntersectionObserver(([entry]) => {
-    if (!entry.isIntersecting) return
+    if (!entry?.isIntersecting) return
     ;(entry.target as HTMLElement).classList.add('in')
     setTimeout(() => { tiltReady.value = true }, 950)
     io.disconnect()
@@ -48,14 +48,29 @@ onMounted(() => {
 
     <div class="card-viewport">
       <div class="viewport-bar"><i></i><i></i><i></i></div>
-      <img
-        v-if="item.coverUrl"
+      <SanityPicture
         :src="item.coverUrl"
         :alt="item.coverAlt ?? loc(item.title)"
         class="viewport-img"
         loading="lazy"
         draggable="false"
-      />
+        :width="700"
+      >
+        <template #placeholder>
+          <div class="viewport-placeholder" aria-hidden="true">
+            <svg viewBox="0 0 48 36" fill="none" width="48" height="36">
+              <rect x="1" y="1" width="46" height="27" rx="2" stroke="currentColor" stroke-width="1.2"/>
+              <line x1="1" y1="7" x2="47" y2="7" stroke="currentColor" stroke-width="1"/>
+              <circle cx="5" cy="4" r="1" fill="currentColor"/>
+              <circle cx="9" cy="4" r="1" fill="currentColor"/>
+              <circle cx="13" cy="4" r="1" fill="currentColor"/>
+              <path d="M16 18l4-5 4 4 5-6 4 4 4-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="12" y1="31" x2="36" y2="31" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="18" y1="34" x2="30" y2="34" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </template>
+      </SanityPicture>
     </div>
   </article>
 </template>
@@ -151,6 +166,14 @@ onMounted(() => {
   object-fit: cover;
   object-position: top;
   display: block;
+}
+.viewport-placeholder {
+  position: absolute;
+  inset: 1.875rem 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--line);
 }
 
 @media (max-width: 47.5em) {

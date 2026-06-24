@@ -47,20 +47,23 @@ useGlowCard(mini1)
         <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div><div class="glare-blob-2"></div></div></div>
 
         <div class="feat-thumb">
-          <img
-            v-if="featured.coverUrl"
+          <SanityPicture
             :src="featured.coverUrl"
             :alt="featured.coverAlt ?? loc(featured.title)"
             class="feat-thumb-img"
             loading="lazy"
             draggable="false"
-          />
-          <svg v-else viewBox="0 0 300 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <line x1="30" y1="200" x2="280" y2="200" stroke="#fff" stroke-opacity=".08"/>
-            <line x1="30" y1="40"  x2="30"  y2="200" stroke="#fff" stroke-opacity=".08"/>
-            <polyline points="30,160 80,100 130,140 180,80 230,120 280,70"
-              fill="none" stroke="#8B95A3" stroke-width="1.5" stroke-opacity=".35"/>
-          </svg>
+            :width="600"
+          >
+            <template #placeholder>
+              <svg viewBox="0 0 300 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <line x1="30" y1="200" x2="280" y2="200" stroke="#fff" stroke-opacity=".08"/>
+                <line x1="30" y1="40"  x2="30"  y2="200" stroke="#fff" stroke-opacity=".08"/>
+                <polyline points="30,160 80,100 130,140 180,80 230,120 280,70"
+                  fill="none" stroke="#8B95A3" stroke-width="1.5" stroke-opacity=".35"/>
+              </svg>
+            </template>
+          </SanityPicture>
         </div>
 
         <div class="feat-body">
