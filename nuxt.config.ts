@@ -17,6 +17,8 @@ export default defineNuxtConfig({
     turnstileContactSecretKey:  process.env.NUXT_TURNSTILE_SECRET_KEY_CONTACT     ?? '',
     public: {
       turnstileContactSiteKey:  process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY_CONTACT ?? '',
+      umamiWebsiteId:           process.env.NUXT_PUBLIC_UMAMI_WEBSITE_ID           ?? '',
+      umamiScriptUrl:           process.env.NUXT_PUBLIC_UMAMI_SCRIPT_URL           ?? '',
     },
   },
 
@@ -25,19 +27,6 @@ export default defineNuxtConfig({
   },
 
   css: ["~/assets/css/main.css"],
-
-  app: {
-    head: {
-      meta: [
-        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
-      ],
-    },
-  },
-
-  devServer: {
-    host: "0.0.0.0",
-    port: 3000,
-  },
 
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
@@ -50,10 +39,16 @@ export default defineNuxtConfig({
         { rel: "manifest", href: "/site.webmanifest" },
       ],
       meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: "theme-color", content: "#0A0C10" },
         { name: "color-scheme", content: "dark" },
       ],
     },
+  },
+
+  devServer: {
+    host: "0.0.0.0",
+    port: 3000,
   },
 
   components: [
