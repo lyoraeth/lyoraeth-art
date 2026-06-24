@@ -6,7 +6,7 @@ const localePath    = useLocalePath()
 const route = useRoute()
 const slug  = route.params.slug as string
 
-const { data: post } = await useFetch(`/api/post/${slug}`)
+const { data: post } = await useFetch<import('~/server/api/post/[slug].get').PostDetail | null>(`/api/post/${slug}`)
 
 if (!post.value) {
   throw createError({ statusCode: 404, statusMessage: 'Post not found' })
@@ -45,6 +45,8 @@ const ptComponents: any = {
               src:     props.value.url,
               alt:     props.value.alt ?? '',
               loading: 'lazy',
+              width:   props.value.width,
+              height:  props.value.height,
               class:   'pt-img',
             }),
           ]),
@@ -104,6 +106,7 @@ const ptComponents: any = {
         :alt="post.coverAlt ?? title"
         loading="eager"
         :width="900"
+        :height="post.coverWidth && post.coverHeight ? Math.round(900 * post.coverHeight / post.coverWidth) : undefined"
       />
     </div>
 

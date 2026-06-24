@@ -57,6 +57,7 @@ useSeoMeta({
         :alt="item.coverAlt ?? title"
         loading="eager"
         :width="1100"
+        :height="item.coverWidth && item.coverHeight ? Math.round(1100 * item.coverHeight / item.coverWidth) : undefined"
       />
     </div>
 

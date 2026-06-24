@@ -5,6 +5,7 @@ const props = withDefaults(defineProps<{
   src:      string | null | undefined
   alt:      string
   width?:   number
+  height?:  number
   quality?: number
   loading?: 'lazy' | 'eager'
 }>(), {
@@ -22,7 +23,7 @@ function fmt(format: 'avif' | 'webp'): string {
   <picture v-if="src" style="display: contents">
     <source :srcset="fmt('avif')" type="image/avif">
     <source :srcset="fmt('webp')"  type="image/webp">
-    <img :src="src" :alt="alt" :loading="loading" v-bind="$attrs">
+    <img :src="src" :alt="alt" :loading="loading" :width="props.width" :height="props.height" v-bind="$attrs">
   </picture>
   <slot v-else name="placeholder" />
 </template>

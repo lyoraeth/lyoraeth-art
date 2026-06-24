@@ -37,4 +37,6 @@ export interface WorkItem {
   year?:       number
   coverUrl:    string | null
   coverAlt:    string | null
+  coverWidth:  number | null
+  coverHeight: number | null
 }

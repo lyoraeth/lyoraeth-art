@@ -13,8 +13,10 @@ export default defineEventHandler(async (event) => {
       publishedAt,
       readingTime,
       tags,
-      "coverUrl": cover.asset->url,
-      "coverAlt": cover.alt,
+      "coverUrl":    cover.asset->url,
+      "coverAlt":    cover.alt,
+      "coverWidth":  cover.asset->metadata.dimensions.width,
+      "coverHeight": cover.asset->metadata.dimensions.height,
       body[] {
         ...,
         _type == "image" => {
@@ -29,5 +31,19 @@ export default defineEventHandler(async (event) => {
   `, { slug })
 
   if (!post) throw createError({ statusCode: 404, message: 'Post not found' })
-  return post
+  return post as PostDetail
 })
+
+export interface PostDetail {
+  _id:         string
+  slug:        string
+  title:       { en: string; ru: string }
+  publishedAt: string
+  readingTime: number
+  tags:        string[]
+  coverUrl:    string | null
+  coverAlt:    string | null
+  coverWidth:  number | null
+  coverHeight: number | null
+  body:        unknown[]
+}

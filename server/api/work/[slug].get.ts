@@ -18,7 +18,10 @@ export default defineEventHandler(async (event) => {
       tagWarm,
       url,
       year,
-      "coverUrl": cover.asset->url
+      "coverUrl":    cover.asset->url,
+      "coverAlt":    cover.alt,
+      "coverWidth":  cover.asset->metadata.dimensions.width,
+      "coverHeight": cover.asset->metadata.dimensions.height
     }
   `, { slug })
 
