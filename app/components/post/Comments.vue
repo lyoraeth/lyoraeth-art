@@ -22,9 +22,6 @@ function formatDate(iso: string) {
   })
 }
 
-function emailNick(e: string) {
-  return e.split('@')[0]
-}
 
 async function submit() {
   if (!name.value.trim() || !email.value.trim() || !message.value.trim() || !token.value) return
@@ -65,7 +62,7 @@ async function submit() {
           </div>
           <div class="comment-meta">
             <span class="comment-name">{{ c.name }}</span>
-            <span class="comment-nick">@{{ emailNick(c.email) }}</span>
+            <span class="comment-nick">@{{ c.nick }}</span>
           </div>
           <span class="comment-date">{{ formatDate(c.publishedAt) }}</span>
         </div>

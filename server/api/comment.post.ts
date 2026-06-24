@@ -24,11 +24,13 @@ export default defineEventHandler(async (event) => {
   const client = createSanityClient(config.sanityProjectId, config.sanityDataset)
     .withConfig({ token: config.sanityToken, useCdn: false })
 
+  const nick = email.trim().toLowerCase().split('@')[0]
+
   await client.create({
     _type:       'comment',
     postSlug,
     name:        name.trim(),
-    email:       email.trim().toLowerCase(),
+    nick,
     message:     message.trim(),
     publishedAt: new Date().toISOString(),
     approved:    false,

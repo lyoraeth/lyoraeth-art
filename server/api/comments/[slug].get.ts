@@ -1,7 +1,7 @@
 export interface CommentItem {
   _id:         string
   name:        string
-  email:       string
+  nick:        string
   message:     string
   publishedAt: string
 }
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   return client.fetch<CommentItem[]>(`
     *[_type == "comment" && postSlug == $slug && approved == true]
     | order(publishedAt asc) {
-      _id, name, email, message, publishedAt
+      _id, name, nick, message, publishedAt
     }
   `, { slug })
 })
