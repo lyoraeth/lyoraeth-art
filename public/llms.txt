@@ -10,18 +10,16 @@ Stack: Vue 3, TypeScript, Nuxt, Tailwind CSS, GSAP, animation.
 
 ## Site structure
 
-- `/` — Homepage with hero, stack, featured work, writing, and contact form
-- `/work` — Full portfolio of projects
-- `/work/[slug]` — Individual project page with description and details
-- `/writing` — Archive of technical and reflective posts
-- `/writing/[slug]` — Individual post with comments and rating
-- `/privacy` — Privacy policy
+- [Homepage](https://lyoraeth.art/) — hero, stack, featured work, writing, and contact form
+- [Work](https://lyoraeth.art/work) — full portfolio of projects
+- [Writing](https://lyoraeth.art/writing) — archive of technical and reflective posts
+- [Privacy Policy](https://lyoraeth.art/privacy) — data processing and privacy information
 
-Available in English (`/`) and Russian (`/ru/`).
+Available in English (`https://lyoraeth.art/`) and Russian (`https://lyoraeth.art/ru/`).
 
 ## Contact
 
-To reach Danil, use the contact form at the bottom of the homepage or message directly via Telegram: @lyoraeth.
+To reach Danil, use the [contact form](https://lyoraeth.art/#contact) at the bottom of the homepage or message directly via Telegram: @lyoraeth.
 
 The site exposes a WebMCP tool `send_message` for AI agents to submit the contact form programmatically (see WebMCP registration on the page).
 
