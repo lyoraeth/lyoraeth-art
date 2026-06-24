@@ -1,15 +1,14 @@
 interface CommentBody {
-  token:    string   // Turnstile token
-  name:     string
-  email:    string
+  token:    string
+  nick:     string
   message:  string
   postSlug: string
 }
 
 export default defineEventHandler(async (event) => {
-  const { token, name, email, message, postSlug } = await readBody<CommentBody>(event)
+  const { token, nick, message, postSlug } = await readBody<CommentBody>(event)
 
-  if (!name?.trim() || !email?.trim() || !message?.trim() || !postSlug) {
+  if (!nick?.trim() || !message?.trim() || !postSlug) {
     throw createError({ statusCode: 400, message: 'All fields are required' })
   }
 
@@ -24,13 +23,10 @@ export default defineEventHandler(async (event) => {
   const client = createSanityClient(config.sanityProjectId, config.sanityDataset)
     .withConfig({ token: config.sanityToken, useCdn: false })
 
-  const nick = email.trim().toLowerCase().split('@')[0]
-
   await client.create({
     _type:       'comment',
     postSlug,
-    name:        name.trim(),
-    nick,
+    nick:        nick.replace(/^@+/, '').trim(),
     message:     message.trim(),
     publishedAt: new Date().toISOString(),
     approved:    false,

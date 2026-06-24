@@ -8,8 +8,7 @@ const props = defineProps<{ slug: string; postTitle: string }>()
 const { data: comments, refresh } = await useFetch<CommentItem[]>(`/api/comments/${props.slug}`)
 
 const token   = ref('')
-const name    = ref('')
-const email   = ref('')
+const nick    = ref('')
 const message = ref('')
 
 type State = 'idle' | 'loading' | 'success' | 'error'
@@ -22,9 +21,8 @@ function formatDate(iso: string) {
   })
 }
 
-
 async function submit() {
-  if (!name.value.trim() || !email.value.trim() || !message.value.trim() || !token.value) return
+  if (!nick.value.trim() || !message.value.trim() || !token.value) return
   state.value = 'loading'
   errMsg.value = ''
   try {
@@ -32,14 +30,13 @@ async function submit() {
       method: 'POST',
       body: {
         token:    token.value,
-        name:     name.value,
-        email:    email.value,
+        nick:     nick.value,
         message:  message.value,
         postSlug: props.slug,
       },
     })
     state.value = 'success'
-    name.value = email.value = message.value = token.value = ''
+    nick.value = message.value = token.value = ''
     await refresh()
   } catch (e: any) {
     errMsg.value = e?.data?.message ?? t('post.comments.error')
@@ -57,13 +54,10 @@ async function submit() {
       <h3 class="comments-title">{{ t(`post.comments.count_${plural(comments.length)}`, { n: comments.length }) }}</h3>
       <div v-for="c in comments" :key="c._id" class="comment-item">
         <div class="comment-header">
-          <div class="comment-avatar" :aria-label="c.name">
-            {{ (c.name[0] ?? '?').toUpperCase() }}
+          <div class="comment-avatar" :aria-label="c.nick">
+            {{ (c.nick[0] ?? '?').toUpperCase() }}
           </div>
-          <div class="comment-meta">
-            <span class="comment-name">{{ c.name }}</span>
-            <span class="comment-nick">@{{ c.nick }}</span>
-          </div>
+          <span class="comment-nick">@{{ c.nick }}</span>
           <span class="comment-date">{{ formatDate(c.publishedAt) }}</span>
         </div>
         <p class="comment-body">{{ c.message }}</p>
@@ -81,19 +75,10 @@ async function submit() {
       </div>
 
       <form v-else class="comment-form" @submit.prevent="submit">
-        <div class="fields-row">
-          <div class="field">
-            <label class="field-label" for="c-name">{{ t('post.comments.name') }}</label>
-            <input id="c-name" v-model="name" class="field-input" type="text"
-              autocomplete="name" required :placeholder="t('post.comments.name_placeholder')" />
-          </div>
-          <div class="field">
-            <label class="field-label" for="c-email">
-              {{ t('post.comments.email') }} <span class="field-hint">{{ t('post.comments.email_hint') }}</span>
-            </label>
-            <input id="c-email" v-model="email" class="field-input" type="email"
-              autocomplete="email" required :placeholder="t('post.comments.email_placeholder')" />
-          </div>
+        <div class="field">
+          <label class="field-label" for="c-nick">{{ t('post.comments.nick') }}</label>
+          <input id="c-nick" v-model="nick" class="field-input" type="text"
+            autocomplete="nickname" required :placeholder="t('post.comments.nick_placeholder')" />
         </div>
 
         <div class="field">
@@ -155,22 +140,11 @@ async function submit() {
   justify-content: center;
   flex-shrink: 0;
 }
-.comment-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  flex: 1;
-  min-width: 0;
-}
-.comment-name {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--snow);
-}
 .comment-nick {
-  font-size: 0.75rem;
-  color: var(--faint);
+  font-size: 0.875rem;
+  color: var(--mist);
   font-family: 'JetBrains Mono', monospace;
+  flex: 1;
 }
 .comment-date {
   font-size: 0.6875rem;
@@ -189,7 +163,6 @@ async function submit() {
 /* ── Form ── */
 .comment-form-wrap { }
 .comment-form { display: flex; flex-direction: column; gap: 1rem; }
-.fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
 .field { display: flex; flex-direction: column; gap: 0.375rem; }
 .field-label {
@@ -272,7 +245,4 @@ async function submit() {
 }
 @keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
 
-@media (max-width: 36rem) {
-  .fields-row { grid-template-columns: 1fr; }
-}
 </style>
