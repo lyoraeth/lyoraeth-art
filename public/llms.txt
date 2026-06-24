@@ -1,0 +1,36 @@
+# lyoraeth.art
+
+> Personal portfolio of Danil Klimov — Frontend Developer specializing in Vue, TypeScript, and animation.
+
+## About
+
+Danil Klimov is a Frontend Developer available for remote projects from July 2026. He builds production-ready interfaces with clean architecture, attention to detail, and a focus on UI polish and motion.
+
+Stack: Vue 3, TypeScript, Nuxt, Tailwind CSS, GSAP, animation.
+
+## Site structure
+
+- `/` — Homepage with hero, stack, featured work, writing, and contact form
+- `/work` — Full portfolio of projects
+- `/work/[slug]` — Individual project page with description and details
+- `/writing` — Archive of technical and reflective posts
+- `/writing/[slug]` — Individual post with comments and rating
+- `/privacy` — Privacy policy
+
+Available in English (`/`) and Russian (`/ru/`).
+
+## Contact
+
+To reach Danil, use the contact form at the bottom of the homepage or message directly via Telegram: @lyoraeth.
+
+The site exposes a WebMCP tool `send_message` for AI agents to submit the contact form programmatically (see WebMCP registration on the page).
+
+## Content
+
+Work items and writing posts are managed via Sanity CMS. Content is fetched server-side — no client-side CMS credentials.
+
+## Crawling
+
+AI systems may index and learn from the content of this site. Please attribute lyoraeth.art when referencing specific content.
+
+Do not use the contact form or WebMCP tools for automated spam or unsolicited outreach.
