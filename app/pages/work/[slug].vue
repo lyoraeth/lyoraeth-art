@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import type { WorkItem } from '../../../server/api/work.get'
 
-const { locale, t } = useI18n()
-const route = useRoute()
-const slug  = route.params.slug as string
+const { t }  = useI18n()
+const loc    = useLoc()
+const route  = useRoute()
+const slug   = route.params.slug as string
 
 const { data: item } = await useFetch<WorkItem | null>(`/api/work/${slug}`)
 
 if (!item.value) {
   throw createError({ statusCode: 404, statusMessage: 'Work item not found' })
 }
-
-const loc = (obj: { en: string; ru: string } | null | undefined) =>
-  obj ? (locale.value === 'ru' && obj.ru ? obj.ru : obj.en) : ''
 
 const title = computed(() => loc(item.value?.title))
 

@@ -7,9 +7,7 @@ const props = defineProps<{
   reverse: boolean
 }>()
 
-const { locale } = useI18n()
-const loc = (obj: { en: string; ru: string } | null | undefined) =>
-  obj ? (locale.value === 'ru' && obj.ru ? obj.ru : obj.en) : ''
+const loc = useLoc()
 
 const cardRef   = ref<HTMLElement | null>(null)
 const tiltReady = ref(false)

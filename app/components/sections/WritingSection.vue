@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import type { PostItem } from '../../server/api/posts.get'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
+const loc   = useLoc()
 
 const { data: posts } = await useFetch('/api/posts', { default: () => [] as PostItem[] })
 
 const featured  = computed(() => posts.value[0] ?? null)
 const secondary = computed(() => posts.value.slice(1))
-
-function postTitle(post: PostItem) {
-  return locale.value === 'ru' && post.title.ru ? post.title.ru : post.title.en
-}
 
 function formatDate(iso: string) {
   const d = new Date(iso)
@@ -75,7 +72,7 @@ useGlowCard(mini1)
             <span class="feat-dot"></span>
             <span class="mono">{{ t('writing.min', { n: featured.readingTime }) }}</span>
           </div>
-          <h3 class="feat-title">{{ postTitle(featured) }}</h3>
+          <h3 class="feat-title">{{ loc(featured.title) }}</h3>
           <div class="feat-tags">
             <span v-for="tag in featured.tags" :key="tag" class="tag">{{ tag }}</span>
           </div>
@@ -101,7 +98,7 @@ useGlowCard(mini1)
             <span class="mini-dot"></span>
             <span class="mono">{{ t('writing.min', { n: post.readingTime }) }}</span>
           </div>
-          <span class="mini-title">{{ postTitle(post) }}</span>
+          <span class="mini-title">{{ loc(post.title) }}</span>
           <span class="mini-read">
             {{ t('writing.read') }} <span class="mini-arrow">→</span>
           </span>

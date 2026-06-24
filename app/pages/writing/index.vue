@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { PostItem } from '../../server/api/posts.get'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const plural = usePlural()
+const loc    = useLoc()
 
 useSeoMeta({ title: computed(() => `${t('writing.title')} — lyoraeth`) })
 
@@ -15,9 +16,6 @@ const { data: allPosts } = await useFetch('/api/posts', {
 type SortKey = 'date-desc' | 'date-asc' | 'alpha' | 'popular'
 const search = ref('')
 const sortBy = ref<SortKey>('date-desc')
-
-const loc = (obj: { en: string; ru: string } | null | undefined) =>
-  obj ? (locale.value === 'ru' && obj.ru ? obj.ru : obj.en) : ''
 
 function formatDate(iso: string) {
   const d = new Date(iso)

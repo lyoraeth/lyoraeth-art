@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { WorkItem } from '../../server/api/work.get'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const plural = usePlural()
+const loc    = useLoc()
 
 useSeoMeta({ title: computed(() => `${t('work.title')} — lyoraeth`) })
 
@@ -10,9 +11,6 @@ const { data: allWork } = await useFetch('/api/work', {
   query: { limit: 0 },
   default: () => [] as WorkItem[],
 })
-
-const loc = (obj: { en: string; ru: string } | null | undefined) =>
-  obj ? (locale.value === 'ru' && obj.ru ? obj.ru : obj.en) : ''
 
 /* Group by year (undefined → 'Other') */
 const grouped = computed(() => {
