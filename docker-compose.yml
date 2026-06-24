@@ -1,0 +1,40 @@
+services:
+  app:
+    image: ghcr.io/lyoraeth/lyoraeth:latest
+    container_name: lyoraeth-app
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - server_network
+
+  umami-db:
+    image: postgres:16-alpine
+    container_name: lyoraeth-umami-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD}
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    networks:
+      - server_network
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: lyoraeth-umami
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD}@lyoraeth-umami-db:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET}
+    depends_on:
+      - umami-db
+    networks:
+      - server_network
+
+volumes:
+  umami-db-data:
+
+networks:
+  server_network:
+    external: true
