@@ -10,6 +10,7 @@ const { data: comments, refresh } = await useFetch<CommentItem[]>(`/api/comments
 const token   = ref('')
 const nick    = ref('')
 const message = ref('')
+const consent = ref(false)
 
 type State = 'idle' | 'loading' | 'success' | 'error'
 const state  = ref<State>('idle')
@@ -21,8 +22,14 @@ function formatDate(iso: string) {
   })
 }
 
+const localePath = useLocalePath()
+const { locale } = useI18n()
+const consentHref = computed(() =>
+  locale.value === 'ru' ? localePath('/personal-data') : localePath('/privacy')
+)
+
 async function submit() {
-  if (!nick.value.trim() || !message.value.trim() || !token.value) return
+  if (!nick.value.trim() || !message.value.trim() || !token.value || !consent.value) return
   state.value = 'loading'
   errMsg.value = ''
   try {
@@ -37,6 +44,7 @@ async function submit() {
     })
     state.value = 'success'
     nick.value = message.value = token.value = ''
+    consent.value = false
     await refresh()
   } catch (e: any) {
     errMsg.value = e?.data?.message ?? t('post.comments.error')
@@ -91,7 +99,12 @@ async function submit() {
 
         <p v-if="state === 'error'" class="err-msg">{{ errMsg }}</p>
 
-        <button type="submit" class="submit-btn" :disabled="state === 'loading' || !token">
+        <label class="consent-label">
+          <input type="checkbox" v-model="consent" class="consent-check" required />
+          {{ t('contact.consent_pre') }}<NuxtLink :to="consentHref" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
+        </label>
+
+        <button type="submit" class="submit-btn" :disabled="state === 'loading' || !token || !consent">
           <span v-if="state === 'loading'" class="loading-dot"></span>
           <span v-else>{{ t('post.comments.submit') }}</span>
         </button>
@@ -211,6 +224,30 @@ async function submit() {
   cursor: pointer;
   transition: background 0.2s;
 }
+.consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--faint);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.consent-check {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  accent-color: var(--ember);
+  cursor: pointer;
+}
+.consent-link {
+  color: var(--ember);
+  text-decoration: underline;
+  text-decoration-color: rgba(214, 154, 106, 0.4);
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.2s;
+}
+.consent-link:hover { text-decoration-color: var(--ember); }
+
 .submit-btn:hover:not(:disabled) { background: rgba(214, 154, 106, 0.15); background: oklch(72% 0.1 58 / 15%); }
 .submit-btn:disabled { opacity: 0.5; cursor: default; }
 

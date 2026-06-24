@@ -152,7 +152,8 @@
     "success": "Message sent — thank you!",
     "send_another": "Send another",
     "error": "Something went wrong",
-    "privacy": "By submitting this form, you agree to the privacy policy.",
+    "consent_pre": "I agree to the ",
+    "consent_link": "Privacy Policy",
     "github": "GitHub",
     "cv": "CV",
     "cv_note": "pdf ↓"
@@ -180,27 +181,11 @@
   },
 
   "privacy": {
-    "title": "Privacy Policy",
-    "updated": "Last updated: June 2026",
-    "intro": "This site is a personal portfolio. I keep data collection to an absolute minimum — no tracking, no profiling, no selling of data.",
+    "title": "Privacy Policy"
+  },
 
-    "s1_title": "Analytics",
-    "s1_body": "Page views are counted with Umami, a self-hosted, open-source analytics tool. Umami does not use cookies, does not collect personal data, and does not share anything with third parties. The data (page URL, referrer, browser language, screen size, country) is stored on my own server and used only to understand which content is useful.",
-
-    "s2_title": "Contact form & CAPTCHA",
-    "s2_body": "The contact form is protected by Cloudflare Turnstile. Turnstile runs a privacy-friendly challenge — it does not use fingerprinting or tracking cookies. Cloudflare may process your IP address and browser metadata on their servers to verify the challenge; see cloudflare.com/privacypolicy for details. The message you send (contact handle and text) is delivered to me via a server-side email and is not stored anywhere else.",
-
-    "s3_title": "Comments",
-    "s3_body": "If you leave a comment on a post, your name, optional email address, and the comment text are stored in Sanity (a cloud-based content platform, servers in the EU/US). Your email is shown only as {'@'}handle — the full address is not displayed publicly. Comments may be moderated or removed at my discretion.",
-
-    "s4_title": "Cookies",
-    "s4_body": "This site sets one functional cookie — `i18n_locale` — to remember your language preference across visits. It contains no personal data and is never shared with third parties. Cloudflare Turnstile may also set a short-lived technical cookie as part of its challenge mechanism; it is cleared when the session ends. No tracking or advertising cookies are used.",
-
-    "s5_title": "Your rights",
-    "s5_body": "Under GDPR and equivalent laws you have the right to access, correct, or delete any personal data I hold. To exercise these rights, email me at {email}. I will respond within 30 days.",
-
-    "s6_title": "Changes",
-    "s6_body": "If this policy changes materially, I will update the date at the top of this page."
+  "personal_data": {
+    "title": "Personal Data Processing"
   },
 
   "curtain": {

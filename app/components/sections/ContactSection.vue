@@ -24,13 +24,19 @@ const cvUrl = computed(() => {
 const contact = ref('')
 const message = ref('')
 const token   = ref('')
+const consent = ref(false)
 
 type State = 'idle' | 'loading' | 'success' | 'error'
 const state  = ref<State>('idle')
 const errMsg = ref('')
 
+const localePath = useLocalePath()
+const consentHref = computed(() =>
+  locale.value === 'ru' ? localePath('/personal-data') : localePath('/privacy')
+)
+
 async function onSubmit() {
-  if (!contact.value.trim() || !message.value.trim() || !token.value) return
+  if (!contact.value.trim() || !message.value.trim() || !token.value || !consent.value) return
   state.value = 'loading'
   errMsg.value = ''
   try {
@@ -40,6 +46,7 @@ async function onSubmit() {
     })
     state.value = 'success'
     contact.value = message.value = token.value = ''
+    consent.value = false
   } catch (e: any) {
     errMsg.value = e?.data?.message ?? t('contact.error')
     state.value = 'error'
@@ -139,11 +146,14 @@ onMounted(() => observe(cardEl.value))
             appearance="invisible"
           />
           <p v-if="state === 'error'" class="form-err" aria-live="polite">{{ errMsg }}</p>
-          <button type="submit" :disabled="state === 'loading' || !token">
+          <label class="consent-label">
+            <input type="checkbox" v-model="consent" class="consent-check" required />
+            {{ t('contact.consent_pre') }}<NuxtLink :to="consentHref" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
+          </label>
+          <button type="submit" :disabled="state === 'loading' || !token || !consent">
             <span v-if="state === 'loading'" class="loading-dot"></span>
             <span v-else>{{ t('contact.submit') }}</span>
           </button>
-          <p class="form-privacy">{{ t('contact.privacy') }}</p>
         </form>
       </div>
     </div>
@@ -399,6 +409,30 @@ onMounted(() => observe(cardEl.value))
   text-decoration: underline;
   font-family: inherit;
 }
+
+.consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--faint);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.consent-check {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  accent-color: var(--ember);
+  cursor: pointer;
+}
+.consent-link {
+  color: var(--ember);
+  text-decoration: underline;
+  text-decoration-color: rgba(214, 154, 106, 0.4);
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.2s;
+}
+.consent-link:hover { text-decoration-color: var(--ember); }
 
 /* ── Responsive ─────────────────────────────────────────────────────────────── */
 @media (max-width: 45em) {
