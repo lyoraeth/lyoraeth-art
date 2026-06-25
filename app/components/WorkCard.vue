@@ -47,7 +47,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="card-viewport">
+    <div class="card-viewport" :class="{ 'card-viewport--loaded': imageLoaded }">
       <div v-show="!imageLoaded" class="viewport-bar"><i></i><i></i><i></i></div>
       <SanityPicture
         :src="item.coverUrl"
@@ -140,11 +140,21 @@ onMounted(() => {
   z-index: 2;
   background: linear-gradient(135deg, #0c1016, #0a0d12);
   border: 1px solid var(--line-soft);
+}
+
+/* Before image loads: fixed ratio so card isn't zero-height */
+.card-viewport:not(.card-viewport--loaded) {
   aspect-ratio: 16/9;
 }
 
 @media (min-width: 80rem) {
-  .card-viewport { aspect-ratio: 2/1; }
+  .card-viewport:not(.card-viewport--loaded) { aspect-ratio: 2/1; }
+}
+
+/* After image loads: viewport stretches to match card-body via grid */
+.card-viewport--loaded .viewport-img {
+  inset: 0;
+  height: 100%;
 }
 
 @media (max-width: 47.5em) {
