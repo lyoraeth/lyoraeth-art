@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
       tags,
       tagWarm,
       url,
+      showLink,
       year,
       "coverUrl":    cover.asset->url,
       "coverAlt":    cover.alt,

@@ -64,14 +64,16 @@ useSeoMeta({
     <p class="work-desc">{{ loc(item.description) }}</p>
 
     <a
-      v-if="item.url"
+      v-if="item.showLink && item.url"
       :href="item.url"
       target="_blank"
       rel="noopener noreferrer"
-      class="view-btn"
+      class="work-link"
     >
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 13L13 3M13 3H7M13 3v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
       {{ t('work.view_project') }}
-      <span class="btn-arrow">↗</span>
     </a>
   </article>
 </template>
@@ -159,23 +161,17 @@ useSeoMeta({
   margin-bottom: 2.5rem;
 }
 
-.view-btn {
+.work-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6875rem 1.75rem;
-  background: var(--ember-bg);
-  border: 1px solid var(--ember-border);
-  border-radius: var(--radius-tag);
-  color: var(--ember);
-  font-size: 0.9375rem;
+  gap: 0.375rem;
+  color: var(--faint);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: color 0.2s;
+  margin-top: 0.5rem;
 }
-.view-btn:hover { background: rgba(214, 154, 106, 0.15); background: oklch(72% 0.1 58 / 15%); }
-.btn-arrow {
-  display: inline-block;
-  transition: transform 0.3s var(--ease-out-expo);
-}
-.view-btn:hover .btn-arrow { transform: translate(0.2rem, -0.2rem); }
+.work-link svg { width: 0.75rem; height: 0.75rem; flex-shrink: 0; }
+.work-link:hover { color: var(--ember); }
 </style>

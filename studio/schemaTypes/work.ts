@@ -61,6 +61,12 @@ export default defineType({
       type: 'url',
     }),
     defineField({
+      name: 'showLink',
+      title: 'Show link at the bottom of the page',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
       name: 'year',
       title: 'Year',
       type: 'number',
