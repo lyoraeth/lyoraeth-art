@@ -30,8 +30,11 @@ function onError(e: Event) {
 
 onMounted(() => {
   const img = pictureRef.value?.querySelector('img') as HTMLImageElement | null
-  if (img && img.complete && img.naturalWidth === 0 && props.src) {
+  if (!img || !img.complete) return
+  if (img.naturalWidth === 0 && props.src) {
     fallbackToRaw(img)
+  } else if (img.naturalWidth > 0) {
+    img.dispatchEvent(new Event('load'))
   }
 })
 </script>
