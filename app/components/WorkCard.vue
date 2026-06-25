@@ -9,8 +9,9 @@ const props = defineProps<{
 
 const loc = useLoc()
 
-const cardRef   = ref<HTMLElement | null>(null)
-const tiltReady = ref(false)
+const cardRef     = ref<HTMLElement | null>(null)
+const tiltReady   = ref(false)
+const imageLoaded = ref(false)
 
 useGlowCard(cardRef, tiltReady)
 
@@ -47,7 +48,7 @@ onMounted(() => {
     </div>
 
     <div class="card-viewport">
-      <div class="viewport-bar"><i></i><i></i><i></i></div>
+      <div v-show="!imageLoaded" class="viewport-bar"><i></i><i></i><i></i></div>
       <SanityPicture
         :src="item.coverUrl"
         :alt="item.coverAlt ?? loc(item.title)"
@@ -55,6 +56,7 @@ onMounted(() => {
         loading="lazy"
         draggable="false"
         :width="700"
+        @load="imageLoaded = true"
       >
         <template #placeholder>
           <div class="viewport-placeholder" aria-hidden="true">
@@ -139,6 +141,13 @@ onMounted(() => {
   background: linear-gradient(135deg, #0c1016, #0a0d12);
   border: 1px solid var(--line-soft);
   min-height: 15rem;
+}
+
+@media (min-width: 80rem) {
+  .card-viewport { max-height: 22rem; }
+}
+@media (max-width: 79.9375rem) and (min-width: 47.5em) {
+  .card-viewport { max-height: 18rem; }
 }
 .viewport-bar {
   position: absolute;
