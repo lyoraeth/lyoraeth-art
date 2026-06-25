@@ -54,6 +54,12 @@ useHead({
 
 const formatDate = useFormatDate()
 
+const body = computed(() => {
+  if (!post.value) return []
+  const ru = post.value.body.ru
+  return (locale.value === 'ru' && ru?.length) ? ru : post.value.body.en
+})
+
 /* ── Portable Text custom components ── */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ptComponents: any = {
@@ -135,7 +141,7 @@ const ptComponents: any = {
 
     <!-- Body -->
     <div class="post-body prose">
-      <PortableText :value="post.body ?? []" :components="ptComponents" />
+      <PortableText :value="body" :components="ptComponents" />
     </div>
 
     <!-- Divider -->

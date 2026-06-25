@@ -55,7 +55,23 @@ export default defineType({
     }),
     defineField({
       name: 'body',
-      title: 'Body',
+      title: 'Body (English)',
+      type: 'array',
+      of: [
+        { type: 'block' },
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            { name: 'alt',     type: 'string', title: 'Alt text' },
+            { name: 'caption', type: 'string', title: 'Caption' },
+          ],
+        },
+      ],
+    }),
+    defineField({
+      name: 'bodyRu',
+      title: 'Body (Russian)',
       type: 'array',
       of: [
         { type: 'block' },
