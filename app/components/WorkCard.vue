@@ -53,7 +53,7 @@ onMounted(() => {
         :src="item.coverUrl"
         :alt="item.coverAlt ?? loc(item.title)"
         class="viewport-img"
-        loading="lazy"
+        loading="eager"
         draggable="false"
         :width="700"
         @load="imageLoaded = true"

@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
   if (!sanityProjectId) return []
 
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
       "coverAlt": cover.alt
     }
   `)
-})
+}, { maxAge: 60 * 5, name: 'work-list', getKey: (event) => getQuery(event).limit ?? '3' })
 
 export interface WorkItem {
   _id:         string
