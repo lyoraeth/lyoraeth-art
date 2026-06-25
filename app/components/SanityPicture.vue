@@ -39,8 +39,7 @@ onMounted(() => {
 <template>
   <!-- display: contents keeps <picture> transparent to layout -->
   <picture v-if="src" ref="pictureRef" style="display: contents">
-    <source :srcset="fmt('avif')" type="image/avif">
-    <source :srcset="fmt('webp')"  type="image/webp">
+    <source :srcset="fmt('webp')" type="image/webp">
     <img :src="src" :alt="alt" :loading="loading" :width="props.width" :height="props.height" v-bind="$attrs" @error="onError">
   </picture>
   <slot v-else name="placeholder" />
