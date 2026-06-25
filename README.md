@@ -1,6 +1,6 @@
 ![Project Status](https://img.shields.io/badge/Status-Live-green.svg)
 ![Technologies](https://img.shields.io/badge/Tech-Nuxt%204%2C%20Vue%203%2C%20Tailwind%2C%20Sanity%2C%20Lenis-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+![License](https://img.shields.io/badge/License-Source%20Reference-red.svg)
 
 # lyoraeth.art
 
@@ -177,4 +177,6 @@ docker-compose.yml    # app + umami + umami-db
 
 ## License
 
-MIT — the code is yours. Design, content, and visual identity are not covered.
+Source Reference License — the code is publicly available for study and reference only.
+Copying code, design, content, locale strings, or legal documents is not permitted.
+See [LICENSE](LICENSE) for the full terms.

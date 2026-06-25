@@ -1,0 +1,79 @@
+Copyright (c) 2026 Danil Klimov (lyoraeth). All rights reserved.
+
+═══════════════════════════════════════════════════════════════════════
+SOURCE REFERENCE LICENSE
+═══════════════════════════════════════════════════════════════════════
+
+This repository contains the source code for lyoraeth.art — a personal
+portfolio website. The code is made publicly available for transparency
+and as a learning resource only. This is not open-source software.
+
+───────────────────────────────────────────────────────────────────────
+WHAT YOU MAY DO
+───────────────────────────────────────────────────────────────────────
+
+  · Read, explore, and study the source code for educational purposes
+  · Reference a specific technique or pattern as inspiration when writing
+    your own original and independent implementation
+  · Link to this repository as an example or case study
+
+───────────────────────────────────────────────────────────────────────
+WHAT YOU MAY NOT DO
+───────────────────────────────────────────────────────────────────────
+
+Without prior written permission from the copyright holder, you may not:
+
+SOURCE CODE
+  · Copy, reproduce, or incorporate any portion of this code — whole or
+    in part — into another project, product, library, or repository
+  · Use this codebase or any file within it as a template, boilerplate,
+    or starting point for any project
+  · Redistribute this code or any modified version of it, publicly
+    or privately
+
+DESIGN SYSTEM & VISUAL IDENTITY
+  · Copy or adapt the design system in whole or in part — including but
+    not limited to: color tokens and palette, glass effect recipe,
+    component architecture, layout patterns, CSS custom properties,
+    animation techniques, scrollbar styling, or any other visual or
+    structural detail implemented here
+  · Reproduce or closely imitate the overall visual identity, aesthetic,
+    or look-and-feel of lyoraeth.art in any other context
+
+BRAND ASSETS
+  · Use the logo, wordmark, favicons, avatar, Open Graph images,
+    or any other brand asset associated with lyoraeth / Danil Klimov
+    for any purpose other than referring to this site
+
+WRITTEN CONTENT
+  · Copy, translate, republish, or redistribute the written content
+    of the site — including but not limited to: blog posts, page copy,
+    section headings, bio text, or the approach/philosophy descriptions
+
+LOCALE & UI STRINGS
+  · Copy the locale files (i18n/locales/en.json, i18n/locales/ru.json)
+    or any portion thereof — these files contain original authored text
+    and are protected as literary works
+
+LEGAL DOCUMENTS
+  · Use the privacy policy, personal data consent document, or any other
+    legal text in this repository as a template or basis for your own
+    documents — these documents identify a specific legal entity and
+    operator (Danil Klimov, INN 540860293688) and cannot be repurposed
+    without constituting misrepresentation
+
+───────────────────────────────────────────────────────────────────────
+NO WARRANTIES
+───────────────────────────────────────────────────────────────────────
+
+This code is provided "as is", without warranty of any kind, express or
+implied. The author makes no guarantees regarding correctness, security,
+completeness, or fitness for any purpose. Reading this code for
+reference is entirely at your own risk.
+
+───────────────────────────────────────────────────────────────────────
+LICENSING INQUIRIES
+───────────────────────────────────────────────────────────────────────
+
+If you would like to use any part of this work beyond the permitted
+uses above, contact: lyoraeth@gmail.com
