@@ -28,6 +28,30 @@ useSeoMeta({
   twitterImage:     ogImage,
 })
 
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: computed(() => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: title.value,
+      datePublished: post.value?.publishedAt,
+      ...(ogImage.value !== 'https://lyoraeth.art/og-image.png' && { image: ogImage.value }),
+      url: `https://lyoraeth.art/writing/${slug}`,
+      author: {
+        '@type': 'Person',
+        name: 'Danil Klimov',
+        url: 'https://lyoraeth.art',
+      },
+      publisher: {
+        '@type': 'Person',
+        name: 'Danil Klimov',
+        url: 'https://lyoraeth.art',
+      },
+    })),
+  }],
+})
+
 const formatDate = useFormatDate()
 
 /* ── Portable Text custom components ── */

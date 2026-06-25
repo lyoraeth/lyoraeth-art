@@ -97,6 +97,12 @@ Comments on writing posts are stored in Sanity and fetched client-side with a pu
 ### Contact form
 `POST /api/contact` — Nitro endpoint. Validates Turnstile server-side, calls Resend SDK. No SMTP, no separate mail server. If Turnstile fails, the request is rejected before anything is sent.
 
+### Comments
+`POST /api/comment` — stores a nickname + message in Sanity (pre-moderated). Email is never requested or stored — only the handle the user chooses. Turnstile-gated.
+
+### Legal
+Privacy policy and personal data consent (152-ФЗ, separate document since 01.09.2025) are static Markdown files parsed at build time with `marked`. No CMS dependency for legal pages.
+
 ### i18n
 Two locales, `prefix_except_default` — `/` for EN, `/ru/` for RU. Browser language detected on first visit, stored in `i18n_locale` cookie. All internal navigation uses `localePath()` — no hardcoded routes.
 
@@ -125,13 +131,19 @@ pnpm preview
 
 ```
 app/
-  components/         # SiteNav, SiteFooter, sections/*, shared UI
-  pages/              # index, work/[slug], writing/[slug], privacy
-  assets/css/         # tokens.css, main.css
+  components/         # SiteNav, SiteFooter, sections/*, WorkCard, post/*
+  pages/              # index, work/[slug], writing/[slug]
+                      # privacy (EN/RU), personal-data (RU — 152-ФЗ consent)
+  assets/
+    css/              # main.css (tokens + global styles)
+    content/          # privacy.en.md, privacy.ru.md, personal-data.ru.md
 i18n/locales/
   en.json  ru.json
 server/
-  api/                # contact.post.ts, work.get.ts, post/[slug].get.ts …
+  api/                # contact.post, comment.post, comments/[slug].get
+                      # work.get, post/[slug].get, rating/*, settings.get
+                      # mcp/send.post
+  routes/             # sitemap.xml.ts
   utils/              # Sanity client, image formatter
 .github/workflows/
   deploy.yml
