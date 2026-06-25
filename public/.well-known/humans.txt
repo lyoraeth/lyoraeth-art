@@ -1,0 +1,41 @@
+/* TEAM */
+  Developer: Danil Klimov (Lyoraeth)
+  Site: https://lyoraeth.art
+  GitHub: @lyoraeth
+  Telegram: @lyoraeth_art
+
+
+/* SITE & CONCEPT */
+  Ninth iteration. The site itself is the demo.
+  Concept: Atmospheric minimalism (dark stage, blurred color primitives in oklch, glass layers, sharp type up front).
+  Volume through light and blur, not shadows on buttons.
+  Design System: Tokens-driven (CSS custom properties via Tailwind @theme inline).
+
+
+/* TECHNOLOGIES & STANDARDS */
+  Core: Nuxt 4, Vue 3 (Composition API)
+  Styles: Tailwind CSS v4 (with full OKLCH/RGBA fallbacks)
+  Content: Sanity Headless CMS (GROQ queries inside Nitro API routes)
+  i18n: @nuxtjs/i18n (EN/RU, prefix_except_default, cookie-persisted)
+  Motion: Lenis (Smooth scroll, client-side progressive enhancement) + IntersectionObserver
+  Fonts: Self-hosted via @nuxtjs/google-fonts (Golos Text, Onest, JetBrains Mono)
+  Mails: Resend SDK via Nitro endpoint
+  CAPTCHA: Cloudflare Turnstile (Invisible, cookie-free)
+  Analytics: Umami (Self-hosted via Docker, cookie-free, zero tracking)
+
+
+/* ROBOTS, AI & PROTOCOLS */
+  LLM Friendly: Integrated llms.txt for context scrapers
+  AI Actions: WebMCP (Model Context Protocol) integration — send_message tool registered for AI agents
+  SEO: JSON-LD Person & BlogPosting schemas, dynamic sitemap.xml via Nitro route
+
+
+/* INFRASTRUCTURE & SECURITY */
+  CI/CD: GitHub Actions -> Docker multi-stage build -> GHCR -> SSH deploy on push
+  Reverse Proxy: nginx-proxy-manager
+  Performance: Zero CLS, GPU-isolated background layers (contain: layout style paint), preloaded fonts
+  Security: HSTS, COOP (same-origin), X-Frame-Options (DENY), CSP-Report-Only
+
+
+/* LICENSE */
+  Source Reference License. Code available for study only.
