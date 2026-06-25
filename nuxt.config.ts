@@ -49,6 +49,13 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    '/avatar.webp':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/logo.svg':       { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/favicon.ico':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/favicon-32.png': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/favicon-16.png': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/apple-touch-icon.png': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/site.webmanifest':     { headers: { 'Cache-Control': 'public, max-age=86400' } },
     '/**': {
       headers: {
         'Strict-Transport-Security':  'max-age=31536000; includeSubDomains; preload',
