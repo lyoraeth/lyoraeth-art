@@ -140,14 +140,15 @@ onMounted(() => {
   z-index: 2;
   background: linear-gradient(135deg, #0c1016, #0a0d12);
   border: 1px solid var(--line-soft);
-  min-height: 15rem;
+  aspect-ratio: 16/9;
 }
 
 @media (min-width: 80rem) {
-  .card-viewport { max-height: 22rem; }
+  .card-viewport { aspect-ratio: 2/1; }
 }
-@media (max-width: 79.9375rem) and (min-width: 47.5em) {
-  .card-viewport { max-height: 18rem; }
+
+@media (max-width: 47.5em) {
+  .card-viewport { min-height: 12.5rem; }
 }
 .viewport-bar {
   position: absolute;

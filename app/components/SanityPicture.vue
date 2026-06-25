@@ -19,11 +19,21 @@ function fmt(format: 'avif' | 'webp'): string {
 
 const pictureRef = ref<HTMLPictureElement>()
 
-function onError(e: Event) {
-  const img = e.target as HTMLImageElement
+function fallbackToRaw(img: HTMLImageElement) {
   pictureRef.value?.querySelectorAll('source').forEach(s => s.remove())
   img.src = props.src!
 }
+
+function onError(e: Event) {
+  fallbackToRaw(e.target as HTMLImageElement)
+}
+
+onMounted(() => {
+  const img = pictureRef.value?.querySelector('img') as HTMLImageElement | null
+  if (img && img.complete && img.naturalWidth === 0 && props.src) {
+    fallbackToRaw(img)
+  }
+})
 </script>
 
 <template>
