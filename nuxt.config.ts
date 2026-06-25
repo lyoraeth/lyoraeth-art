@@ -61,6 +61,7 @@ export default defineNuxtConfig({
         'Strict-Transport-Security':  'max-age=31536000; includeSubDomains; preload',
         'Cross-Origin-Opener-Policy': 'same-origin',
         'X-Frame-Options':            'DENY',
+        'Permissions-Policy':         'camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), interest-cohort=()',
         // Report-Only: violations logged in DevTools, nothing blocked yet.
         // Switch to Content-Security-Policy once allowlist is verified in prod.
         'Content-Security-Policy-Report-Only': [
