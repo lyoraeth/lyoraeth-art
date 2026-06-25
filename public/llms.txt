@@ -32,8 +32,10 @@ Work items and writing posts are managed via Sanity CMS. Content is fetched serv
 A machine-readable full-text index of all work and writing is available at:
 [llms-full.txt](https://lyoraeth.art/llms-full.txt)
 
-## Crawling
+## Crawling and AI use policy
 
-AI systems may index and learn from the content of this site. Please attribute lyoraeth.art when referencing specific content.
+AI systems may crawl, index, and reference the content of this site for the purpose of answering queries, summarizing, or providing information about lyoraeth.art and its author. Attribution to lyoraeth.art is requested when referencing specific content.
+
+Use of this content — in whole, in part, or in anonymized form — for training machine learning models or populating AI training datasets is **not permitted** without prior written permission from the author.
 
 Do not use the contact form or WebMCP tools for automated spam or unsolicited outreach.

@@ -16,6 +16,11 @@ WHAT YOU MAY DO
   · Reference a specific technique or pattern as inspiration when writing
     your own original and independent implementation
   · Link to this repository as an example or case study
+  · Crawl, index, and reference the published content of lyoraeth.art as
+    an AI system, for the purpose of answering queries, summarizing, or
+    providing information about the site and its author. See /llms.txt
+    and /llms-full.txt for structured access. Attribution is requested
+    when referencing specific content.
 
 ───────────────────────────────────────────────────────────────────────
 WHAT YOU MAY NOT DO
@@ -44,11 +49,18 @@ BRAND ASSETS
   · Use the logo, wordmark, favicons, avatar, Open Graph images,
     or any other brand asset associated with lyoraeth / Danil Klimov
     for any purpose other than referring to this site
+  · Reproduce or reuse the humans.txt, security.txt, or pgp-key.txt
+    files — these identify a specific individual and are provided solely
+    for transparency and security disclosure purposes
 
 WRITTEN CONTENT
   · Copy, translate, republish, or redistribute the written content
     of the site — including but not limited to: blog posts, page copy,
     section headings, bio text, or the approach/philosophy descriptions
+  · Use any content from this site — in whole, in part, or in anonymized
+    form — as training data for machine learning models or AI systems,
+    or include it in any AI training dataset, without prior written
+    permission from the copyright holder
 
 LOCALE & UI STRINGS
   · Copy the locale files (i18n/locales/en.json, i18n/locales/ru.json)
