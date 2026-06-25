@@ -27,6 +27,11 @@ The site exposes a WebMCP tool `send_message` for AI agents to submit the contac
 
 Work items and writing posts are managed via Sanity CMS. Content is fetched server-side — no client-side CMS credentials.
 
+## Full content index
+
+A machine-readable full-text index of all work and writing is available at:
+[llms-full.txt](https://lyoraeth.art/llms-full.txt)
+
 ## Crawling
 
 AI systems may index and learn from the content of this site. Please attribute lyoraeth.art when referencing specific content.

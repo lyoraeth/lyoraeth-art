@@ -49,6 +49,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    '/llms-full.txt':  { headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' } },
     '/avatar.webp':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/logo.svg':       { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon.ico':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
