@@ -81,6 +81,7 @@ onMounted(() => {
 .work-card {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
+  align-items: start;
   border-radius: var(--radius-card);
 }
 .work-card--reverse {
@@ -151,7 +152,10 @@ onMounted(() => {
   .card-viewport:not(.card-viewport--loaded) { aspect-ratio: 2/1; }
 }
 
-/* After image loads: viewport stretches to match card-body via grid */
+/* After image loads: stretch to match card-body height (align-items: start on grid) */
+.card-viewport--loaded {
+  align-self: stretch;
+}
 .card-viewport--loaded .viewport-img {
   inset: 0;
   height: 100%;
