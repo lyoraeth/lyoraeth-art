@@ -63,7 +63,6 @@ const ptComponents: any = {
       setup(props) {
         return () => h('figure', { class: 'pt-figure' }, [
           h('picture', { style: 'display: contents' }, [
-            h('source', { srcset: sanityFmt(props.value.url, 'avif', { w: 800, q: 80 }), type: 'image/avif' }),
             h('source', { srcset: sanityFmt(props.value.url, 'webp', { w: 800, q: 80 }), type: 'image/webp' }),
             h('img', {
               src:     props.value.url,
