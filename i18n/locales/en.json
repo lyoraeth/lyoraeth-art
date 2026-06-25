@@ -133,7 +133,7 @@
       "message": "Comment",
       "message_placeholder": "Your thoughts…",
       "submit": "Submit",
-      "success": "Comment submitted — thank you!",
+      "success": "Comment submitted — it will appear after moderation.",
       "another": "Write another",
       "error": "Something went wrong"
     }

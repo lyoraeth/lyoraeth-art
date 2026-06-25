@@ -51,7 +51,6 @@ async function submit() {
     state.value = 'success'
     nick.value = message.value = token.value = ''
     consent.value = false
-    await refresh()
   } catch (e: any) {
     errMsg.value = e?.data?.message ?? t('post.comments.error')
     state.value = 'error'

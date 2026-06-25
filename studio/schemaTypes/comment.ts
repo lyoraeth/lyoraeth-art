@@ -6,8 +6,7 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({ name: 'postSlug',    type: 'string',   title: 'Post slug' }),
-    defineField({ name: 'name',        type: 'string',   title: 'Name' }),
-    defineField({ name: 'email',       type: 'string',   title: 'Email (shown as nick)' }),
+    defineField({ name: 'nick',        type: 'string',   title: 'Nick' }),
     defineField({ name: 'message',     type: 'text',     title: 'Message' }),
     defineField({ name: 'publishedAt', type: 'datetime', title: 'Posted at' }),
     defineField({
@@ -24,7 +23,7 @@ export default defineType({
     by:    [{ field: 'publishedAt', direction: 'desc' }],
   }],
   preview: {
-    select: { title: 'name', subtitle: 'message' },
+    select: { title: 'nick', subtitle: 'message' },
     prepare: ({ title, subtitle }: any) => ({ title, subtitle: subtitle?.slice(0, 60) }),
   },
 })
