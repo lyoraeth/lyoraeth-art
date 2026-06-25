@@ -16,14 +16,22 @@ const props = withDefaults(defineProps<{
 function fmt(format: 'avif' | 'webp'): string {
   return sanityFmt(props.src!, format, { w: props.width, q: props.quality })
 }
+
+const pictureRef = ref<HTMLPictureElement>()
+
+function onError(e: Event) {
+  const img = e.target as HTMLImageElement
+  pictureRef.value?.querySelectorAll('source').forEach(s => s.remove())
+  img.src = props.src!
+}
 </script>
 
 <template>
   <!-- display: contents keeps <picture> transparent to layout -->
-  <picture v-if="src" style="display: contents">
+  <picture v-if="src" ref="pictureRef" style="display: contents">
     <source :srcset="fmt('avif')" type="image/avif">
     <source :srcset="fmt('webp')"  type="image/webp">
-    <img :src="src" :alt="alt" :loading="loading" :width="props.width" :height="props.height" v-bind="$attrs">
+    <img :src="src" :alt="alt" :loading="loading" :width="props.width" :height="props.height" v-bind="$attrs" @error="onError">
   </picture>
   <slot v-else name="placeholder" />
 </template>
