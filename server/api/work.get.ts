@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
       "slug": coalesce(slug.current, _id),
       title,
       kicker,
+      shortDescription,
       description,
       tags,
       tagWarm,
@@ -31,6 +32,7 @@ export interface WorkItem {
   slug:        string
   title:       { en: string; ru: string }
   kicker:      { en: string; ru: string }
+  shortDescription: { en: string; ru: string } | null
   description: { en: string; ru: string }
   tags:        string[]
   tagWarm:     string | null

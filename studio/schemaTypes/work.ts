@@ -24,8 +24,18 @@ export default defineType({
       ],
     }),
     defineField({
+      name: 'shortDescription',
+      title: 'Short description (cards)',
+      type: 'object',
+      description: 'Shown on homepage and work listing. 1–2 sentences.',
+      fields: [
+        { name: 'en', title: 'English', type: 'text', rows: 2 },
+        { name: 'ru', title: 'Russian', type: 'text', rows: 2 },
+      ],
+    }),
+    defineField({
       name: 'description',
-      title: 'Description',
+      title: 'Full description (case page)',
       type: 'object',
       fields: [
         { name: 'en', title: 'English', type: 'text', rows: 3 },

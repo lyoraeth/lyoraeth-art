@@ -55,7 +55,7 @@ const grouped = computed(() => {
             <span v-if="item.tagWarm" class="tag tag--warm">{{ item.tagWarm }}</span>
           </div>
           <h2 class="wc-title">{{ loc(item.title) }}</h2>
-          <p class="wc-desc">{{ loc(item.description) }}</p>
+          <p class="wc-desc">{{ loc(item.shortDescription) || loc(item.description) }}</p>
           <div class="wc-tags">
             <span v-for="tag in item.tags" :key="tag" class="tag">{{ tag }}</span>
           </div>
