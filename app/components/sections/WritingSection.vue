@@ -145,6 +145,7 @@ useGlowCard(mini1)
 }
 .va-arrow {
   display: inline-block;
+  vertical-align: middle;
   transition: transform 0.3s var(--ease-out-expo);
 }
 .view-all:hover .va-arrow { transform: translateX(0.25rem); }
@@ -240,6 +241,7 @@ useGlowCard(mini1)
 }
 .feat-arrow {
   display: inline-block;
+  vertical-align: middle;
   transition: transform 0.35s var(--ease-out-expo);
 }
 .feat:hover .feat-arrow { transform: translateX(0.3125rem); }
@@ -303,6 +305,7 @@ useGlowCard(mini1)
 }
 .mini-arrow {
   display: inline-block;
+  vertical-align: middle;
   transition: transform 0.3s var(--ease-out-expo);
 }
 .mini-card:hover .mini-arrow { transform: translateX(0.25rem); }

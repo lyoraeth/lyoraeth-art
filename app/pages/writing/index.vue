@@ -289,6 +289,7 @@ const sorts = computed(() => [
 }
 .row-arrow {
   display: inline-block;
+  vertical-align: middle;
   transition: transform 0.3s var(--ease-out-expo);
 }
 .post-row:hover .row-arrow { transform: translateX(0.25rem); }

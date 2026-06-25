@@ -58,6 +58,7 @@
   }
   .va-arrow {
     display: inline-block;
+    vertical-align: middle;
     transition: transform 0.3s var(--ease-out-expo);
   }
   .view-all:hover .va-arrow { transform: translateX(0.25rem); }

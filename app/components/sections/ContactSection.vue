@@ -249,6 +249,7 @@ onMounted(() => observe(cardEl.value))
 }
 .cta-arrow {
   display: inline-block;
+  vertical-align: middle;
   transition: transform 0.25s var(--ease-out-expo);
 }
 .contact-cta:hover .cta-arrow { transform: translateX(0.25rem); }
