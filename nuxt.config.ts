@@ -65,7 +65,7 @@ export default defineNuxtConfig({
         // Switch to Content-Security-Policy once allowlist is verified in prod.
         'Content-Security-Policy-Report-Only': [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' 'sha256-HreWAkEe8Cz2/hF4lwFf/4n4D6zk7M1QQlxFFJsUhAg=' https://challenges.cloudflare.com https://stat.lyoraeth.art",
+          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://stat.lyoraeth.art",
           "style-src 'self' 'unsafe-inline'",
           "img-src 'self' https://cdn.sanity.io data: blob:",
           "font-src 'self' data:",
