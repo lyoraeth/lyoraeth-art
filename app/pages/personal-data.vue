@@ -10,6 +10,10 @@ if (locale.value !== 'ru') {
   await navigateTo(localePath('/privacy'), { redirectCode: 301 })
 }
 
+watch(locale, (lang) => {
+  if (lang !== 'ru') navigateTo(localePath('/privacy'))
+})
+
 useSeoMeta({ title: computed(() => `${t('personal_data.title')} — lyoraeth`) })
 
 const html = computed(() => marked(ruMd) as string)
