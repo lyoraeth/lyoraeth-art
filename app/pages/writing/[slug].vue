@@ -144,6 +144,16 @@ const ptComponents: any = {
       <PortableText :value="body" :components="ptComponents" />
     </div>
 
+    <!-- References -->
+    <footer v-if="post.references?.length" class="post-references">
+      <span class="references-label">источники</span>
+      <ol class="references-list">
+        <li v-for="ref in post.references" :key="ref.href">
+          <a :href="ref.href" target="_blank" rel="noopener noreferrer">{{ ref.title }}</a>
+        </li>
+      </ol>
+    </footer>
+
     <!-- Divider -->
     <hr class="post-divider" />
 
@@ -337,4 +347,57 @@ const ptComponents: any = {
 }
 
 .post-comments { padding-bottom: 2rem; }
+
+/* ── References ── */
+.post-references {
+  margin-bottom: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.references-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--faint);
+  margin-bottom: 0.75rem;
+}
+
+.references-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: ref;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.references-list li {
+  counter-increment: ref;
+  display: flex;
+  gap: 0.625rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.references-list li::before {
+  content: counter(ref) '.';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  color: var(--faint);
+  min-width: 1.25rem;
+  padding-top: 0.05em;
+  flex-shrink: 0;
+}
+
+.references-list a {
+  color: var(--mist);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.references-list a:hover { color: var(--snow); }
 </style>

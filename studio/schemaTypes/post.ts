@@ -54,6 +54,23 @@ export default defineType({
       initialValue: 0,
     }),
     defineField({
+      name: 'references',
+      title: 'References',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'title', title: 'Title', type: 'string' },
+            { name: 'href',  title: 'URL',   type: 'url' },
+          ],
+          preview: {
+            select: { title: 'title', subtitle: 'href' },
+          },
+        },
+      ],
+    }),
+    defineField({
       name: 'body',
       title: 'Body (English)',
       type: 'array',

@@ -17,6 +17,7 @@ export default defineEventHandler(async (event) => {
       "coverAlt":    cover.alt,
       "coverWidth":  cover.asset->metadata.dimensions.width,
       "coverHeight": cover.asset->metadata.dimensions.height,
+      references,
       "body": {
         "en": body[] {
           ...,
@@ -58,4 +59,5 @@ export interface PostDetail {
   coverWidth:  number | null
   coverHeight: number | null
   body:        { en: unknown[]; ru: unknown[] | null }
+  references:  { title: string; href: string }[] | null
 }
