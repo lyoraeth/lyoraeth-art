@@ -96,6 +96,7 @@ Comments on writing posts are stored in Sanity and fetched client-side with a pu
 - JS: SSR-first — the page is readable before any script runs; Lenis and observers are progressive enhancement
 - Work cards: `loading="eager"` on all card images (above-the-fold section); `/api/work` response cached for 5 minutes server-side
 - Analytics: Umami script is a single lightweight beacon, no tracking cookies, no external calls
+- Server-Timing: a Nitro plugin hooks into `request` and `beforeResponse` to emit an `app;dur=` metric — visible in DevTools → Network → Timing, no overhead in production
 
 ### Security
 All routes carry `Strict-Transport-Security` (preload), `Cross-Origin-Opener-Policy: same-origin`, `X-Frame-Options: DENY`, and `Permissions-Policy` explicitly disabling camera, microphone, geolocation, payment, USB, Bluetooth, and interest-cohort.
@@ -105,6 +106,8 @@ A `Content-Security-Policy-Report-Only` header is in place with a verified allow
 `GET /api/health` returns `{"ok":true}` unconditionally — used as the Docker `HEALTHCHECK` target (interval 30 s, timeout 5 s, start-period 10 s).
 
 Well-known security files are served as static assets: `/.well-known/security.txt` (with PGP signature), `/pgp-key.txt`, and `/humans.txt`.
+
+Rate limiting on `POST /api/comment` and `POST /api/contact` is enforced at the nginx level via `limit_req_zone` (10 req/min per IP, burst 5, `nodelay`). Requests beyond the burst cap receive 429 before reaching the application. The zone definition lives in nginx-proxy-manager's `http.conf` custom include; the `limit_req` directives are applied per-location in NPM's Advanced tab.
 
 Browser compatibility: every `oklch()` and `color-mix()` value is preceded by an `rgba()` fallback — the cascade ensures older engines get a valid color without any visual degradation.
 
