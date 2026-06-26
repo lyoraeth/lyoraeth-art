@@ -15,6 +15,10 @@ if (!item.value) {
 
 const title = computed(() => loc(item.value?.title))
 
+const descParagraphs = computed(() =>
+  (loc(item.value?.description) ?? '').split(/\n\n+/).filter(Boolean),
+)
+
 const ogImage = computed(() => item.value?.coverUrl ?? 'https://lyoraeth.art/og-image.png')
 
 useSeoMeta({
@@ -61,7 +65,7 @@ useSeoMeta({
       />
     </div>
 
-    <p class="work-desc">{{ loc(item.description) }}</p>
+    <p v-for="(para, i) in descParagraphs" :key="i" class="work-desc">{{ para }}</p>
 
     <a
       v-if="item.showLink && item.url"
@@ -157,8 +161,34 @@ useSeoMeta({
 .work-desc {
   font-size: 1.0625rem;
   color: var(--ink);
-  line-height: 1.75;
+  line-height: 1.9;
+  margin-bottom: 1.25rem;
+  hyphens: auto;
+  font-kerning: normal;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+.work-desc:last-of-type {
   margin-bottom: 2.5rem;
+}
+
+/* lead paragraph — brighter, slightly larger, sets the tone */
+.work-desc:first-of-type {
+  font-size: 1.125rem;
+  color: var(--snow);
+  line-height: 1.8;
+  margin-bottom: 1.75rem;
+}
+
+/* ember accent on the opening letter — inline, same baseline */
+.work-desc:first-of-type::first-letter {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--ember);
+}
+
+/* indent subsequent paragraphs — classic typographic rhythm */
+.work-desc + .work-desc {
+  text-indent: 1.5em;
 }
 
 .work-link {

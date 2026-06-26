@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* ── Base ────────────────────────────────────────────────────────────────── */
+html, body { overscroll-behavior: none; }
+
 /* ── Custom scrollbar ────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
