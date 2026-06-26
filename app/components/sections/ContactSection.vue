@@ -85,7 +85,6 @@ onMounted(() => observe(cardEl.value))
       <!-- Left: heading + CTA + channels -->
       <div class="contact-left">
         <h2 class="contact-heading">
-          {{ t('contact.heading') }}<br>
           {{ t('contact.heading_before_acc') }}<span class="contact-acc">{{ t('contact.heading_acc') }}</span>
         </h2>
         <p class="contact-lead">{{ t('contact.lead') }}</p>
