@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PortableText } from '@portabletext/vue'
+import { Marked } from 'marked'
 
 const { locale, t } = useI18n()
 const localePath    = useLocalePath()
@@ -54,55 +54,22 @@ useHead({
 
 const formatDate = useFormatDate()
 
-const body = computed(() => {
-  if (!post.value) return []
-  const ru = post.value.body.ru
-  return (locale.value === 'ru' && ru?.length) ? ru : post.value.body.en
+const md = new Marked({
+  renderer: {
+    image({ href, title, text }) {
+      const caption = title ? `<figcaption class="post-caption">${title}</figcaption>` : ''
+      return `<figure class="post-figure"><img src="${href}" alt="${text ?? ''}" loading="lazy" class="post-img">${caption}</figure>`
+    },
+  },
 })
 
-/* ── Portable Text custom components ── */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ptComponents: any = {
-  types: {
-    image: defineComponent({
-      props: ['value'],
-      setup(props) {
-        return () => h('figure', { class: 'pt-figure' }, [
-          h('picture', { style: 'display: contents' }, [
-            h('source', { srcset: sanityFmt(props.value.url, 'webp', { w: 800, q: 80 }), type: 'image/webp' }),
-            h('img', {
-              src:     props.value.url,
-              alt:     props.value.alt ?? '',
-              loading: 'lazy',
-              width:   props.value.width,
-              height:  props.value.height,
-              class:   'pt-img',
-            }),
-          ]),
-          props.value.caption
-            ? h('figcaption', { class: 'pt-caption' }, props.value.caption)
-            : null,
-        ])
-      },
-    }),
-  },
-  marks: {
-    link: defineComponent({
-      props: ['value'],
-      setup(props, { slots }) {
-        return () => h('a', {
-          href:   props.value.href,
-          target: '_blank',
-          rel:    'noopener noreferrer',
-          class:  'pt-link',
-        }, slots.default?.())
-      },
-    }),
-    code: defineComponent({
-      setup(_, { slots }) { return () => h('code', { class: 'pt-inline-code' }, slots.default?.()) },
-    }),
-  },
-}
+const bodyHtml = computed(() => {
+  if (!post.value) return ''
+  const raw = locale.value === 'ru' ? post.value.body.ru : post.value.body.en
+  if (!raw || typeof raw !== 'string') return ''
+  const html = md.parse(raw) as string
+  return html.replace(/<a href="(https?:\/\/[^"]+)"/g, '<a href="$1" target="_blank" rel="noopener noreferrer"')
+})
 </script>
 
 <template>
@@ -140,9 +107,7 @@ const ptComponents: any = {
     </div>
 
     <!-- Body -->
-    <div class="post-body prose">
-      <PortableText :value="body" :components="ptComponents" />
-    </div>
+    <div class="post-body" v-html="bodyHtml" />
 
     <!-- References -->
     <footer v-if="post.references?.length" class="post-references">
@@ -250,31 +215,53 @@ const ptComponents: any = {
 /* ── Prose (body) ── */
 .post-body {
   color: var(--ink);
-  line-height: 1.75;
   font-size: 1.0625rem;
+  line-height: 1.9;
   margin-bottom: 3rem;
+  hyphens: auto;
+  font-kerning: normal;
+  font-feature-settings: 'kern' 1, 'liga' 1;
 }
 
+/* Lead paragraph */
+:deep(.post-body > p:first-child) {
+  font-size: 1.125rem;
+  color: var(--snow);
+  line-height: 1.8;
+  margin-bottom: 1.75rem;
+}
+:deep(.post-body > p:first-child::first-letter) {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--ember);
+}
+
+/* Paragraphs */
+:deep(.post-body p)       { margin: 0 0 1.25rem; }
+:deep(.post-body p:last-child) { margin-bottom: 0; }
+:deep(.post-body p + p)   { text-indent: 1.5em; }
+
 /* Headings */
-:deep(.post-body h1),
 :deep(.post-body h2),
 :deep(.post-body h3) {
   font-weight: 600;
   letter-spacing: -0.025em;
-  margin: 2.5rem 0 0.75rem;
   color: var(--snow);
+  margin: 2.5rem 0 0.75rem;
 }
-:deep(.post-body h1) { font-size: 1.75rem; line-height: 1.15; }
 :deep(.post-body h2) { font-size: 1.375rem; line-height: 1.2; }
 :deep(.post-body h3) { font-size: 1.125rem; line-height: 1.25; }
 
-/* Paragraphs */
-:deep(.post-body p) { margin: 0 0 1.25rem; }
-:deep(.post-body p:last-child) { margin-bottom: 0; }
+/* Divider from --- */
+:deep(.post-body hr) {
+  border: none;
+  border-top: 1px solid var(--line-soft);
+  margin: 2rem 0;
+}
 
 /* Strong / em */
 :deep(.post-body strong) { color: var(--snow); font-weight: 600; }
-:deep(.post-body em) { color: var(--mist); }
+:deep(.post-body em)     { color: var(--mist); }
 
 /* Blockquote */
 :deep(.post-body blockquote) {
@@ -286,10 +273,9 @@ const ptComponents: any = {
 }
 
 /* Code inline */
-:deep(.pt-inline-code) {
+:deep(.post-body code) {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.875em;
-  background: rgba(255, 255, 255, 0.06);
   background: oklch(100% 0 0 / 6%);
   border: 1px solid var(--line-soft);
   border-radius: 0.25rem;
@@ -297,29 +283,43 @@ const ptComponents: any = {
   color: var(--ember);
 }
 
+/* Code block */
+:deep(.post-body pre) {
+  background: oklch(100% 0 0 / 3%);
+  border: 1px solid var(--line-soft);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+:deep(.post-body pre code) {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--mist);
+}
+
 /* Links */
-:deep(.pt-link) {
+:deep(.post-body a) {
   color: var(--ember);
   text-decoration: underline;
-  text-decoration-color: rgba(214, 154, 106, 0.4);
   text-decoration-color: oklch(72% 0.1 58 / 40%);
   text-underline-offset: 2px;
   transition: text-decoration-color 0.2s;
 }
-:deep(.pt-link:hover) { text-decoration-color: var(--ember); }
+:deep(.post-body a:hover) { text-decoration-color: var(--ember); }
 
 /* Images */
-:deep(.pt-figure) {
-  margin: 2rem 0;
-}
-:deep(.pt-img) {
+:deep(.post-body .post-figure) { margin: 2rem 0; }
+:deep(.post-body .post-img) {
   width: 100%;
   height: auto;
   border-radius: 0.5rem;
   border: 1px solid var(--line-soft);
   display: block;
 }
-:deep(.pt-caption) {
+:deep(.post-body .post-caption) {
   font-size: 0.8125rem;
   color: var(--faint);
   text-align: center;
@@ -329,9 +329,7 @@ const ptComponents: any = {
 
 /* Lists */
 :deep(.post-body ul),
-:deep(.post-body ol) {
-  margin: 0 0 1.25rem 1.5rem;
-}
+:deep(.post-body ol) { margin: 0 0 1.25rem 1.5rem; }
 :deep(.post-body li) { margin-bottom: 0.375rem; }
 
 /* ── Dividers / sections ── */

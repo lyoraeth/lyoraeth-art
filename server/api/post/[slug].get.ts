@@ -18,28 +18,7 @@ export default defineEventHandler(async (event) => {
       "coverWidth":  cover.asset->metadata.dimensions.width,
       "coverHeight": cover.asset->metadata.dimensions.height,
       references,
-      "body": {
-        "en": body[] {
-          ...,
-          _type == "image" => {
-            ...,
-            "url": asset->url,
-            "alt": alt,
-            "width":  asset->metadata.dimensions.width,
-            "height": asset->metadata.dimensions.height
-          }
-        },
-        "ru": bodyRu[] {
-          ...,
-          _type == "image" => {
-            ...,
-            "url": asset->url,
-            "alt": alt,
-            "width":  asset->metadata.dimensions.width,
-            "height": asset->metadata.dimensions.height
-          }
-        }
-      }
+      "body": { "en": body, "ru": bodyRu }
     }
   `, { slug })
 
@@ -58,6 +37,6 @@ export interface PostDetail {
   coverAlt:    string | null
   coverWidth:  number | null
   coverHeight: number | null
-  body:        { en: unknown[]; ru: unknown[] | null }
+  body:        { en: string | null; ru: string | null }
   references:  { title: string; href: string }[] | null
 }
