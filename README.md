@@ -135,6 +135,9 @@ Two locales, `prefix_except_default` — `/` for EN, `/ru/` for RU. Browser lang
 ### CI/CD
 Push to `main` → GitHub Actions: multi-stage Docker build → push to GHCR → SSH into VPS → pull, restart, prune. ~3 minutes from push to live. The VPS runs nginx-proxy-manager for SSL termination — no custom nginx config.
 
+### DNS and network
+Cloudflare is used as DNS only (gray cloud, no proxy). The VPS is hosted at Sprinthost, St. Petersburg — a Russian IP range. Routing traffic through Cloudflare's proxy made the site inaccessible in Russia without a VPN, since Cloudflare's IP ranges are blocked by Roskomnadzor. DNS-only keeps all Cloudflare configuration intact (rules, SSL settings, etc.) while resolving the domain directly to the VPS IP, which is reachable from within Russia.
+
 ---
 
 ## Dev
