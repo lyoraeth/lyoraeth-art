@@ -2,6 +2,7 @@
 import type { PostItem } from '../../../server/api/posts.get'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const plural = usePlural()
 const loc    = useLoc()
 
@@ -101,7 +102,7 @@ const sorts = computed(() => [
           <a
             v-for="post in filtered"
             :key="post._id"
-            :href="`/writing/${post.slug}`"
+            :href="localePath(`/writing/${post.slug}`)"
             class="post-row glass-card"
           >
             <div class="post-row-meta">

@@ -2,6 +2,7 @@
 import type { WorkItem } from '../../../server/api/work.get'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const plural = usePlural()
 const loc    = useLoc()
 
@@ -48,7 +49,7 @@ const grouped = computed(() => {
           v-for="item in items"
           :key="item._id"
           class="work-compact glass-card"
-          :to="`/work/${item.slug}`"
+          :to="localePath(`/work/${item.slug}`)"
         >
           <div class="wc-top">
             <span class="eyebrow wc-kicker">{{ loc(item.kicker) }}</span>
