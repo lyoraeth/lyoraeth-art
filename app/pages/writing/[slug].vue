@@ -54,6 +54,23 @@ useHead({
 
 const formatDate = useFormatDate()
 
+const { progress, active } = useReadingProgress()
+
+onMounted(() => {
+  active.value = true
+  const update = () => {
+    const total = document.documentElement.scrollHeight - window.innerHeight
+    progress.value = total > 0 ? Math.min(100, (window.scrollY / total) * 100) : 0
+  }
+  window.addEventListener('scroll', update, { passive: true })
+  update()
+  onUnmounted(() => {
+    window.removeEventListener('scroll', update)
+    active.value = false
+    progress.value = 0
+  })
+})
+
 const md = new Marked({
   renderer: {
     image({ href, title, text }) {

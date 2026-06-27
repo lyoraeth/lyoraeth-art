@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useReadingProgress } from '~/composables/useReadingProgress'
+
 const { t, locale } = useI18n()
 const switchLocalePathRaw = useSwitchLocalePath()
 const localePath = useLocalePath()
@@ -42,10 +44,18 @@ const onScroll = () => { scrolled.value = window.scrollY > 24 }
 
 onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
 onUnmounted(() => window.removeEventListener('scroll', onScroll))
+
+const { progress, active } = useReadingProgress()
 </script>
 
 <template>
   <nav class="nav" :class="{ 'nav--glass': scrolled }" :aria-label="t('nav.site_nav')">
+    <div
+      class="reading-bar"
+      :class="{ 'reading-bar--visible': active && scrolled }"
+      :style="{ width: progress + '%' }"
+      aria-hidden="true"
+    />
     <div class="nav-inner">
       <NuxtLink :to="localePath('/')" class="brand">
         <img src="/logo.svg" alt="lyoraeth" class="brand-logo" width="256" height="45" />
@@ -274,6 +284,24 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .nav-cv:active {
   background: rgba(214, 154, 106, 0.18);
   background: color-mix(in srgb, var(--ember) 18%, transparent);
+}
+
+/* ── Reading progress bar ────────────────────────────────────────────────── */
+.reading-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1.5px;
+  background: var(--ember);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.5s var(--ease-silk),
+    width 0.08s linear;
+}
+
+.reading-bar--visible {
+  opacity: 1;
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
