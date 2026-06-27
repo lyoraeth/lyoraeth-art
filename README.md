@@ -6,7 +6,7 @@
 
 Personal site — work, writing, contact. The site itself is the demo.
 
-**→ [lyoraeth.art](https://lyoraeth.art)** · [Roadmap](ROADMAP.md)
+<a href="https://lyoraeth.art"><img src="readme/btn-site.png" width="122" height="41"></a>&nbsp;&nbsp;<a href="ROADMAP.md"><img src="readme/btn-roadmap.png" width="103" height="41"></a>
 
 ---
 
