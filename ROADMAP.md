@@ -16,7 +16,6 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 - [ ] `perf` динамические OG images — Satori/nuxt-og-image, брендированный шаблон per-post/per-case
 - [ ] `feat` beta-banner — флаг inDevelopment в siteSettings (Sanity) + первый визит, появляется через 15-30с, автоскрытие, крестик, localStorage чтобы не показывать снова
-- [ ] `feat` nav дропдаун — desktop: ховер на Work/Writing → всплывашка с топ-3 (те же данные что на главной, нужно пробросить и вне неё); mobile: прямой редирект на /work и /writing без дропдауна — меньше шагов до списка
 - [ ] `feat` RSS feed — /rss.xml через Nitro route
 - [ ] `feat` TOC для длинных постов — якорные ссылки, sticky sidebar (событие toc-click уже в плане)
 - [ ] `feat` навигация пред/след пост — в конце writing/[slug]
@@ -35,6 +34,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 ## Done
 
+- [x] `feat` nav дропдаун — ховер на Work/Writing, топ-3 кейса/поста, Teleport + backdrop-filter, i18n, анимация, тёмный/светлый режим по состоянию хэдера
 - [x] `fix` стрелочки на кнопках — vertical-align: middle
 - [x] `feat` комментарии — схема, Studio, email-апрув через Resend + HMAC
 - [x] `content` локализация body постов — поле bodyRu в схеме и GROQ
