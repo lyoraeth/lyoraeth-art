@@ -3,6 +3,12 @@ name: Deploy
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'ROADMAP.md'
+      - 'SECURITY.md'
+      - 'LICENSE'
+      - 'darkstage-design-spec.md'
 
 env:
   REGISTRY: ghcr.io
