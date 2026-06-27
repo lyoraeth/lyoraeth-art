@@ -6,7 +6,7 @@
 
 Personal site — work, writing, contact. The site itself is the demo.
 
-**→ [lyoraeth.art](https://lyoraeth.art)**
+**→ [lyoraeth.art](https://lyoraeth.art)** · [Roadmap](ROADMAP.md)
 
 ---
 
