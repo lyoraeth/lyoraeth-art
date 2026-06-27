@@ -19,9 +19,9 @@ function navTo(hash: string) {
 
 <template>
   <nav class="dock" aria-label="Mobile navigation">
-    <NuxtLink :to="navTo('work')"    class="dock-link">{{ t('nav.work') }}</NuxtLink>
-    <NuxtLink :to="navTo('stack')"   class="dock-link">{{ t('nav.stack') }}</NuxtLink>
-    <NuxtLink :to="navTo('writing')" class="dock-link">{{ t('nav.writing') }}</NuxtLink>
+    <NuxtLink :to="localePath('/work')"    class="dock-link">{{ t('nav.work') }}</NuxtLink>
+    <NuxtLink :to="navTo('stack')"         class="dock-link">{{ t('nav.stack') }}</NuxtLink>
+    <NuxtLink :to="localePath('/writing')" class="dock-link">{{ t('nav.writing') }}</NuxtLink>
     <NuxtLink :to="navTo('contact')" class="dock-link">{{ t('nav.contact') }}</NuxtLink>
 
     <span class="dock-sep" aria-hidden="true" />
