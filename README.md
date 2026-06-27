@@ -78,6 +78,8 @@ Every transition duration and animation is a token (`--dur-base`, `--ease-out-ex
 ### Motion
 Scroll reveals and entrance transitions run on `IntersectionObserver` — no scroll event listeners, no layout thrashing. Lenis takes over smooth scroll on desktop and is initialized client-side only so SSR stays clean.
 
+Reading progress bar on post pages — a passive `scroll` listener updates shared `useState`, rendered as a 1.5px ember line at the bottom of the nav. Activates only on `writing/[slug]`, resets and cleans up on unmount.
+
 ### SSR and hydration
 The server renders complete, readable HTML. Anything that touches `window`, `document`, or pointer events lives in `onMounted` or a `.client`-suffixed plugin. Vue's hydration never sees a mismatch because the client picks up exactly where the server left off.
 
@@ -105,7 +107,7 @@ A `Content-Security-Policy-Report-Only` header is in place with a verified allow
 
 `GET /api/health` returns `{"ok":true}` unconditionally — used as the Docker `HEALTHCHECK` target (interval 30 s, timeout 5 s, start-period 10 s).
 
-Well-known security files are served as static assets: `/.well-known/security.txt` (with PGP signature), `/pgp-key.txt`, and `/humans.txt`.
+Well-known security files are served as static assets: `/.well-known/security.txt` (with PGP signature), `/pgp-key.txt`, and `/humans.txt`. Vulnerability disclosure policy is documented in [SECURITY.md](SECURITY.md) — 72 h acknowledgment, 14-day resolution target.
 
 Rate limiting on `POST /api/comment` and `POST /api/contact` is enforced at the nginx level via `limit_req_zone` (10 req/min per IP, burst 5, `nodelay`). Requests beyond the burst cap receive 429 before reaching the application. The zone definition lives in nginx-proxy-manager's `http.conf` custom include; the `limit_req` directives are applied per-location in NPM's Advanced tab.
 
