@@ -14,6 +14,13 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 ## Considering
 
+- [ ] `perf` динамические OG images — Satori/nuxt-og-image, брендированный шаблон per-post/per-case
+- [ ] `feat` beta-banner — флаг inDevelopment в siteSettings (Sanity) + первый визит, появляется через 15-30с, автоскрытие, крестик, localStorage чтобы не показывать снова
+- [ ] `feat` nav дропдаун — desktop: ховер на Work/Writing → всплывашка с топ-3 (те же данные что на главной, нужно пробросить и вне неё); mobile: прямой редирект на /work и /writing без дропдауна — меньше шагов до списка
+- [ ] `feat` RSS feed — /rss.xml через Nitro route
+- [ ] `feat` TOC для длинных постов — якорные ссылки, sticky sidebar (событие toc-click уже в плане)
+- [ ] `feat` навигация пред/след пост — в конце writing/[slug]
+- [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)
 - [ ] `feat` донаты — оценить целесообразность
 - [ ] `dx` Lighthouse CI
 - [ ] `a11y` WCAG 2.2 AA аудит
