@@ -36,14 +36,9 @@ SOURCE CODE
   · Redistribute this code or any modified version of it, publicly
     or privately
 
-DESIGN SYSTEM & VISUAL IDENTITY
-  · Copy or adapt the design system in whole or in part — including but
-    not limited to: color tokens and palette, glass effect recipe,
-    component architecture, layout patterns, CSS custom properties,
-    animation techniques, scrollbar styling, or any other visual or
-    structural detail implemented here
-  · Reproduce or closely imitate the overall visual identity, aesthetic,
-    or look-and-feel of lyoraeth.art in any other context
+DESIGN & VISUAL IDENTITY
+  · Reproduce or closely imitate the overall visual identity or
+    look-and-feel of lyoraeth.art in another project
 
 BRAND ASSETS
   · Use the logo, wordmark, favicons, avatar, Open Graph images,

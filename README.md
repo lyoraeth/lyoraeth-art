@@ -48,22 +48,20 @@ EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
 ## Design
 
 ### Concept
-The visual language has three depth planes. Deep in the background — large, heavily blurred color blobs (`oklch`, because sRGB doesn't interpolate through grey). In the middle — glass panels. Up front — sharp typographic content under hard directional light. The result reads as spatial without a single drop shadow or bevel.
-
-Dark mode only. Not a trend choice — the atmospheric depth only works on a dark field. Light mode would flatten everything.
+Background: large blurred color blobs in `oklch`. Middle layer: glass panels. Front: sharp type. Dark mode only.
 
 ### Glass
-The glass effect is the load-bearing visual detail of the whole design, so it got obsessive treatment. The recipe:
+Four properties, one `.glass` utility in `tokens.css`:
 
-- `backdrop-filter: blur(24px) saturate(160%)` — the frosted base
-- `background: oklch(100% 0 0 / 4%)` — a hint of white to catch the light
-- `box-shadow: inset 0 1px 0 oklch(100% 0 0 / 12%)` — inner top highlight, simulates the physical edge of glass
-- `::after` pseudo-element with a linear gradient — the specular catch light, the fine line that makes it read as a surface rather than a rectangle
+- `backdrop-filter: blur(24px) saturate(160%)`
+- `background: oklch(100% 0 0 / 4%)`
+- `box-shadow: inset 0 1px 0 oklch(100% 0 0 / 12%)`
+- `::after` with a linear gradient — top-edge catch light
 
-All four ingredients are defined as a single `.glass` utility in `tokens.css`. Used identically on cards, nav, modals, and the contact panel — the light behaves consistently everywhere.
+Used on cards, nav, modals, and the contact panel.
 
 ### Logo
-Designed in Figma. The mark is a geometric construction — no stock, no font-based wordmark. From Figma it was exported as SVG and then prepared across every required format: `favicon.ico` (multi-size), `favicon-16.png`, `favicon-32.png`, `apple-touch-icon.png` (180×180), and `site.webmanifest` with the full icon set. The SVG version is inlined in the nav so it inherits `currentColor` and responds to any future theme changes without touching the asset.
+Designed in Figma, exported as SVG. Prepared in all required formats: `favicon.ico`, `favicon-16/32.png`, `apple-touch-icon.png`, `site.webmanifest`. Inlined in the nav to inherit `currentColor`.
 
 ### Typography
 Three typefaces, three jobs. **Golos Text** — body and UI, neutral and highly legible. **Onest** — headings, a bit more character. **JetBrains Mono** — tags, labels, metadata — anything that needs to read as a code artifact. All three are self-hosted via `@nuxtjs/google-fonts` with `download: true`, so there are zero external font requests in production.
