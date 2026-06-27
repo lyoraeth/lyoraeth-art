@@ -1,31 +1,5 @@
 const BASE = 'https://lyoraeth.art'
 
-// ── Minimal PortableText → plain text ─────────────────────────────────────────
-function ptToText(blocks: unknown[]): string {
-  if (!Array.isArray(blocks)) return ''
-  return blocks.map((block: any) => {
-    if (block._type === 'image') {
-      return block.caption ? `[Image: ${block.caption}]` : '[Image]'
-    }
-    if (block._type !== 'block' || !Array.isArray(block.children)) return ''
-
-    const text = block.children.map((span: any) => {
-      let t = span.text ?? ''
-      if (span.marks?.includes('code')) t = `\`${t}\``
-      const link = block.markDefs?.find((m: any) => span.marks?.includes(m._key) && m._type === 'link')
-      if (link) t = `${t} (${link.href})`
-      return t
-    }).join('')
-
-    const style = block.style ?? 'normal'
-    if (style === 'h1') return `# ${text}`
-    if (style === 'h2') return `## ${text}`
-    if (style === 'h3') return `### ${text}`
-    if (style === 'blockquote') return `> ${text}`
-    return text
-  }).filter(Boolean).join('\n\n')
-}
-
 export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
 
@@ -44,8 +18,7 @@ export default defineEventHandler(async (event) => {
       client.fetch<any[]>(`
         *[_type == "post"] | order(publishedAt desc) {
           "slug": slug.current,
-          title, publishedAt, readingTime, tags,
-          body[] { ..., _type == "image" => { ..., "url": asset->url } }
+          title, publishedAt, readingTime, tags, body
         }
       `),
     ])
@@ -95,8 +68,8 @@ export default defineEventHandler(async (event) => {
       if (post.tags?.length) lines.push(`Tags: ${post.tags.join(', ')}`)
       lines.push(`URL: ${BASE}/writing/${post.slug}`)
       lines.push('')
-      if (post.body?.length) {
-        lines.push(ptToText(post.body))
+      if (post.body && typeof post.body === 'string') {
+        lines.push(post.body)
         lines.push('')
       }
     }
