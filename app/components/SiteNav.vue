@@ -160,7 +160,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
         @mouseleave="closeWork"
       >
         <template v-if="navWork?.length">
-          <span class="drop-label">featured</span>
+          <span class="drop-label">{{ t('nav.drop_work_label') }}</span>
           <NuxtLink
             v-for="item in navWork"
             :key="item._id"
@@ -174,7 +174,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
           <div class="drop-divider" />
         </template>
         <NuxtLink :to="localePath('/work')" class="drop-all" role="menuitem">
-          All work <span class="drop-arrow">→</span>
+          {{ t('nav.drop_all_work') }} <span class="drop-arrow">→</span>
         </NuxtLink>
       </div>
     </Transition>
@@ -193,7 +193,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
         @mouseleave="closeWriting"
       >
         <template v-if="navPosts?.length">
-          <span class="drop-label">latest</span>
+          <span class="drop-label">{{ t('nav.drop_writing_label') }}</span>
           <NuxtLink
             v-for="post in navPosts"
             :key="post._id"
@@ -207,7 +207,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
           <div class="drop-divider" />
         </template>
         <NuxtLink :to="localePath('/writing')" class="drop-all" role="menuitem">
-          All posts <span class="drop-arrow">→</span>
+          {{ t('nav.drop_all_posts') }} <span class="drop-arrow">→</span>
         </NuxtLink>
       </div>
     </Transition>

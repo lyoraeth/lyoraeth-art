@@ -17,7 +17,11 @@
     "contact": "Контакт",
     "cv": "CV",
     "lang_toggle": "Язык",
-    "site_nav": "Навигация по сайту"
+    "site_nav": "Навигация по сайту",
+    "drop_work_label": "избранное",
+    "drop_writing_label": "последние",
+    "drop_all_work": "Все работы",
+    "drop_all_posts": "Все посты"
   },
 
   "hero": {
