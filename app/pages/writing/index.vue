@@ -44,6 +44,8 @@ const filtered = computed<PostItem[]>(() => {
   }
 })
 
+const sortOpen = ref(false)
+
 const sorts = computed(() => [
   { key: 'date-desc' as SortKey, label: t('writing.sort_date_desc') },
   { key: 'date-asc'  as SortKey, label: t('writing.sort_date_asc')  },
@@ -81,17 +83,26 @@ const sorts = computed(() => [
         </div>
 
         <div class="sb-section">
-          <span class="sb-label">{{ t('writing.sort_by') }}</span>
-          <div class="sort-list">
-            <button
-              v-for="s in sorts"
-              :key="s.key"
-              class="sort-btn"
-              :class="{ active: sortBy === s.key }"
-              @click="sortBy = s.key"
-            >
-              {{ s.label }}
-            </button>
+          <button class="sb-label sort-toggle" :class="{ open: sortOpen }" @click="sortOpen = !sortOpen" :aria-expanded="sortOpen">
+            {{ t('writing.sort_by') }}
+            <svg class="sort-chevron" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+              <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="sort-collapse" :class="{ open: sortOpen }">
+            <div class="sort-collapse-inner">
+              <div class="sort-list">
+                <button
+                  v-for="s in sorts"
+                  :key="s.key"
+                  class="sort-btn"
+                  :class="{ active: sortBy === s.key }"
+                  @click="sortBy = s.key"
+                >
+                  {{ s.label }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </aside>
@@ -208,8 +219,39 @@ const sorts = computed(() => [
 .search-input:focus { border-color: rgba(214, 154, 106, 0.4); border-color: oklch(72% 0.1 58 / 40%); }
 .search-input::-webkit-search-cancel-button { display: none; }
 
+/* Sort toggle */
+.sort-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--faint);
+  transition: color 0.2s;
+}
+.sort-toggle:hover { color: var(--mist); }
+.sort-chevron {
+  width: 0.625rem;
+  height: 0.375rem;
+  flex-shrink: 0;
+  transition: transform 0.25s var(--ease-out-expo);
+}
+.sort-toggle.open .sort-chevron { transform: rotate(180deg); }
+
+/* Collapse */
+.sort-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s var(--ease-out-expo);
+}
+.sort-collapse.open { grid-template-rows: 1fr; }
+.sort-collapse-inner { overflow: hidden; }
+.sort-list { display: flex; flex-direction: column; gap: 0.125rem; padding-top: 0.375rem; }
+
 /* Sort */
-.sort-list { display: flex; flex-direction: column; gap: 0.125rem; }
 .sort-btn {
   text-align: left;
   padding: 0.4375rem 0.625rem;
