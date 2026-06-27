@@ -34,6 +34,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 ## Done
 
+- [x] `fix` смена языка сбрасывала скролл — router.options.ts, stripLocale-сравнение путей
 - [x] `feat` nav дропдаун — ховер на Work/Writing, топ-3 кейса/поста, Teleport + backdrop-filter, i18n, анимация, тёмный/светлый режим по состоянию хэдера
 - [x] `fix` стрелочки на кнопках — vertical-align: middle
 - [x] `feat` комментарии — схема, Studio, email-апрув через Resend + HMAC
