@@ -80,6 +80,8 @@ Scroll reveals and entrance transitions run on `IntersectionObserver` — no scr
 
 Reading progress bar on post pages — a passive `scroll` listener updates shared `useState`, rendered as a 1.5px ember line at the bottom of the nav. Activates only on `writing/[slug]`, resets and cleans up on unmount.
 
+Table of contents on post pages — headings are extracted from the raw Markdown at render time and turned into anchor links (`slugify` on h2/h3 text, injected via a custom `marked` renderer). On desktop (≥1152px) the TOC renders as a `position: fixed` sidebar to the right of the content without shifting the layout. On tablet/mobile it collapses into a button in the nav bar that opens a glass dropdown. Active section is tracked with a passive scroll listener comparing heading positions against a reading-line at 50% of viewport height. TOC always includes Introduction (everything before the first heading), any post headings, and appends Sources and Comments as visually separated entries at the bottom.
+
 ### SSR and hydration
 The server renders complete, readable HTML. Anything that touches `window`, `document`, or pointer events lives in `onMounted` or a `.client`-suffixed plugin. Vue's hydration never sees a mismatch because the client picks up exactly where the server left off.
 

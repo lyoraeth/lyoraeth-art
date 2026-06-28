@@ -17,7 +17,6 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [ ] `perf` динамические OG images — Satori/nuxt-og-image, брендированный шаблон per-post/per-case
 - [ ] `feat` beta-banner — флаг inDevelopment в siteSettings (Sanity) + первый визит, появляется через 15-30с, автоскрытие, крестик, localStorage чтобы не показывать снова
 - [ ] `feat` RSS feed — /rss.xml через Nitro route
-- [ ] `feat` TOC для длинных постов — якорные ссылки, sticky sidebar (событие toc-click уже в плане)
 - [ ] `feat` навигация пред/след пост — в конце writing/[slug]
 - [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)
 - [ ] `feat` донаты — оценить целесообразность
@@ -34,6 +33,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 ## Done
 
+- [x] `feat` TOC для длинных постов — десктоп sidebar, планшет/мобайл dropdown в nav, intro/источники/комментарии в оглавлении
 - [x] `fix` смена языка сбрасывала скролл — router.options.ts, stripLocale-сравнение путей
 - [x] `feat` nav дропдаун — ховер на Work/Writing, топ-3 кейса/поста, Teleport + backdrop-filter, i18n, анимация, тёмный/светлый режим по состоянию хэдера
 - [x] `fix` стрелочки на кнопках — vertical-align: middle
