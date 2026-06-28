@@ -103,7 +103,11 @@
     "sort_date_asc": "Oldest",
     "sort_alpha": "A → Z",
     "sort_popular": "Popular",
-    "not_found": "Nothing here yet. Writing soon."
+    "not_found": "Nothing here yet. Writing soon.",
+    "toc": "Contents",
+    "toc_intro": "Introduction",
+    "toc_references": "Sources",
+    "toc_comments": "Comments"
   },
 
   "work": {

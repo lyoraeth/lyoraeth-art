@@ -144,6 +144,8 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
 
         <NuxtLink :to="navTo('contact')" class="nav-cv">{{ t('nav.cv') }}</NuxtLink>
       </div>
+
+      <div id="nav-toc-slot" class="nav-end" />
     </div>
   </nav>
 
@@ -551,12 +553,24 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
+/* ── Mobile TOC slot ─────────────────────────────────────────────────────── */
+.nav-end {
+  display: none;
+}
+
 @media (max-width: 47.5em) {
   .navlink,
   .nav-cv,
   .avail,
   .lang {
     display: none;
+  }
+}
+
+@media (max-width: 72rem) {
+  .nav-end {
+    display: flex;
+    align-items: center;
   }
 }
 </style>

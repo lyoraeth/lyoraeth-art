@@ -103,7 +103,11 @@
     "sort_date_asc": "Старые",
     "sort_alpha": "А → Я",
     "sort_popular": "Популярное",
-    "not_found": "Пусто. Скоро допишу."
+    "not_found": "Пусто. Скоро допишу.",
+    "toc": "Содержание",
+    "toc_intro": "Введение",
+    "toc_references": "Источники",
+    "toc_comments": "Комментарии"
   },
 
   "work": {
