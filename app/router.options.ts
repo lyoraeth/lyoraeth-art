@@ -10,7 +10,7 @@ export default <RouterConfig>{
       return false
     }
 
-    if (to.hash) return { el: to.hash }
+    if (to.hash) return { el: to.hash, top: Math.round(window.innerHeight / 3) }
     return { top: 0 }
   },
 }

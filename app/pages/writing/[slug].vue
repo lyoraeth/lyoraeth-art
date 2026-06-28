@@ -56,7 +56,54 @@ const formatDate = useFormatDate()
 
 const { progress, active } = useReadingProgress()
 
-onMounted(() => {
+/* ── TOC ── */
+interface TocEntry { id: string; text: string; level: 2 | 3 }
+
+function slugifyHeading(text: string) {
+  return text.toLowerCase().replace(/[^a-z0-9а-яёa-z\s-]/gi, '').trim().replace(/\s+/g, '-')
+}
+
+const toc = computed<TocEntry[]>(() => {
+  if (!post.value) return []
+  const raw = locale.value === 'ru' ? post.value.body.ru : post.value.body.en
+  if (!raw) return []
+  const entries: TocEntry[] = []
+  const re = /^(#{2,3})\s+(.+)$/gm
+  let m
+  while ((m = re.exec(raw)) !== null) {
+    const text = m[1] ? m[2]?.trim() ?? '' : ''
+    if (text) entries.push({ level: m[1]!.length as 2 | 3, text, id: slugifyHeading(text) })
+  }
+  return entries
+})
+
+const activeId = ref('')
+let tocObs: IntersectionObserver | null = null
+
+function detectActive() {
+  const els = [...document.querySelectorAll<Element>('.post-body h2[id], .post-body h3[id]')]
+  const cutoff = window.innerHeight * 0.2
+  const hit = els.filter(el => el.getBoundingClientRect().top <= cutoff).at(-1)
+  if (hit) activeId.value = hit.id
+}
+
+async function setupTocObserver() {
+  tocObs?.disconnect()
+  if (toc.value.length < 2) return
+  await nextTick()
+  tocObs = new IntersectionObserver(
+    (entries) => {
+      const hit = entries.find(e => e.isIntersecting)
+      if (hit) activeId.value = hit.target.id
+    },
+    { rootMargin: '-10% 0% -80% 0%' },
+  )
+  document.querySelectorAll('.post-body h2[id], .post-body h3[id]').forEach(el => tocObs!.observe(el))
+  detectActive()
+}
+
+onMounted(async () => {
+  /* Reading progress */
   active.value = true
   const update = () => {
     const total = document.documentElement.scrollHeight - window.innerHeight
@@ -64,8 +111,14 @@ onMounted(() => {
   }
   window.addEventListener('scroll', update, { passive: true })
   update()
+
+  /* TOC observer — recreate on locale switch (bodyHtml changes) */
+  await setupTocObserver()
+  watch(bodyHtml, setupTocObserver)
+
   onUnmounted(() => {
     window.removeEventListener('scroll', update)
+    tocObs?.disconnect()
     active.value = false
     progress.value = 0
   })
@@ -73,6 +126,13 @@ onMounted(() => {
 
 const md = new Marked({
   renderer: {
+    heading({ text, depth }) {
+      if (depth === 2 || depth === 3) {
+        const id = slugifyHeading(text)
+        return `<h${depth} id="${id}">${text}</h${depth}>\n`
+      }
+      return `<h${depth}>${text}</h${depth}>\n`
+    },
     image({ href, title, text }) {
       const caption = title ? `<figcaption class="post-caption">${title}</figcaption>` : ''
       return `<figure class="post-figure"><img src="${href}" alt="${text ?? ''}" loading="lazy" class="post-img">${caption}</figure>`
@@ -90,7 +150,29 @@ const bodyHtml = computed(() => {
 </script>
 
 <template>
-  <article class="post-page" v-if="post">
+  <div class="post-outer" v-if="post">
+
+  <!-- TOC sidebar (desktop, ≥2 headings) -->
+  <aside v-if="toc.length >= 2" class="toc-sidebar" aria-label="Table of contents">
+    <nav class="toc-nav">
+      <span class="toc-label">{{ t('writing.toc') }}</span>
+      <ol class="toc-list">
+        <li
+          v-for="entry in toc"
+          :key="entry.id"
+          :class="['toc-item', `toc-item--h${entry.level}`]"
+        >
+          <a
+            :href="`#${entry.id}`"
+            class="toc-link"
+            :class="{ 'toc-link--active': activeId === entry.id }"
+          >{{ entry.text }}</a>
+        </li>
+      </ol>
+    </nav>
+  </aside>
+
+  <article class="post-page">
     <!-- Back -->
     <NuxtLink :to="localePath('/writing')" class="back-link">
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -151,13 +233,69 @@ const bodyHtml = computed(() => {
       <PostComments :slug="slug" :post-title="post.title.en" />
     </section>
   </article>
+  </div>
 </template>
 
 <style scoped>
+.toc-sidebar { display: none; }
+
+@media (min-width: 72rem) {
+  .toc-sidebar {
+    display: block;
+    position: fixed;
+    left: calc(75% + 5.5rem);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 11rem;
+  }
+}
+
 .post-page {
   max-width: 44rem;
   margin: 0 auto;
   padding: clamp(5rem, 10vw, 8rem) var(--page-px, 1.5rem) clamp(4rem, 8vw, 8rem);
+}
+
+/* ── TOC ── */
+.toc-nav { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.toc-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.5625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.toc-item--h3 { padding-left: 0.75rem; }
+
+.toc-link {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--faint);
+  text-decoration: none;
+  padding: 0.25rem 0.375rem;
+  border-radius: 0.375rem;
+  border-left: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.toc-link:hover { color: var(--mist); background: oklch(100% 0 0 / 3%); }
+.toc-link--active {
+  color: var(--ember);
+  border-left-color: var(--ember);
+  background: var(--ember-bg);
 }
 
 /* ── Back ── */
