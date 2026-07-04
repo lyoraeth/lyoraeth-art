@@ -43,7 +43,13 @@ export default defineType({
       type: 'image',
       options: { hotspot: true },
       fields: [
-        { name: 'alt', title: 'Alt text', type: 'string' },
+        {
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          description: 'Describes the cover for screen readers and search engines',
+          validation: (rule: any) => rule.required().warning('Add alt text — the site falls back to the post title otherwise'),
+        },
       ],
     }),
     defineField({

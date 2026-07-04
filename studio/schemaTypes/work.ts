@@ -59,10 +59,16 @@ export default defineType({
       name: 'cover',
       title: 'Viewport cover image',
       type: 'image',
-      description: 'Screenshot shown in the mock browser frame',
+      description: 'Screenshot shown in the card viewport',
       options: { hotspot: true },
       fields: [
-        { name: 'alt', title: 'Alt text', type: 'string' },
+        {
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          description: 'Describes the screenshot for screen readers and search engines',
+          validation: (rule: any) => rule.required().warning('Add alt text — the site falls back to the project title otherwise'),
+        },
       ],
     }),
     defineField({
