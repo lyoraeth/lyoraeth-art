@@ -54,12 +54,14 @@ useHead({
     <Grain />
     <SiteNav />
     <MobileDock />
-    <SiteCurtain />
     <main id="main-content" class="page">
       <Stage />
       <NuxtPage />
       <SiteFooter />
     </main>
+    <!-- After <main> so it can flow as a plain footer on touch devices;
+         on fine pointers it's position:fixed and DOM order doesn't matter. -->
+    <SiteCurtain />
   </div>
 </template>
 

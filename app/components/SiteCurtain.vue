@@ -32,6 +32,10 @@ function onScroll() {
 }
 
 onMounted(() => {
+  // Touch devices: the curtain is a plain in-flow footer (see CSS) — no page
+  // margin trick, no reveal, no scroll hold.
+  if (window.matchMedia('(pointer: coarse)').matches) return
+
   const page = document.querySelector('.page') as HTMLElement | null
   if (!page || !curtainEl.value) return
 
@@ -155,6 +159,16 @@ onUnmounted(() => {
   .curtain-inner {
     grid-template-columns: 1fr;
     gap: 1.875rem;
+  }
+}
+
+/* Touch devices: reveal-under-the-page misbehaves with mobile URL-bar viewport
+   resizing and native momentum — the curtain becomes a plain footer instead. */
+@media (pointer: coarse) {
+  .curtain {
+    position: static;
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 </style>

@@ -238,6 +238,10 @@ const bodyHtml = computed(() => {
     </Transition>
   </Teleport>
 
+  <!-- Desktop layout: article column + TOC column. The TOC is sticky inside a
+       column that spans the full article height (comments included), so it
+       naturally stops scrolling where the article ends — no scroll listener. -->
+  <div class="post-layout">
   <!-- TOC sidebar (desktop, ≥2 headings) -->
   <aside v-if="toc.length >= 2" class="toc-sidebar" aria-label="Table of contents">
     <nav class="toc-nav">
@@ -333,6 +337,7 @@ const bodyHtml = computed(() => {
     </section>
   </article>
   </div>
+  </div>
 </template>
 
 <style scoped>
@@ -393,14 +398,32 @@ const bodyHtml = computed(() => {
 /* ── Desktop TOC sidebar ── */
 .toc-sidebar { display: none; }
 
+/* Desktop: article + TOC as grid columns. The sidebar column stretches to the
+   article's full height, and the nav inside is sticky — viewport-centered
+   while scrolling, but clamped by its column, so it stops at the end of the
+   article (bottom of the comments block) instead of following forever. */
 @media (min-width: 72rem) {
+  .post-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 44rem) minmax(0, 1fr);
+  }
+  .post-layout > .post-page {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+  }
   .toc-sidebar {
     display: block;
-    position: fixed;
-    left: calc(75% + 5.5rem);
-    top: 50%;
-    transform: translateY(-50%);
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: start;
+    margin-left: 5.5rem;
     width: 11rem;
+  }
+  .toc-sidebar .toc-nav {
+    position: sticky;
+    top: 50vh;
+    transform: translateY(-50%);
   }
 }
 
