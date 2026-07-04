@@ -45,8 +45,6 @@ useGlowCard(mini1)
         ref="featRef"
         @click.prevent="navigateTo(`/writing/${featured.slug}`)"
       >
-        <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div><div class="glare-blob-2"></div></div></div>
-
         <div class="feat-thumb">
           <div class="feat-thumb-media">
             <SanityPicture
@@ -58,16 +56,14 @@ useGlowCard(mini1)
               :width="600"
             >
               <template #placeholder>
-                <svg viewBox="0 0 300 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                  <line x1="30" y1="200" x2="280" y2="200" stroke="#fff" stroke-opacity=".08"/>
-                  <line x1="30" y1="40"  x2="30"  y2="200" stroke="#fff" stroke-opacity=".08"/>
-                  <polyline points="30,160 80,100 130,140 180,80 230,120 280,70"
-                    fill="none" stroke="#8B95A3" stroke-width="1.5" stroke-opacity=".35"/>
-                </svg>
+                <!-- FPO sheet — print-production placeholder, see lyoaeth-brand/placeholders -->
+                <img src="/placeholders/writing.svg" alt="" class="feat-thumb-img" aria-hidden="true" draggable="false" />
               </template>
             </SanityPicture>
           </div>
         </div>
+
+        <div class="feat-divider" aria-hidden="true"></div>
 
         <div class="feat-body">
           <div class="feat-meta">
@@ -95,7 +91,6 @@ useGlowCard(mini1)
           :ref="(el) => { if (i === 0) mini0 = el as HTMLElement | null; else mini1 = el as HTMLElement | null }"
           @click.prevent="navigateTo(`/writing/${post.slug}`)"
         >
-          <div class="card-glare"><div class="glare-mb"><div class="glare-blob"></div></div></div>
           <div class="mini-meta">
             <span class="mono mini-date">{{ formatDate(post.publishedAt) }}</span>
             <span class="mini-dot"></span>
@@ -158,21 +153,21 @@ useGlowCard(mini1)
   text-decoration: none;
   color: inherit;
 }
-.feat:hover { border-color: rgba(214, 154, 106, 0.3); border-color: oklch(72% 0.1 58 / 30%); }
-
 .feat-thumb {
   position: relative;
   min-height: 13.75rem;
   background: linear-gradient(135deg, #0c1016, #0a0d12);
   overflow: hidden;
-  border-radius: var(--radius-card) 0 0 var(--radius-card);
   z-index: 2;
 }
-.feat-thumb svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+/* Sunk on the 3 sides touching the card's own border (so it shows through
+   unbroken) — flush against the divider, which already separates it from the text.
+   Radius nudged in by the same 1px so the corner stays concentric with the card. */
+@media (min-width: 42.5em) {
+  .feat-thumb {
+    margin: 1px 0 1px 1px;
+    border-radius: calc(var(--radius-card) - 1px) 0 0 calc(var(--radius-card) - 1px);
+  }
 }
 .feat-thumb-media {
   position: absolute;
@@ -180,11 +175,40 @@ useGlowCard(mini1)
   overflow: hidden;
 }
 .feat-thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
   object-position: center;
   display: block;
+}
+
+/* Divider — a single masked container (no native `border`) so the static line and
+   its hover glow share one clip and can't drift apart into a stepped double-edge.
+   Trimmed 1px top/bottom so it doesn't overlap the outer ring's horizontal runs. */
+.feat-divider {
+  position: absolute;
+  inset: 1px 0;
+  pointer-events: none;
+  z-index: 3;
+  background: var(--line-soft);
+  -webkit-mask: linear-gradient(to right, transparent calc(45% - 0.5px), #fff calc(45% - 0.5px), #fff calc(45% + 0.5px), transparent calc(45% + 0.5px));
+  mask: linear-gradient(to right, transparent calc(45% - 0.5px), #fff calc(45% - 0.5px), #fff calc(45% + 0.5px), transparent calc(45% + 0.5px));
+}
+/* Cursor-tracked glow, nested so it inherits the parent's mask/clip for free
+   (--gx/--gy from useGlowCard on featRef). */
+.feat-divider::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(16rem circle at var(--gx, 50%) var(--gy, 50%), oklch(72% 0.1 58 / 90%), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-silk);
+}
+.feat:hover .feat-divider::after {
+  opacity: 1;
+}
+@media (max-width: 42.5em) {
+  .feat-divider { display: none; }
 }
 
 .feat-body {
@@ -261,13 +285,10 @@ useGlowCard(mini1)
   text-decoration: none;
   color: inherit;
   transition:
-    opacity      var(--duration-reveal) var(--ease-out-expo),
-    transform    0.25s var(--ease-out-expo),
-    border-color 0.3s  var(--ease-silk);
+    opacity   var(--duration-reveal) var(--ease-out-expo),
+    transform 0.25s var(--ease-out-expo);
 }
 .mini-card:hover {
-  border-color: rgba(214, 154, 106, 0.3);
-  border-color: oklch(72% 0.1 58 / 30%);
   transform: translateY(-0.1875rem);
 }
 .mini-meta {
@@ -314,7 +335,7 @@ useGlowCard(mini1)
   .feat { grid-template-columns: 1fr; }
   .feat-thumb {
     min-height: 9.375rem;
-    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    margin: 1px;
   }
   .more-writing { grid-template-columns: 1fr; }
 }

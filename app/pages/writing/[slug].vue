@@ -347,7 +347,7 @@ const bodyHtml = computed(() => {
   background: none;
   color: var(--faint);
   cursor: pointer;
-  border-radius: 0.4375rem;
+  border-radius: 0.5rem;
   transition: color 0.2s, background 0.2s;
 }
 .toc-btn:hover,
@@ -362,7 +362,7 @@ const bodyHtml = computed(() => {
   max-height: 60vh;
   overflow-y: auto;
   padding: 0.625rem;
-  border-radius: var(--radius-card-sm, 0.75rem);
+  border-radius: var(--radius-card-sm, 1rem);
   background: oklch(10% 0.008 235 / 85%);
   backdrop-filter: blur(24px) saturate(1.6) brightness(1.05);
   -webkit-backdrop-filter: blur(24px) saturate(1.6) brightness(1.05);

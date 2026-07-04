@@ -4,7 +4,7 @@ import type { SiteSettings } from '../../../server/api/settings.get'
 const { t, locale } = useI18n()
 const { public: { turnstileContactSiteKey } } = useRuntimeConfig()
 
-const { data: settings } = await useFetch<SiteSettings>('/api/settings')
+const { data: settings } = await useFetch<SiteSettings>('/api/settings', { key: 'site-settings' })
 
 const telegramUrl = computed(() =>
   settings.value?.telegramHandle ? `https://t.me/${settings.value.telegramHandle}` : undefined
@@ -75,13 +75,6 @@ onMounted(() => observe(cardEl.value))
       class="contact-card glass-card reveal rv-d1"
       ref="cardEl"
     >
-      <div class="card-glare">
-        <div class="glare-mb">
-          <div class="glare-blob"></div>
-          <div class="glare-blob-2"></div>
-        </div>
-      </div>
-
       <!-- Left: heading + CTA + channels -->
       <div class="contact-left">
         <h2 class="contact-heading">
@@ -225,7 +218,7 @@ onMounted(() => observe(cardEl.value))
   font-weight: 600;
   font-size: 0.9375rem;
   padding: 0.875rem 1.375rem;
-  border-radius: 0.6875rem;
+  border-radius: 0.75rem;
   text-decoration: none;
   transition:
     transform 0.2s var(--ease-out-expo),
@@ -322,7 +315,7 @@ onMounted(() => observe(cardEl.value))
   background: rgba(255, 255, 255, 0.03);
   background: oklch(100% 0 0 / 3%);
   border: 1px solid var(--line-soft);
-  border-radius: 0.625rem;
+  border-radius: 0.75rem;
   padding: 0.75rem 0.875rem;
   color: var(--ink);
   font-family: 'Onest', sans-serif;
@@ -352,7 +345,7 @@ onMounted(() => observe(cardEl.value))
   background: rgba(255, 255, 255, 0.04);
   background: oklch(100% 0 0 / 4%);
   border: 1px solid var(--line);
-  border-radius: 0.625rem;
+  border-radius: 0.75rem;
   color: var(--ink);
   font-family: 'Onest', sans-serif;
   font-weight: 500;
@@ -376,14 +369,6 @@ onMounted(() => observe(cardEl.value))
   background: oklch(100% 0 0 / 6%);
   border-color: var(--line);
   color: var(--ink);
-}
-
-.form-privacy {
-  font-size: 0.75rem;
-  color: var(--faint);
-  margin: 0.5rem 0 0;
-  text-align: left;
-  line-height: 1.5;
 }
 
 .form-err {

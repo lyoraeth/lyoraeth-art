@@ -339,7 +339,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
   display: flex;
   gap: 0;
   border: 1px solid var(--line);
-  border-radius: 0.4375rem;
+  border-radius: 0.375rem;
   padding: 0.125rem;
   background: rgba(255, 255, 255, 0.03);
   background: oklch(100% 0 0 / 3%);
@@ -355,7 +355,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
   bottom: 0.125rem;
   left: 0.125rem;
   width: calc(50% - 0.125rem);
-  border-radius: 0.3125rem;
+  border-radius: 0.25rem;
   background: var(--ember-bg);
   transition: transform 0.26s var(--ease-glide);
   pointer-events: none;
@@ -371,7 +371,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
   font-size: 0.6875rem;
   color: var(--faint);
   padding: 0.25rem 0.5rem;
-  border-radius: 0.3125rem;
+  border-radius: 0.25rem;
   letter-spacing: 0.05em;
   text-decoration: none;
   transition: color 0.3s var(--ease-silk);
@@ -386,7 +386,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
 /* ── CV button ───────────────────────────────────────────────────────────── */
 .nav-cv {
   border: 1px solid var(--line);
-  border-radius: 0.4375rem;
+  border-radius: 0.5rem;
   padding: 0.4375rem 0.75rem;
   color: var(--ink);
   text-decoration: none;
