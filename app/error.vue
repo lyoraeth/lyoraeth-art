@@ -2,6 +2,7 @@
 import type { NuxtError } from '#app'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const props = defineProps<{ error: NuxtError }>()
 
 const is404 = computed(() => props.error.statusCode === 404)
@@ -13,7 +14,8 @@ const message = computed(() => is404.value ? t('error.404_message') : t('error.5
 useSeoMeta({ title: computed(() => `${code.value} — lyoraeth`) })
 
 function handleError() {
-  clearError({ redirect: '/' })
+  // localePath — otherwise a RU visitor lands on the EN home after an error
+  clearError({ redirect: localePath('/') })
 }
 </script>
 

@@ -40,10 +40,10 @@ useGlowCard(mini1)
     <div v-if="featured" class="writing-wrap">
       <!-- Featured post -->
       <a
-        :href="`/writing/${featured.slug}`"
+        :href="localePath(`/writing/${featured.slug}`)"
         class="feat glass-card reveal rv-d1"
         ref="featRef"
-        @click.prevent="navigateTo(`/writing/${featured.slug}`)"
+        @click.prevent="navigateTo(localePath(`/writing/${featured.slug}`))"
       >
         <div class="feat-thumb">
           <div class="feat-thumb-media">
@@ -86,10 +86,10 @@ useGlowCard(mini1)
         <a
           v-for="(post, i) in secondary"
           :key="post._id"
-          :href="`/writing/${post.slug}`"
+          :href="localePath(`/writing/${post.slug}`)"
           class="mini-card glass-card reveal rv-d2"
           :ref="(el) => { if (i === 0) mini0 = el as HTMLElement | null; else mini1 = el as HTMLElement | null }"
-          @click.prevent="navigateTo(`/writing/${post.slug}`)"
+          @click.prevent="navigateTo(localePath(`/writing/${post.slug}`))"
         >
           <div class="mini-meta">
             <span class="mono mini-date">{{ formatDate(post.publishedAt) }}</span>
