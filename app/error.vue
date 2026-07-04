@@ -19,10 +19,6 @@ function handleError() {
 
 <template>
   <div class="error-page">
-    <!-- Ambient blobs — same pattern as main layout -->
-    <div class="blob blob-a" aria-hidden="true"></div>
-    <div class="blob blob-b" aria-hidden="true"></div>
-
     <main class="error-wrap">
       <div class="error-code mono">{{ code }}</div>
 
@@ -46,40 +42,18 @@ function handleError() {
 .error-page {
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--void);
+  /* Static shading — same scenography as Stage.vue: tints larger than the
+     viewport so they read as temperature, never as shapes */
+  background:
+    radial-gradient(ellipse 140vw 110vh at 10% -20vh, color-mix(in srgb, var(--teal) 11%, transparent), transparent 60%),
+    radial-gradient(ellipse 140vw 120vh at 95% 120vh, color-mix(in srgb, var(--indigo) 9%, transparent), transparent 60%),
+    radial-gradient(120% 90% at 50% -10%, var(--deep) 0%, var(--void) 58%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem var(--page-px, 1.5rem);
   position: relative;
   overflow: hidden;
-}
-
-/* ── Ambient blobs ── */
-.blob {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  opacity: 0.35;
-  animation: blob-drift 18s ease-in-out infinite alternate;
-}
-.blob-a {
-  width: 40vw; height: 40vw;
-  top: -10%; left: -5%;
-  background: var(--teal);
-  animation-duration: 20s;
-}
-.blob-b {
-  width: 32vw; height: 32vw;
-  bottom: -8%; right: -4%;
-  background: var(--indigo);
-  animation-duration: 24s;
-  animation-direction: alternate-reverse;
-}
-@keyframes blob-drift {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(3%, 4%) scale(1.06); }
 }
 
 /* ── Layout ── */
