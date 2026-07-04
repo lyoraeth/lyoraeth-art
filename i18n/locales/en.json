@@ -34,6 +34,8 @@
       { "label": "Now", "value": "Open to projects, from July" },
       { "label": "Stack", "value": "Vue · TypeScript · Animation" }
     ],
+    "fig_label": "fig. 01",
+    "fig_caption": "the author, in his natural habitat",
     "scroll": "scroll ↓"
   },
 
@@ -69,7 +71,7 @@
         "num": "01",
         "name": "dive in",
         "title": "What's actually needed",
-        "desc": "I study the task and design to figure out what matters. I don't wait for hand-holding — I ask the right questions and keep moving."
+        "desc": "I study the task and design to figure out what matters. Questions when they count — and I keep moving."
       },
       {
         "num": "02",
@@ -80,8 +82,8 @@
       {
         "num": "03",
         "name": "ship",
-        "title": "Production-ready, for real",
-        "desc": "I deliver a product that works exactly as intended. With documentation if needed."
+        "title": "Done means working",
+        "desc": "I hand over a product that behaves exactly as intended. With documentation if needed."
       }
     ]
   },

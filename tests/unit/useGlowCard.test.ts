@@ -1,24 +1,21 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { createApp, defineComponent, h, nextTick, onMounted, ref } from 'vue'
+import { createApp, defineComponent, h, nextTick, ref } from 'vue'
 import { useGlowCard } from '../../app/composables/useGlowCard'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
-function mountGlowCard(el: HTMLElement, tiltReady = true) {
-  let unmount!: () => void
+function mountGlowCard(el: HTMLElement) {
   const app = createApp(
     defineComponent({
       setup() {
         const elRef = ref(el)
-        const ready = ref(tiltReady)
-        useGlowCard(elRef, ready)
+        useGlowCard(elRef)
         return () => h('div')
       },
     }),
   )
   app.mount(document.createElement('div'))
-  unmount = () => app.unmount()
-  return { unmount }
+  return { unmount: () => app.unmount() }
 }
 
 // ── RAF mock ──────────────────────────────────────────────────────────────────
@@ -47,7 +44,7 @@ afterEach(() => {
 // ── tests ─────────────────────────────────────────────────────────────────────
 
 describe('useGlowCard', () => {
-  it('registers pointermove and pointerleave on mount', async () => {
+  it('registers pointermove on mount', async () => {
     const el = document.createElement('div')
     const addSpy = vi.spyOn(el, 'addEventListener')
 
@@ -56,10 +53,9 @@ describe('useGlowCard', () => {
 
     const events = addSpy.mock.calls.map(([event]) => event)
     expect(events).toContain('pointermove')
-    expect(events).toContain('pointerleave')
   })
 
-  it('removes listeners and cancels RAF on unmount (no leak)', async () => {
+  it('removes the listener and cancels RAF on unmount (no leak)', async () => {
     const el = document.createElement('div')
     const removeSpy = vi.spyOn(el, 'removeEventListener')
 
@@ -68,18 +64,14 @@ describe('useGlowCard', () => {
 
     // trigger a move so RAF starts
     el.dispatchEvent(
-      Object.assign(new Event('pointermove'), {
-        clientX: 100,
-        clientY: 100,
-        getBoundingClientRect: undefined,
-      }),
+      Object.assign(new PointerEvent('pointermove'), { clientX: 100, clientY: 100 }),
     )
+    expect(rafCallbacks.size).toBeGreaterThan(0)
 
     unmount()
 
     const events = removeSpy.mock.calls.map(([event]) => event)
     expect(events).toContain('pointermove')
-    expect(events).toContain('pointerleave')
     // all RAF callbacks should be cleared after unmount
     expect(rafCallbacks.size).toBe(0)
   })
@@ -111,36 +103,32 @@ describe('useGlowCard', () => {
     expect(gy).toBeGreaterThan(0)
   })
 
-  it('tilt returns to 0 after pointerleave (no frozen transform)', async () => {
+  it('stops rescheduling RAF once the glow settles on the pointer', async () => {
     const el = document.createElement('div')
     vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
       left: 0, top: 0, width: 400, height: 300,
       right: 400, bottom: 300, x: 0, y: 0, toJSON: () => {},
     })
 
-    mountGlowCard(el, true)
+    mountGlowCard(el)
     await nextTick()
 
-    // move into card
-    el.dispatchEvent(Object.assign(new PointerEvent('pointermove'), { clientX: 300, clientY: 200 }))
-    // flush several RAF frames to build up tilt
-    for (let i = 0; i < 5; i++) {
-      const [id, cb] = [...rafCallbacks.entries()][0] ?? []
-      if (cb) { cb(performance.now()); rafCallbacks.delete(id) }
+    el.dispatchEvent(
+      Object.assign(new PointerEvent('pointermove'), { clientX: 200, clientY: 150 }),
+    )
+
+    // flush RAF frames until the lerp converges (loop parks itself when close)
+    for (let i = 0; i < 200; i++) {
+      const next = [...rafCallbacks.entries()][0]
+      if (!next) break
+      const [id, cb] = next
+      rafCallbacks.delete(id)
+      cb(performance.now())
     }
 
-    // leave card
-    el.dispatchEvent(new PointerEvent('pointerleave'))
-
-    // flush RAF until settled (tilt target = 0, lerp 0.1 needs ~35+ frames)
-    for (let i = 0; i < 60; i++) {
-      const [id, cb] = [...rafCallbacks.entries()][0] ?? []
-      if (!cb) break
-      cb(performance.now()); rafCallbacks.delete(id)
-    }
-
-    // transform should be cleared once tilt is back at ~0
-    const transform = el.style.transform
-    expect(transform).toBe('')
+    // loop settled: no pending frame left, glow parked at the pointer
+    expect(rafCallbacks.size).toBe(0)
+    expect(parseFloat(el.style.getPropertyValue('--gx'))).toBeCloseTo(200, 0)
+    expect(parseFloat(el.style.getPropertyValue('--gy'))).toBeCloseTo(150, 0)
   })
 })

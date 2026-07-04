@@ -1,33 +1,16 @@
-export function useGlowCard(el: Ref<HTMLElement | null>, tiltReady: Ref<boolean> = ref(true)) {
-  // Blob cursor position
-  let bX = 0, bY = 0, tBX = 0, tBY = 0
-  // Tilt angles (degrees)
-  let tX = 0, tY = 0, tTX = 0, tTY = 0
+export function useGlowCard(el: Ref<HTMLElement | null>) {
+  // Mouse position, eased — drives the cursor-tracked edge glow
+  let gX = 0, gY = 0, tGX = 0, tGY = 0
   let raf: number | null = null
 
   function tick() {
-    bX += (tBX - bX) * 0.085
-    bY += (tBY - bY) * 0.085
-    tX += (tTX - tX) * 0.1
-    tY += (tTY - tY) * 0.1
+    gX += (tGX - gX) * 0.085
+    gY += (tGY - gY) * 0.085
 
-    const node = el.value
-    if (node) {
-      node.style.setProperty('--gx', `${bX}px`)
-      node.style.setProperty('--gy', `${bY}px`)
+    el.value?.style.setProperty('--gx', `${gX}px`)
+    el.value?.style.setProperty('--gy', `${gY}px`)
 
-      if (Math.abs(tX) > 0.005 || Math.abs(tY) > 0.005) {
-        node.style.transform = `perspective(62.5rem) rotateX(${tY}deg) rotateY(${tX}deg)`
-      } else if (node.style.transform) {
-        node.style.transform = ''
-      }
-    }
-
-    const done =
-      Math.abs(tBX - bX) < 0.3 && Math.abs(tBY - bY) < 0.3 &&
-      Math.abs(tTX - tX) < 0.005 && Math.abs(tTY - tY) < 0.005
-
-    if (done) raf = null
+    if (Math.abs(tGX - gX) < 0.3 && Math.abs(tGY - gY) < 0.3) raf = null
     else raf = requestAnimationFrame(tick)
   }
 
@@ -39,32 +22,17 @@ export function useGlowCard(el: Ref<HTMLElement | null>, tiltReady: Ref<boolean>
     const node = el.value
     if (!node) return
     const rect = node.getBoundingClientRect()
-    tBX = e.clientX - rect.left
-    tBY = e.clientY - rect.top
-    if (tiltReady.value) {
-      const px = tBX / rect.width
-      const py = tBY / rect.height
-      tTX = (px - 0.5) * 1.8
-      tTY = (py - 0.5) * -1.8
-    }
-    startRaf()
-  }
-
-  function onLeave() {
-    // Tilt returns to flat — blob STAYS where it is (CSS opacity on .card-glare fades it out)
-    tTX = 0
-    tTY = 0
+    tGX = e.clientX - rect.left
+    tGY = e.clientY - rect.top
     startRaf()
   }
 
   onMounted(() => {
     el.value?.addEventListener('pointermove', onMove, { passive: true })
-    el.value?.addEventListener('pointerleave', onLeave)
   })
 
   onUnmounted(() => {
     el.value?.removeEventListener('pointermove', onMove)
-    el.value?.removeEventListener('pointerleave', onLeave)
     if (raf) { cancelAnimationFrame(raf); raf = null }
   })
 }

@@ -138,7 +138,7 @@ function navTo(hash: string) {
   text-decoration: none;
   font-size: 0.78125rem;
   padding: 0.5625rem 0.6875rem;
-  border-radius: 0.6875rem;
+  border-radius: 0.75rem;
   transition: color 0.2s var(--ease-silk), background 0.2s var(--ease-silk);
   white-space: nowrap;
 }
@@ -174,7 +174,7 @@ function navTo(hash: string) {
   bottom: 0.125rem;
   left: 0.125rem;
   width: calc(50% - 0.125rem);
-  border-radius: 0.4375rem;
+  border-radius: 0.375rem;
   background: var(--ember-bg);
   transition: transform 0.28s var(--ease-glide);
   pointer-events: none;
@@ -189,7 +189,7 @@ function navTo(hash: string) {
   font-size: 0.6875rem;
   color: var(--faint);
   padding: 0.4375rem 0.5625rem;
-  border-radius: 0.4375rem;
+  border-radius: 0.375rem;
   letter-spacing: 0.05em;
   text-decoration: none;
   transition: color 0.25s var(--ease-silk);

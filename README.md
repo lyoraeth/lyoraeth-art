@@ -22,7 +22,7 @@ Personal site — work, writing, contact. The site itself is the demo.
 
 Ninth iteration. First one built on a real brief, a design system, and a stack chosen for reasons.
 
-The concept is **atmospheric minimalism** — dark stage, blurred color primitives in the background, glass layers in the middle, sharp type up front. Volume through light and blur, not shadows on buttons.
+The concept is **editorial minimalism** — the browser treated as an interactive newspaper, not a window manager. Dark paper under a single overhead light, flat hairline-framed content with a cursor-tracked ember edge, film grain as the paper's texture, sharp type up front. Glass is reserved for the reader's tools — nav, dock, dropdowns — never for content.
 
 EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
 
@@ -48,32 +48,25 @@ EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
 ## Design
 
 ### Concept
-Background: large blurred color blobs in `oklch`. Middle layer: glass panels. Front: sharp type. Dark mode only.
+Content is laid out like a page of print: hairline frames, figure captions, FPO-style placeholders (crop marks + diagonals — the way newspapers mark a not-yet-placed illustration). Interface chrome — nav, mobile dock, dropdowns — floats above it on frosted glass. The background is a single static layered gradient: an overhead light, faint cool-to-warm temperature drift down the page, side falloff like page margins. Dark mode only.
 
-### Glass
-Four properties, one `.glass` utility in `tokens.css`:
-
-- `backdrop-filter: blur(24px) saturate(160%)`
-- `background: oklch(100% 0 0 / 4%)`
-- `box-shadow: inset 0 1px 0 oklch(100% 0 0 / 12%)`
-- `::after` with a linear gradient — top-edge catch light
-
-Used on cards, nav, modals, and the contact panel.
+### Cards
+Flat and outline-only — a near-transparent fill, a 1px border and a cursor-tracked ember glow that runs along it. Both the static ring and the glow are identically masked pseudo-elements sharing one geometry, so they can't drift into a stepped double edge. No `backdrop-filter` on content: glass lives only on the reader's tools (nav, dock, dropdowns) and, dialed way down, on the Approach cells.
 
 ### Logo
 Designed in Figma, exported as SVG. Prepared in all required formats: `favicon.ico`, `favicon-16/32.png`, `apple-touch-icon.png`, `site.webmanifest`. Inlined in the nav to inherit `currentColor`.
 
 ### Typography
-Three typefaces, three jobs. **Golos Text** — body and UI, neutral and highly legible. **Onest** — headings, a bit more character. **JetBrains Mono** — tags, labels, metadata — anything that needs to read as a code artifact. All three are self-hosted via `@nuxtjs/google-fonts` with `download: true`, so there are zero external font requests in production.
+Three typefaces, three jobs. **Onest** — body and UI, neutral and highly legible. **Golos Text** — headings, a bit more character. **JetBrains Mono** — tags, labels, metadata — anything that needs to read as a code artifact. All three are self-hosted via `@nuxtjs/google-fonts` with `download: true`, so there are zero external font requests in production.
 
 ---
 
 ## How it's built
 
 ### Design system
-All design tokens — color, spacing, radius, easing, blur — are CSS custom properties in `tokens.css`. Tailwind reads them via `@theme inline`. Components read them directly. No magic numbers anywhere in the codebase.
+All design tokens — color, spacing, radius, easing, blur — are CSS custom properties in `main.css`. Tailwind reads them via `@theme inline`. Components read them directly. No magic numbers anywhere in the codebase; radii sit on a deliberate even scale (4 / 6 / 8 / 12 / 16 / 18…).
 
-Every transition duration and animation is a token (`--dur-base`, `--ease-out-expo`, etc.). A single `@media (prefers-reduced-motion: reduce)` block sets them all to zero — no conditional logic scattered across components.
+Every transition duration and animation is a token (`--duration-reveal`, `--ease-out-expo`, etc.). A single `@media (prefers-reduced-motion: reduce)` block sets them all to zero — no conditional logic scattered across components.
 
 ### Motion
 Scroll reveals and entrance transitions run on `IntersectionObserver` — no scroll event listeners, no layout thrashing. Lenis takes over smooth scroll on desktop and is initialized client-side only so SSR stays clean.
@@ -86,7 +79,7 @@ Table of contents on post pages — headings are extracted from the raw Markdown
 The server renders complete, readable HTML. Anything that touches `window`, `document`, or pointer events lives in `onMounted` or a `.client`-suffixed plugin. Vue's hydration never sees a mismatch because the client picks up exactly where the server left off.
 
 ### CMS (Sanity)
-Work items and writing posts are managed in Sanity Studio. Content is fetched server-side via GROQ queries inside Nitro API routes — the Sanity token never leaves the server. Images go through Sanity's CDN transformation pipeline: the server builds `?w=&fm=webp&q=` URLs, the component renders a `<picture>` with WebP → JPEG fallback.
+Work items and writing posts are managed in Sanity Studio; site-wide settings (availability status, contacts, CV files, the hero portrait) live in a `siteSettings` singleton. Content is fetched server-side via GROQ queries inside Nitro API routes — the Sanity token never leaves the server. Images go through Sanity's CDN transformation pipeline: the server builds `?w=&fm=webp&q=` URLs, the component renders a `<picture>` with WebP → JPEG fallback.
 
 Post bodies are written in Markdown — stored as a plain `text` field in Sanity, fetched as a string via GROQ, and parsed on the frontend with `marked`. The custom renderer wraps images in `<figure>` and adds `target="_blank"` to external links. Posts support a structured `references` array (title + URL) rendered as a numbered footer below the body.
 
@@ -96,7 +89,7 @@ Comments on writing posts are stored in Sanity and fetched client-side with a pu
 - Fonts: self-hosted, `font-display: swap`, preloaded — zero render-blocking external requests
 - Images: WebP via Sanity CDN (`?fm=webp`), `loading="lazy"` everywhere except above-the-fold covers; cover dimensions pulled from Sanity asset metadata and passed as explicit `width`/`height` — zero CLS. AVIF was dropped after CDN pre-hydration failures caused broken `<picture>` fallback chains in SSR.
 - Static assets (avatar, logo, favicons): `Cache-Control: public, max-age=31536000, immutable`
-- Stage background: `contain: layout style paint` — GPU-isolated layer, no reflow from blob animation
+- Stage background: a single static layered gradient (`contain: layout style paint`) — zero per-frame JS, no animated blur layers to composite
 - JS: SSR-first — the page is readable before any script runs; Lenis and observers are progressive enhancement
 - Work cards: `loading="eager"` on all card images (above-the-fold section); `/api/work` response cached for 5 minutes server-side
 - Analytics: Umami script is a single lightweight beacon, no tracking cookies, no external calls

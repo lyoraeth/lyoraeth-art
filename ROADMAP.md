@@ -6,8 +6,27 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 ---
 
+## Done — редизайн (exp/redesign-v2)
+
+- [x] `feat` отсебяшка в хиро из Sanity — image-поле в siteSettings, SanityPicture вместо статики из /public, alt из hero.name; текущий файл остаётся фоллбэком (студии нужен редеплой для нового поля)
+- [x] `design` пересмотреть плейсхолдеры — FPO-система (print-разметка: кроп-марки, обрез, диагонали) вместо косплея ОС; исходники в lyoaeth-brand/placeholders, продовые в public/placeholders; viewport-bar и loading-машинерия убраны
+- [x] `design` ApproachSection — стекло оставить, но подзагасить (интенсивность каустики/блюра вниз)
+- [x] `dx` убрать артефакты редизайна — мёртвые .card-glare дивы, токены --duration-blob/--duration-tilt/--duration-metaball/--ease-stage/--duration-magnet, мёртвый .form-privacy; glass-caustic оставлен (док + Approach); тесты useGlowCard переписаны под новый API
+- [x] `content` локали, быстрый проход — слоган к «результату», RU унифицирован на «вы», approach без оправдательных усилителей (полный проход — после мержа)
+- [x] `docs` README, быстрый проход — концепт/дизайн-секция переписаны под editorial minimalism, поправлены typography/tokens рассинхроны (СКРИНШОТЫ В readme/ УСТАРЕЛИ — переснять после мержа; полный проход — после мержа)
+
 ## Todo
 
+- [ ] `fix` !! lenis — на тачпадах и телефонах отключить полностью
+- [ ] `fix` !! прокрутка на телефонах не работает (репорт: Xiaomi 15T — скролл только двумя пальцами со случайным зумом) — вероятно следствие lenis, проверить связку
+- [ ] `fix` !! всплывашка скрытого футера на телефонах — отключить, футер должен быть виден сразу при прокрутке
+- [ ] `fix` TOC в статьях — прекращать sticky-скролл на уровне конца статьи (там же, где низ блока комментария)
+- [ ] `seo` статьи блога и все индексируемые страницы — превью ссылок без картинки и описания, GSC не парсит; явная локализация (hreflang) для гугла
+- [ ] `fix` webp/png фоллбэки SanityPicture — разобраться, почему картинки иногда падают в raw
+- [ ] `fix` переадресация сбрасывает язык на англ — кейсы перехода на пост/блог/работу/портфолио
+- [ ] `dx` причесать кодовую базу — артефакты, баги, утечки, небезопасные/ненадёжные места, строго оформить под TSDoc/SOLID
+- [ ] `content` локали, полный проход — снять пафос, выровнять тон
+- [ ] `docs` обновить README и политики под актуалочку
 - [ ] `analytics` кастомные события Umami — lang-switch, section-view, scroll-depth, cta-click, copy-email, work-open/depth/completed/link, post-read/completed, reference-click, comment-start, contact-start, outbound-click
 - [ ] `analytics` алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env
 - [ ] `a11y` alt-атрибуты обложек из Sanity
@@ -28,7 +47,6 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [ ] `infra` полноценный error tracking
 - [ ] `infra` Advanced observability
 - [ ] `feat` PWA
-
 ---
 
 ## Done

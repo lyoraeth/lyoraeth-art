@@ -55,7 +55,7 @@ onMounted(() => {
   position: relative;
 }
 
-/* Caustic overlay on the whole container */
+/* Caustic overlay on the whole container — kept, but dialed down to a whisper */
 .approach-grid::before {
   content: '';
   position: absolute;
@@ -63,11 +63,11 @@ onMounted(() => {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% -20%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 35% at 85% 120%, rgba(178, 153, 116, 0.05) 0%, transparent 55%);
+    radial-gradient(ellipse 80% 60% at 20% -20%, rgba(255, 255, 255, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 120%, rgba(178, 153, 116, 0.03) 0%, transparent 55%);
   background:
-    radial-gradient(ellipse 80% 60% at 20% -20%, oklch(100% 0 0 / 8%) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 35% at 85% 120%, oklch(65% 0.04 55 / 5%) 0%, transparent 55%);
+    radial-gradient(ellipse 80% 60% at 20% -20%, oklch(100% 0 0 / 4%) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 120%, oklch(65% 0.04 55 / 3%) 0%, transparent 55%);
   mix-blend-mode: screen;
   filter: url(#glass-caustic);
 }
@@ -76,10 +76,10 @@ onMounted(() => {
 .approach-cell {
   position: relative;
   z-index: 1;
-  background: rgba(14, 18, 26, 0.60);
-  background: oklch(13% 0.009 235 / 60%);
-  backdrop-filter: blur(12px) saturate(1.4) brightness(1.02);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4) brightness(1.02);
+  background: rgba(14, 18, 26, 0.68);
+  background: oklch(13% 0.009 235 / 68%);
+  backdrop-filter: blur(10px) saturate(1.15) brightness(1.01);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15) brightness(1.01);
   padding: clamp(1.375rem, 2.6vw, 2.125rem);
 }
 
