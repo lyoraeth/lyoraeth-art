@@ -129,6 +129,24 @@ function updateActiveId() {
   activeId.value = above.at(-1)!.id
 }
 
+/* Fixed TOC follows the viewport center; near the article's end it would sail
+   past the content, so the scroll handler pushes it up by exactly the amount
+   its bottom overshoots the comments block's bottom. */
+const tocAsideEl = ref<HTMLElement | null>(null)
+function clampToc() {
+  const el = tocAsideEl.value
+  if (!el) return
+  if (!window.matchMedia('(min-width: 72rem)').matches) {
+    el.style.transform = ''
+    return
+  }
+  const comments = document.getElementById('post-comments')
+  if (!comments) return
+  const desiredBottom = window.innerHeight / 2 + el.offsetHeight / 2
+  const overshoot = Math.max(0, desiredBottom - comments.getBoundingClientRect().bottom)
+  el.style.transform = overshoot > 0 ? `translateY(calc(-50% - ${Math.round(overshoot)}px))` : ''
+}
+
 onMounted(async () => {
   /* Reading progress */
   active.value = true
@@ -137,15 +155,19 @@ onMounted(async () => {
     progress.value = total > 0 ? Math.min(100, (window.scrollY / total) * 100) : 0
     scrolled.value = window.scrollY > 24
     updateActiveId()
+    clampToc()
   }
   window.addEventListener('scroll', update, { passive: true })
+  window.addEventListener('resize', clampToc, { passive: true })
 
   await nextTick()
   updateActiveId()
-  watch(bodyHtml, async () => { await nextTick(); updateActiveId() })
+  clampToc()
+  watch(bodyHtml, async () => { await nextTick(); updateActiveId(); clampToc() })
 
   onUnmounted(() => {
     window.removeEventListener('scroll', update)
+    window.removeEventListener('resize', clampToc)
     active.value = false
     progress.value = 0
   })
@@ -238,12 +260,11 @@ const bodyHtml = computed(() => {
     </Transition>
   </Teleport>
 
-  <!-- Desktop layout: article column + TOC column. The TOC is sticky inside a
-       column that spans the full article height (comments included), so it
-       naturally stops scrolling where the article ends — no scroll listener. -->
-  <div class="post-layout">
-  <!-- TOC sidebar (desktop, ≥2 headings) -->
-  <aside v-if="toc.length >= 2" class="toc-sidebar" aria-label="Table of contents">
+  <!-- TOC sidebar (desktop, ≥2 headings). position: fixed — NOT sticky: the
+       global overflow-x: hidden on html/body turns body into a scroll
+       container and kills sticky (hard-won lesson). The stop-at-article-end
+       behavior comes from a small clamp in the scroll handler instead. -->
+  <aside v-if="toc.length >= 2" ref="tocAsideEl" class="toc-sidebar" aria-label="Table of contents">
     <nav class="toc-nav">
       <span class="toc-label">{{ t('writing.toc') }}</span>
       <ol class="toc-list">
@@ -337,7 +358,6 @@ const bodyHtml = computed(() => {
     </section>
   </article>
   </div>
-  </div>
 </template>
 
 <style scoped>
@@ -398,32 +418,14 @@ const bodyHtml = computed(() => {
 /* ── Desktop TOC sidebar ── */
 .toc-sidebar { display: none; }
 
-/* Desktop: article + TOC as grid columns. The sidebar column stretches to the
-   article's full height, and the nav inside is sticky — viewport-centered
-   while scrolling, but clamped by its column, so it stops at the end of the
-   article (bottom of the comments block) instead of following forever. */
 @media (min-width: 72rem) {
-  .post-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 44rem) minmax(0, 1fr);
-  }
-  .post-layout > .post-page {
-    grid-column: 2;
-    grid-row: 1;
-    width: 100%;
-  }
   .toc-sidebar {
     display: block;
-    grid-column: 3;
-    grid-row: 1;
-    justify-self: start;
-    margin-left: 5.5rem;
-    width: 11rem;
-  }
-  .toc-sidebar .toc-nav {
-    position: sticky;
-    top: 50vh;
+    position: fixed;
+    left: calc(75% + 5.5rem);
+    top: 50%;
     transform: translateY(-50%);
+    width: 11rem;
   }
 }
 
