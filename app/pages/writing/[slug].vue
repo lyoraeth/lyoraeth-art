@@ -22,6 +22,7 @@ const excerpt = computed(() =>
 )
 
 const { ogImage, pageUrl } = useArticleSeo({
+  type:        'writing',
   title:       () => title.value,
   description: () => excerpt.value,
   coverUrl:    () => post.value?.coverUrl,

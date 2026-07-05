@@ -24,6 +24,7 @@ const metaDescription = computed(() =>
 )
 
 const { ogImage, pageUrl } = useArticleSeo({
+  type:        'work',
   title:       () => title.value,
   description: () => metaDescription.value,
   coverUrl:    () => item.value?.coverUrl,

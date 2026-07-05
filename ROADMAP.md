@@ -28,7 +28,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 ## Considering
 
 - [x] RSS-точка в колофон куртины — строка «Feed/Фид» → ссылка RSS с тултипом, ведёт на локале-версию фида (/rss.xml EN, /ru/rss.xml RU), ember-hover как у прочих ссылок
-- [ ] `perf` динамические OG images — генерация брендированного шаблона per-post через Satori/nuxt-og-image (заголовок+брендинг+фон, рисуется на лету). НЕ ПУТАТЬ с уже сделанным: сейчас og:image = обложка поста через Sanity-трансформ (jpg w1200). Это про генерацию картинки для постов БЕЗ обложки / единый брендовый вид
+- [x] `perf` динамические OG images — satori+resvg Nitro-роут /og/[type]/[slug] генерит брендированную 1200×630 (editorial: wordmark+рубрика, заголовок, ember-полоса+mono-мета), билингва через ?l. Интегрировано в useArticleSeo: есть обложка → обложка (Sanity-трансформ), нет → генерация. Шрифты — static Onest latin+cyrillic + JBMono как base64 в server/utils/ogFonts.ts (satori не парсит variable, storage ненадёжен между Nitro-пресетами). Посты + работы
 - [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)
 - [ ] `feat` донаты — оценить целесообразность
 - [ ] `dx` Lighthouse CI

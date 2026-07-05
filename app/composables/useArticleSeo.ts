@@ -2,6 +2,7 @@
  *  Sets `useSeoMeta` and returns `ogImage` / `pageUrl` so each page can reuse
  *  them inside its own JSON-LD (which stays page-specific). */
 export function useArticleSeo(opts: {
+  type:        'writing' | 'work'
   title:       () => string
   description: () => string
   coverUrl:    () => string | null | undefined
@@ -10,17 +11,23 @@ export function useArticleSeo(opts: {
   coverAlt:    () => string | null | undefined
 }) {
   const route = useRoute()
+  const { locale } = useI18n()
+  const slug = route.params.slug as string
 
-  /* social crawlers get a bounded jpeg, not the multi-megabyte original;
-     the static fallback ships as-is — transform params would 404 on it */
+  /* Cover, if present, gets a bounded jpeg. With no cover we fall back to a
+     branded 1200×630 image generated on the fly (server/routes/og), localized
+     via ?l — so link previews are always on-brand, never the bare og-image.png. */
+  const generated = computed(() => !opts.coverUrl())
   const ogImage = computed(() =>
-    opts.coverUrl() ? sanityFmt(opts.coverUrl()!, 'jpg', { w: 1200, q: 80 }) : 'https://lyoraeth.art/og-image.png'
+    opts.coverUrl()
+      ? sanityFmt(opts.coverUrl()!, 'jpg', { w: 1200, q: 80 })
+      : `https://lyoraeth.art/og/${opts.type}/${encodeURIComponent(slug)}?l=${locale.value}`,
   )
-  const ogImageHeight = computed(() =>
-    opts.coverUrl() && opts.coverWidth() && opts.coverHeight()
-      ? Math.round(1200 * opts.coverHeight()! / opts.coverWidth()!)
-      : undefined
-  )
+  const ogImageHeight = computed(() => {
+    if (generated.value) return 630
+    if (opts.coverWidth() && opts.coverHeight()) return Math.round(1200 * opts.coverHeight()! / opts.coverWidth()!)
+    return undefined
+  })
   const ogImageAlt = computed(() => opts.coverAlt() ?? opts.title())
   const pageUrl    = computed(() => `https://lyoraeth.art${route.path}`)
 
