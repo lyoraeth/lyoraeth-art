@@ -71,7 +71,7 @@ export function useToc(opts: {
     activeId.value = above.at(-1)!.id
   }
 
-  /* Fixed TOC follows the viewport center; near the article's end it would sail
+  /* Fixed TOC follows the viewport center; near the article's end it would run
      past the content, so the scroll handler pushes it up by exactly the amount
      its bottom overshoots the comments block's bottom. */
   function clampToc() {

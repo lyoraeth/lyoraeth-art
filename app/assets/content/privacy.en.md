@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last updated:** June 2026
+**Last updated:** July 2026
 **Site:** https://lyoraeth.art
 
 ## 1. Who is responsible
@@ -38,10 +38,10 @@ This site is a personal portfolio. Data collection is kept to an absolute minimu
 
 ### 3.4. Analytics
 
-Page views are counted with **Umami**, a self-hosted, open-source analytics tool running on the owner's own server.
+Page views and anonymous interaction events (e.g. scroll depth, section views, button and link clicks) are counted with **Umami**, a self-hosted, open-source analytics tool running on the owner's own server.
 
 - Umami uses **no cookies** and no fingerprinting.
-- Only anonymous aggregates are collected: page URL, referrer, browser language, screen resolution, country.
+- Only anonymous aggregates are collected: page URL, referrer, browser language, screen resolution, country, and the interaction events above. No personal data and no cross-site identifiers.
 - Data is **never shared with third parties** — it stays on the owner's server and is used only to understand which content is useful.
 - **Legal basis:** legitimate interest in understanding site usage (Art. 6(1)(f) GDPR).
 

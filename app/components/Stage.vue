@@ -3,12 +3,11 @@
 </template>
 
 <style scoped>
-/* Static scenography — dark paper under one overhead light, with faint
-   temperature drift down the page (cool top → warm mid → cool deep).
-   Every tinted layer is deliberately LARGER than the viewport: at that scale
-   an ellipse can never read as a shape, only as shading — which is what kills
-   the "frozen blob" look. Alphas stay in single digits / low teens: barely
-   noticeable, the grain overlay carries the texture. Non-black so the
+/* Static background — a dark base plus a faint cool→warm→cool tint drift down
+   the page. Every tinted layer is deliberately LARGER than the viewport: at
+   that scale an ellipse reads as shading, not a shape, which avoids the
+   "frozen blob" look. Alphas stay in single digits / low teens — barely
+   visible; the grain overlay carries the texture. Non-black so the
    header/dropdown glass has something to blur. */
 .stage {
   position: absolute;
@@ -18,16 +17,16 @@
   user-select: none;
   contain: layout style paint;
   background:
-    /* side falloff — the page's margins */
+    /* darkened side edges */
     linear-gradient(90deg, oklch(0% 0 0 / 14%), transparent 15%, transparent 85%, oklch(0% 0 0 / 14%)),
-    /* temperature drift: cool up top… */
+    /* cool tint up top */
     radial-gradient(ellipse 130vw 90vh at 20% -10vh, color-mix(in srgb, var(--teal) 12%, transparent), transparent 60%),
     radial-gradient(ellipse 130vw 100vh at 85% 120vh, color-mix(in srgb, var(--indigo) 10%, transparent), transparent 60%),
-    /* …a warm breath mid-page… */
+    /* warm tint mid-page */
     radial-gradient(ellipse 120vw 90vh at 40% 210vh, color-mix(in srgb, var(--warm-haze) 10%, transparent), transparent 62%),
-    /* …and a cold echo further down */
+    /* cool tint further down */
     radial-gradient(ellipse 130vw 110vh at 70% 330vh, color-mix(in srgb, var(--teal) 8%, transparent), transparent 60%),
-    /* софит + base sheet */
+    /* overhead gradient + base */
     radial-gradient(120% 90% at 50% -10%, var(--deep) 0%, var(--void) 58%);
 }
 </style>

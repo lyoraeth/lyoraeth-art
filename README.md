@@ -22,7 +22,7 @@ Personal site — work, writing, contact. The site itself is the demo.
 
 Ninth iteration. First one built on a real brief, a design system, and a stack chosen for reasons.
 
-The concept is **editorial minimalism** — the browser treated as an interactive newspaper, not a window manager. Dark paper under a single overhead light, flat hairline-framed content with a cursor-tracked ember edge, film grain as the paper's texture, sharp type up front. Glass is reserved for the reader's tools — nav, dock, dropdowns — never for content.
+Dark theme, editorial layout. Flat content framed by hairline borders with a cursor-tracked ember edge, a film-grain overlay, and sharp type up front. `backdrop-filter` glass is used only on interface chrome — nav, mobile dock, dropdowns — not on content.
 
 EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
 
@@ -37,7 +37,7 @@ EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
 | **Tailwind CSS v4** | Utility-first, reads design tokens from CSS variables |
 | **Sanity** | Headless CMS — work items and writing posts |
 | **@nuxtjs/i18n** | EN / RU, `prefix_except_default`, cookie-persisted locale |
-| **Lenis** | Smooth scroll, client-side only |
+| **Lenis** | Smooth scroll, desktop only — off on touch devices and touchpads |
 | **Resend** | Contact form email delivery |
 | **Cloudflare Turnstile** | Invisible CAPTCHA — no fingerprinting, no tracking cookies |
 | **Umami** | Self-hosted analytics — cookie-free, no third parties |
@@ -48,7 +48,7 @@ EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
 ## Design
 
 ### Concept
-Content is laid out like a page of print: hairline frames, figure captions, FPO-style placeholders (crop marks + diagonals — the way newspapers mark a not-yet-placed illustration). Interface chrome — nav, mobile dock, dropdowns — floats above it on frosted glass. The background is a single static layered gradient: an overhead light, faint cool-to-warm temperature drift down the page, side falloff like page margins. Dark mode only.
+Content uses hairline frames, figure captions, and FPO-style cover placeholders (crop marks + diagonals — the standard "for position only" print marker). Interface chrome — nav, mobile dock, dropdowns — sits above it on frosted glass. The background is a single static layered gradient: a soft overhead light, a faint cool-to-warm shift down the page, and darkened side edges. Dark mode only.
 
 ### Cards
 Flat and outline-only — a near-transparent fill, a 1px border and a cursor-tracked ember glow that runs along it. Both the static ring and the glow are identically masked pseudo-elements sharing one geometry, so they can't drift into a stepped double edge. No `backdrop-filter` on content: glass lives only on the reader's tools (nav, dock, dropdowns) and, dialed way down, on the Approach cells.
@@ -69,7 +69,7 @@ All design tokens — color, spacing, radius, easing, blur — are CSS custom pr
 Every transition duration and animation is a token (`--duration-reveal`, `--ease-out-expo`, etc.). A single `@media (prefers-reduced-motion: reduce)` block sets them all to zero — no conditional logic scattered across components.
 
 ### Motion
-Scroll reveals and entrance transitions run on `IntersectionObserver` — no scroll event listeners, no layout thrashing. Lenis takes over smooth scroll on desktop and is initialized client-side only so SSR stays clean.
+Scroll reveals and entrance transitions run on `IntersectionObserver` — no scroll event listeners, no layout thrashing. Lenis takes over smooth scroll on fine-pointer devices only: it never initializes on touch (native scrolling), and destroys itself if a touchpad is detected by its wheel-event signature. Client-side only, so SSR stays clean.
 
 Reading progress bar on post pages — a passive `scroll` listener updates shared `useState`, rendered as a 1.5px ember line at the bottom of the nav. Activates only on `writing/[slug]`, resets and cleans up on unmount.
 

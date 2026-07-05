@@ -55,7 +55,7 @@ onMounted(() => {
   position: relative;
 }
 
-/* Caustic overlay on the whole container — kept, but dialed down to a whisper */
+/* Caustic overlay on the whole container — kept, but dialed way down */
 .approach-grid::before {
   content: '';
   position: absolute;

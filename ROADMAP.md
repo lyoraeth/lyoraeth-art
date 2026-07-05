@@ -15,10 +15,10 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 **Этап 6 — финальная уборка:**
 - [x] `dx` причесать кодовую базу — воркфлоу: багхант (14 находок, 10 подтверждено адверсариально) → фиксы → SOLID-декомпозиция god-компонентов (writing/[slug] 867 строк → useMarkdown/useToc/useArticleSeo/useReadingProgressBar; work/[slug] → useArticleSeo/useCaseStudyFunnel) → TSDoc. Финал: typecheck+tests+build+смоук зелёные, 0 регрессий
 - [x] `sec` !! найдено и исправлено воркфлоу (НЕ ЗАПУШЕНО — прод пока уязвим): **Turnstile bypass** в contact.post + comment.post (`if(!valid)` где valid=объект {success}, всегда truthy → капча не работала вовсе); **HTML-инъекция в письма** (comment nick/message + csp-report — неэкранированный ввод рядом с live approve-ссылкой → escapeHtml util); **mcp/send.post открытый email-релей** без Turnstile/rate-limit; **утечка listeners** в writing/[slug] (onUnmounted после await не регался → scroll-листенеры + reading-progress state текли между постами)
-- [ ] `content` локали, полный проход — снять пафос, выровнять тон
-- [ ] `docs` обновить README и политики под актуалочку
-- [ ] `docs` убрать претенциозные метафоры из README и код-комментов («editorial minimalism — the browser is a newspaper, not a window manager» и т.п.) — дизайн не уникален и не делает такого заявления; протаскивать «между строк» посыл про природу сайтов как лейтмотив = натужно. Описывать что сделано, а не манифестировать
-- [ ] `docs` переснять скриншоты в readme/ — устарели после редизайна
+- [x] `content` локали, полный проход — тон уже выровнен быстрым проходом; полный нашёл одну кальку («Со всеми углами» → «Ничего не срезаю»), остальное в норме
+- [x] `docs` README + политики под актуалочку — README: Lenis desktop-only/touch-off; политики privacy EN/RU: Umami теперь учитывает и события взаимодействия (не только просмотры), дата → июль 2026; personal-data не тронут (аналитики не касается)
+- [x] `docs` убрать претенциозные метафоры — README (newspaper/window manager/page-of-print/paper), код-комменты (Hero «browser is a newspaper», Stage «scenography/софит/dark paper», error, Approach «whisper», useToc «sail»)
+- [ ] `docs` переснять скриншоты в readme/ — устарели после редизайна (РУЧНОЕ — нужен браузер)
 
 **Отложено (нужны внешние условия):**
 - [ ] `sec` nginx rate-limit для POST /api/mcp/send — сейчас в limit_req_zone только /api/contact и /api/comment; у mcp/send капчи нет (WebMCP-мост), поэтому лимит на nginx-уровне особенно нужен (добавить в nginx-proxy-manager Advanced, как для contact/comment). В коде уже добавлен size-cap как первый барьер

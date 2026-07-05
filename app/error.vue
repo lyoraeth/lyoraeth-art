@@ -47,8 +47,8 @@ function handleError() {
 .error-page {
   min-height: 100vh;
   min-height: 100dvh;
-  /* Static shading — same scenography as Stage.vue: tints larger than the
-     viewport so they read as temperature, never as shapes */
+  /* Static shading — same approach as Stage.vue: tints larger than the
+     viewport so they read as a tint, never as shapes */
   background:
     radial-gradient(ellipse 140vw 110vh at 10% -20vh, color-mix(in srgb, var(--teal) 11%, transparent), transparent 60%),
     radial-gradient(ellipse 140vw 120vh at 95% 120vh, color-mix(in srgb, var(--indigo) 9%, transparent), transparent 60%),

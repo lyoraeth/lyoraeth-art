@@ -90,12 +90,11 @@ const meta = computed(() =>
   margin-bottom: 1.875rem;
 }
 
-/* ── Portrait — an editorial figure, print-style: hairline frame with a
-   passe-partout gap (photo matted inside, radii kept concentric), mono
-   caption underneath like a newspaper credit line. Deliberately NOT a card
-   (cards here are clickable teasers) and NOT fake OS chrome — the browser
-   is a newspaper, not a window manager. Photo comes from Sanity site
-   settings, with the bundled static file as fallback while it's unset. */
+/* ── Portrait — a figure with a hairline frame, an inner gap (photo inset,
+   radii kept concentric with the frame), and a mono caption underneath.
+   Intentionally not a card (cards here are clickable teasers) and not a
+   mock-browser frame. Photo comes from Sanity site settings, with the
+   bundled static file as fallback while it's unset. */
 .hero-portrait {
   display: none;
 }
