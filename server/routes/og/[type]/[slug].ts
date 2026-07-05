@@ -31,18 +31,35 @@ const h = (type: string, props: any, ...kids: any[]): any => ({
 
 const C = {
   base: '#10151C', ink: '#E8EAEE', soft: '#C4CCD6',
-  faint: '#5B6573', ember: '#D69A6A', line: 'rgba(255,255,255,0.14)',
+  faint: '#5B6573', ember: '#D69A6A',
+  line: 'rgba(255,255,255,0.14)', frame: 'rgba(255,255,255,0.09)', mark: 'rgba(255,255,255,0.24)',
 }
 
 // Lighter-than-black stage lit by a few coloured sources (teal, indigo, warm
-// ember), plus a soft bottom vignette to keep text legible — same palette as the
-// site, just turned up a notch.
+// ember) — muted and spread wide so they read as ambient light, not blobs — plus
+// a soft bottom vignette for legibility. Same palette as the site.
 const BACKGROUND = [
-  `radial-gradient(75% 85% at 6% -5%, rgba(46,116,128,0.34), transparent 60%)`,
-  `radial-gradient(65% 75% at 104% 108%, rgba(96,78,158,0.30), transparent 55%)`,
-  `radial-gradient(48% 60% at 88% 6%, rgba(214,154,106,0.16), transparent 62%)`,
-  `radial-gradient(120% 110% at 50% 128%, #0A0E14 0%, transparent 55%)`,
+  `radial-gradient(95% 105% at 2% -12%, rgba(46,116,128,0.20), transparent 72%)`,
+  `radial-gradient(90% 100% at 108% 114%, rgba(96,78,158,0.17), transparent 70%)`,
+  `radial-gradient(64% 76% at 94% 0%, rgba(214,154,106,0.10), transparent 74%)`,
+  `radial-gradient(130% 120% at 50% 132%, #0A0E14 0%, transparent 60%)`,
 ].join(', ')
+
+// Schematic editorial frame — a hairline inset border with crop-tick brackets at
+// the corners (same registration-mark language as the FPO placeholders). Content
+// lives inside it with ~30px breathing room.
+const INSET = 48       // stage edge → frame
+const PAD   = '30px 40px' // frame → content
+const MARK_LEN = 22, MARK_INSET = 30
+const corner = (v: 'top' | 'bottom', hd: 'left' | 'right') => {
+  const pos = { ...(v === 'top' ? { top: `${MARK_INSET}px` } : { bottom: `${MARK_INSET}px` }),
+                ...(hd === 'left' ? { left: `${MARK_INSET}px` } : { right: `${MARK_INSET}px` }) }
+  return [
+    h('div', { style: { display: 'flex', position: 'absolute', ...pos, width: `${MARK_LEN}px`, height: '1px', backgroundColor: C.mark } }),
+    h('div', { style: { display: 'flex', position: 'absolute', ...pos, width: '1px', height: `${MARK_LEN}px`, backgroundColor: C.mark } }),
+  ]
+}
+const cornerMarks = () => [corner('top', 'left'), corner('top', 'right'), corner('bottom', 'left'), corner('bottom', 'right')].flat()
 
 // wordmark logo (transparent PNG). aspect ≈ 1056:423 (2.4965:1)
 const LOGO_AR = 1056 / 423
@@ -52,14 +69,23 @@ const logo = (w: number) => {
   return h('img', { src: logoSrc, width: w, height, style: { display: 'flex', width: `${w}px`, height: `${height}px` } })
 }
 
-const stage = (children: any[]) =>
+const stage = (children: any[], lit = false) =>
   h('div', {
     style: {
-      display: 'flex', flexDirection: 'column', width: '1200px', height: '630px',
-      padding: '80px', justifyContent: 'space-between',
-      backgroundColor: C.base, backgroundImage: BACKGROUND,
+      display: 'flex', position: 'relative', width: '1200px', height: '630px',
+      padding: `${INSET}px`, backgroundColor: C.base,
+      // Cover: ambient coloured light. Link-preview: flat monotone dark.
+      ...(lit ? { backgroundImage: BACKGROUND } : {}),
     },
-  }, children)
+  },
+    h('div', {
+      style: {
+        display: 'flex', flexDirection: 'column', flex: '1', justifyContent: 'space-between',
+        border: `1px solid ${C.frame}`, borderRadius: '12px', padding: PAD,
+      },
+    }, children),
+    cornerMarks(),
+  )
 
 const rubric = (eyebrow: string) =>
   h('div', { style: { display: 'flex', fontFamily: 'JetBrains Mono', fontSize: '22px', color: C.faint, letterSpacing: '4px' } }, eyebrow)
@@ -105,7 +131,7 @@ function templateCover({ eyebrow, tags }: { eyebrow: string; tags: string[] }) {
           ),
         )
       : h('div', { style: { display: 'flex', width: '34px', height: '4px', backgroundColor: C.ember } }),
-  ])
+  ], true)
 }
 
 export default defineCachedEventHandler(async (event) => {
