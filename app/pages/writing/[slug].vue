@@ -352,18 +352,20 @@ const bodyHtml = computed(() => {
           v-if="post.prev"
           :to="localePath(`/writing/${post.prev.slug}`)"
           class="back-link adjacent-link"
-          :aria-label="t('writing.prev_post')"
+          :aria-label="`${t('writing.prev_post')}: ${loc(post.prev.title)}`"
+          :title="loc(post.prev.title)"
         >
           <span aria-hidden="true">←</span>
-          <span class="adjacent-title">{{ loc(post.prev.title) }}</span>
+          <span>{{ t('writing.prev_post') }}</span>
         </NuxtLink>
         <NuxtLink
           v-if="post.next"
           :to="localePath(`/writing/${post.next.slug}`)"
           class="back-link adjacent-link"
-          :aria-label="t('writing.next_post')"
+          :aria-label="`${t('writing.next_post')}: ${loc(post.next.title)}`"
+          :title="loc(post.next.title)"
         >
-          <span class="adjacent-title">{{ loc(post.next.title) }}</span>
+          <span>{{ t('writing.next_post') }}</span>
           <span aria-hidden="true">→</span>
         </NuxtLink>
       </div>
@@ -610,13 +612,6 @@ const bodyHtml = computed(() => {
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  min-width: 0;
-}
-.adjacent-title {
-  max-width: 16ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* ── Header ── */
