@@ -30,6 +30,12 @@ function handleError() {
       <div class="error-divider"></div>
 
       <div class="error-body">
+        <!-- The 5xx copy already blames "the tech cats" — so on a server error,
+             here is one. Never on 404. -->
+        <figure v-if="!is404" class="error-cat">
+          <img src="/500-cat.webp" alt="A cat smirking at the server outage" width="586" height="489" loading="eager" />
+        </figure>
+
         <h1 class="error-title">{{ title }}</h1>
         <p class="error-message">{{ message }}</p>
 
@@ -97,6 +103,22 @@ function handleError() {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+/* ── 5xx cat — framed like the hero portrait so the joke still reads as "ours" ── */
+.error-cat {
+  margin: 0 0 0.5rem;
+  width: 100%;
+  max-width: 13rem;
+  padding: 0.3125rem;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-card-sm);
+}
+.error-cat img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: calc(var(--radius-card-sm) - 0.3125rem - 1px);
 }
 
 .error-title {
