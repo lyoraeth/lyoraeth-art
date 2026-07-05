@@ -252,15 +252,25 @@ onMounted(() => {
       </div>
     </header>
 
-    <!-- Cover -->
-    <div v-if="post.coverUrl" class="post-cover">
+    <!-- Cover: uploaded image, or the generated branded OG as a fallback -->
+    <div class="post-cover">
       <SanityPicture
+        v-if="post.coverUrl"
         :src="post.coverUrl"
         :alt="post.coverAlt ?? title"
         loading="eager"
         fetchpriority="high"
         :width="900"
         :height="post.coverWidth && post.coverHeight ? Math.round(900 * post.coverHeight / post.coverWidth) : undefined"
+      />
+      <img
+        v-else
+        :src="`/og/writing/${encodeURIComponent(slug)}?l=${locale}`"
+        :alt="title"
+        width="1200"
+        height="630"
+        loading="eager"
+        fetchpriority="high"
       />
     </div>
 

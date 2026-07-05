@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PostItem } from '../../../server/api/posts.get'
 
-const { t }        = useI18n()
+const { t, locale }  = useI18n()
 const loc          = useLoc()
 const localePath   = useLocalePath()
 
@@ -9,6 +9,9 @@ const { data: posts } = await useFetch('/api/posts', { default: () => [] as Post
 
 const featured  = computed(() => posts.value[0] ?? null)
 const secondary = computed(() => (posts.value ?? []).slice(1))
+
+// No cover → the branded generated OG image doubles as the cover.
+const ogCover = (slug: string) => `/og/writing/${encodeURIComponent(slug)}?l=${locale.value}`
 
 const formatDate = useFormatDate()
 
@@ -48,18 +51,16 @@ useGlowCard(mini1)
         <div class="feat-thumb">
           <div class="feat-thumb-media">
             <SanityPicture
+              v-if="featured.coverUrl"
               :src="featured.coverUrl"
               :alt="featured.coverAlt ?? loc(featured.title)"
               class="feat-thumb-img"
               loading="lazy"
               draggable="false"
               :width="600"
-            >
-              <template #placeholder>
-                <!-- FPO sheet — print-production placeholder, see lyoaeth-brand/placeholders -->
-                <img src="/placeholders/writing.svg" alt="" class="feat-thumb-img" aria-hidden="true" draggable="false" />
-              </template>
-            </SanityPicture>
+            />
+            <!-- No cover → generated branded OG image as the cover -->
+            <img v-else :src="ogCover(featured.slug)" class="feat-thumb-img" alt="" loading="lazy" draggable="false" />
           </div>
         </div>
 
