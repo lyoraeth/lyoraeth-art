@@ -219,6 +219,8 @@
     "trackers_label": "Аналитика",
     "trackers_value": "Umami — без куков",
     "lang_label": "Язык",
-    "lang_value": "EN · RU"
+    "lang_value": "EN · RU",
+    "feed_label": "Фид",
+    "feed_hint": "Подписаться в RSS-читалке"
   }
 }

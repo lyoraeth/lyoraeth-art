@@ -1,6 +1,10 @@
 <script setup lang="ts">
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { $lenis } = useNuxtApp() as any
+
+// RSS feed for the active locale — the visible, human-facing counterpart to the
+// discovery <link> tags already in <head>.
+const rssUrl = computed(() => locale.value === 'ru' ? '/ru/rss.xml' : '/rss.xml')
 
 const curtainEl = ref<HTMLElement | null>(null)
 let ro: ResizeObserver | null = null
@@ -80,6 +84,12 @@ onUnmounted(() => {
           <dt class="curtain-key">{{ t('curtain.lang_label') }}</dt>
           <dd>{{ t('curtain.lang_value') }}</dd>
         </div>
+        <div class="curtain-row">
+          <dt class="curtain-key">{{ t('curtain.feed_label') }}</dt>
+          <dd>
+            <a :href="rssUrl" class="curtain-link" :title="t('curtain.feed_hint')">RSS</a>
+          </dd>
+        </div>
       </dl>
     </div>
   </div>
@@ -152,6 +162,15 @@ onUnmounted(() => {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   flex-shrink: 0;
+}
+
+.curtain-link {
+  color: var(--mist);
+  text-decoration: none;
+  transition: color 0.2s var(--ease-silk);
+}
+.curtain-link:hover {
+  color: var(--ember);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */

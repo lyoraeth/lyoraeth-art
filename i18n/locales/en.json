@@ -219,6 +219,8 @@
     "trackers_label": "Analytics",
     "trackers_value": "Umami — cookie-free",
     "lang_label": "Language",
-    "lang_value": "EN · RU"
+    "lang_value": "EN · RU",
+    "feed_label": "Feed",
+    "feed_hint": "Subscribe in your RSS reader"
   }
 }

@@ -27,7 +27,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 ## Considering
 
-- [ ] RSS-точка в колофон куртины — строка вроде «Feed» / ссылка «RSS» с тултипом-подсказкой (в стиле остальных строк колофона: Fonts / Built with / CMS / Analytics). Ведёт на локале-версию фида (/rss.xml для EN, /ru/rss.xml для RU). Discovery-линки в head уже есть — это просто зримая человеческая точка.
+- [x] RSS-точка в колофон куртины — строка «Feed/Фид» → ссылка RSS с тултипом, ведёт на локале-версию фида (/rss.xml EN, /ru/rss.xml RU), ember-hover как у прочих ссылок
 - [ ] `perf` динамические OG images — Satori/nuxt-og-image, брендированный шаблон per-post/per-case
 - [ ] `feat` beta-banner — флаг inDevelopment в siteSettings (Sanity) + первый визит, появляется через 15-30с, автоскрытие, крестик, localStorage чтобы не показывать снова
 - [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)
