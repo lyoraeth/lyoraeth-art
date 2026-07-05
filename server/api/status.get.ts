@@ -1,3 +1,5 @@
+/** GET /api/status — site availability flag from the `siteStatus` singleton.
+ *  Defaults to `available` when unset or the CMS is unconfigured. */
 export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset, sanityToken } = useRuntimeConfig(event)
   if (!sanityProjectId) return { availability: 'available' }

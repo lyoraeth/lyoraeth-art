@@ -1,3 +1,6 @@
+/** GET /api/post/:slug — full post plus prev/next neighbours (by publish date).
+ *  `excerpt` and `wordCount` are derived server-side from the EN/RU markdown so
+ *  the client never ships the markdown pipeline twice. 404 when not found. */
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)

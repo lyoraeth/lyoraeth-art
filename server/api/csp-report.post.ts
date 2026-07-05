@@ -1,5 +1,8 @@
 import { Resend } from 'resend'
 
+/** POST /api/csp-report — browser CSP violation sink (report-uri target).
+ *  Parses the report envelope and emails a digest via Resend (best-effort).
+ *  Always answers 204, even on malformed/empty bodies. */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event)
 
@@ -25,11 +28,11 @@ export default defineEventHandler(async (event) => {
       to:      config.mailerTo,
       subject: `CSP violation: ${directive}`,
       html: `
-        <p><strong>Directive:</strong> ${directive}</p>
-        <p><strong>Blocked:</strong> ${blocked}</p>
-        <p><strong>Page:</strong> ${page}</p>
+        <p><strong>Directive:</strong> ${escapeHtml(directive)}</p>
+        <p><strong>Blocked:</strong> ${escapeHtml(blocked)}</p>
+        <p><strong>Page:</strong> ${escapeHtml(page)}</p>
         <details><summary>Full report</summary>
-          <pre>${JSON.stringify(report, null, 2)}</pre>
+          <pre>${escapeHtml(JSON.stringify(report, null, 2))}</pre>
         </details>
       `,
     }).catch(() => {})

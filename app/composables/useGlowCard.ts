@@ -1,3 +1,6 @@
+/** Cursor-tracked edge glow for a card: eases `--gx`/`--gy` CSS vars toward the
+ *  pointer on an rAF loop (idles when settled). Binds a passive `pointermove`
+ *  listener on mount, cleans up on unmount. */
 export function useGlowCard(el: Ref<HTMLElement | null>) {
   // Mouse position, eased — drives the cursor-tracked edge glow
   let gX = 0, gY = 0, tGX = 0, tGY = 0

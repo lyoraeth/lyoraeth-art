@@ -1,3 +1,5 @@
+/** GET /api/posts — published posts newest-first. `?limit=N` caps the count;
+ *  `limit=0` (or negative) returns the full list. Empty when CMS unconfigured. */
 export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
   if (!sanityProjectId) return []

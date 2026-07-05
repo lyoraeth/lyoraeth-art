@@ -1,5 +1,8 @@
 import { createHash } from 'node:crypto'
 
+/** POST /api/rating/:slug — record one up/down vote. Dedupes per voter with a
+ *  salted SHA-256 of IP+slug as the vote doc id, so a repeat vote hits Sanity's
+ *  create conflict and returns 409 (Already voted). 400 on a bad `dir` body. */
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug')!
   const { dir } = await readBody<{ dir: 'up' | 'down' }>(event)

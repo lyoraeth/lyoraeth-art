@@ -5,6 +5,9 @@ interface McpContactBody {
   message: string
 }
 
+/** POST /api/mcp/send — contact endpoint for the WebMCP `send_message` tool.
+ *  No captcha (the browser-agent bridge can't solve one); emails via Resend.
+ *  400 on empty fields, 503 when the mailer is unconfigured. */
 export default defineEventHandler(async (event) => {
   const { contact, message } = await readBody<McpContactBody>(event)
 

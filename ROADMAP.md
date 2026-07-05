@@ -13,7 +13,8 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [ ] `fix` раздел «как я работаю» на главной, возможно, отрисовывается в старом стиле и перерисовывается — есть прыжок дизайна, непонятно откуда
 
 **Этап 6 — финальная уборка:**
-- [ ] `dx` причесать кодовую базу — артефакты, баги, утечки, небезопасные/ненадёжные места, строго оформить под TSDoc/SOLID
+- [x] `dx` причесать кодовую базу — воркфлоу: багхант (14 находок, 10 подтверждено адверсариально) → фиксы → SOLID-декомпозиция god-компонентов (writing/[slug] 867 строк → useMarkdown/useToc/useArticleSeo/useReadingProgressBar; work/[slug] → useArticleSeo/useCaseStudyFunnel) → TSDoc. Финал: typecheck+tests+build+смоук зелёные, 0 регрессий
+- [x] `sec` !! найдено и исправлено воркфлоу (НЕ ЗАПУШЕНО — прод пока уязвим): **Turnstile bypass** в contact.post + comment.post (`if(!valid)` где valid=объект {success}, всегда truthy → капча не работала вовсе); **HTML-инъекция в письма** (comment nick/message + csp-report — неэкранированный ввод рядом с live approve-ссылкой → escapeHtml util); **mcp/send.post открытый email-релей** без Turnstile/rate-limit; **утечка listeners** в writing/[slug] (onUnmounted после await не регался → scroll-листенеры + reading-progress state текли между постами)
 - [ ] `content` локали, полный проход — снять пафос, выровнять тон
 - [ ] `docs` обновить README и политики под актуалочку
 - [ ] `docs` убрать претенциозные метафоры из README и код-комментов («editorial minimalism — the browser is a newspaper, not a window manager» и т.п.) — дизайн не уникален и не делает такого заявления; протаскивать «между строк» посыл про природу сайтов как лейтмотив = натужно. Описывать что сделано, а не манифестировать
@@ -25,6 +26,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 ## Considering
 
+- [ ] RSS-точка в колофон куртины — строка вроде «Feed» / ссылка «RSS» с тултипом-подсказкой (в стиле остальных строк колофона: Fonts / Built with / CMS / Analytics). Ведёт на локале-версию фида (/rss.xml для EN, /ru/rss.xml для RU). Discovery-линки в head уже есть — это просто зримая человеческая точка.
 - [ ] `perf` динамические OG images — Satori/nuxt-og-image, брендированный шаблон per-post/per-case
 - [ ] `feat` beta-banner — флаг inDevelopment в siteSettings (Sanity) + первый визит, появляется через 15-30с, автоскрытие, крестик, localStorage чтобы не показывать снова
 - [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)

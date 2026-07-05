@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Marked } from 'marked'
 import type { PostDetail } from '../../../server/api/post/[slug].get'
 
 const { locale, t } = useI18n()
@@ -22,33 +21,13 @@ const excerpt = computed(() =>
   post.value ? (locale.value === 'ru' && post.value.excerpt.ru ? post.value.excerpt.ru : post.value.excerpt.en) : ''
 )
 
-/* social crawlers get a bounded jpeg, not the multi-megabyte original;
-   the static fallback ships as-is — transform params would 404 on it */
-const ogImage = computed(() =>
-  post.value?.coverUrl ? sanityFmt(post.value.coverUrl, 'jpg', { w: 1200, q: 80 }) : 'https://lyoraeth.art/og-image.png'
-)
-const ogImageHeight = computed(() =>
-  post.value?.coverUrl && post.value.coverWidth && post.value.coverHeight
-    ? Math.round(1200 * post.value.coverHeight / post.value.coverWidth)
-    : undefined
-)
-const ogImageAlt = computed(() => post.value?.coverAlt ?? title.value)
-const pageUrl    = computed(() => `https://lyoraeth.art${route.path}`)
-
-useSeoMeta({
-  title:              computed(() => `${title.value} — lyoraeth`),
-  description:        excerpt,
-  ogTitle:            computed(() => title.value),
-  ogDescription:      excerpt,
-  ogImage:            ogImage,
-  ogImageWidth:       computed(() => ogImageHeight.value ? 1200 : undefined),
-  ogImageHeight:      ogImageHeight,
-  ogImageAlt:         ogImageAlt,
-  ogType:             'article',
-  ogUrl:              pageUrl,
-  twitterCard:        'summary_large_image',
-  twitterImage:       ogImage,
-  twitterDescription: excerpt,
+const { ogImage, pageUrl } = useArticleSeo({
+  title:       () => title.value,
+  description: () => excerpt.value,
+  coverUrl:    () => post.value?.coverUrl,
+  coverWidth:  () => post.value?.coverWidth,
+  coverHeight: () => post.value?.coverHeight,
+  coverAlt:    () => post.value?.coverAlt,
 })
 
 useHead({
@@ -95,49 +74,20 @@ useHead({
 
 const formatDate = useFormatDate()
 
-const { progress, active } = useReadingProgress()
-
-/* ── TOC ── */
-interface TocEntry { id: string; text: string; level: 2 | 3 | 'intro' }
-
-function slugifyHeading(text: string) {
-  return text.toLowerCase().replace(/[^a-z0-9а-яёa-z\s-]/gi, '').trim().replace(/\s+/g, '-')
-}
-
-const toc = computed<TocEntry[]>(() => {
-  if (!post.value) return []
+const { renderPost } = useMarkdown()
+const bodyHtml = computed(() => {
+  if (!post.value) return ''
   const raw = locale.value === 'ru' ? post.value.body.ru : post.value.body.en
-  if (!raw) return []
-  const entries: TocEntry[] = []
-
-  entries.push({ level: 'intro', text: t('writing.toc_intro'), id: 'post-body-start' })
-
-  const re = /^(#{2,3})\s+(.+)$/gm
-  let m
-  while ((m = re.exec(raw)) !== null) {
-    const text = m[1] ? m[2]?.trim() ?? '' : ''
-    if (text) entries.push({ level: m[1]!.length as 2 | 3, text, id: slugifyHeading(text) })
-  }
-  return entries
+  if (!raw || typeof raw !== 'string') return ''
+  return renderPost(raw)
 })
 
-const activeId     = ref('')
-const tocOpen      = ref(false)
-const tocBtnEl     = ref<HTMLElement | null>(null)
-const scrolled     = ref(false)
-const tocPanelStyle = ref<Record<string, string>>({})
-function updateTocPanelStyle() {
-  if (!tocBtnEl.value) return
-  const r = tocBtnEl.value.getBoundingClientRect()
-  const gap = scrolled.value ? 32 : 14
-  tocPanelStyle.value = {
-    right: `${document.documentElement.clientWidth - r.right}px`,
-    top:   `${r.bottom + gap}px`,
-  }
-}
-
-watch(tocOpen,   (open) => { if (open) nextTick().then(updateTocPanelStyle) })
-watch(scrolled,  ()     => { if (tocOpen.value) updateTocPanelStyle() })
+/* ── TOC ── */
+const { toc, activeId, tocOpen, tocBtnEl, tocAsideEl, tocPanelStyle, jumpTo } = useToc({
+  markdown:   () => (locale.value === 'ru' ? post.value?.body.ru : post.value?.body.en) ?? '',
+  introLabel: () => t('writing.toc_intro'),
+  content:    () => bodyHtml.value,
+})
 
 const tocMeta = computed(() => {
   const entries: { id: string; label: string }[] = []
@@ -146,106 +96,14 @@ const tocMeta = computed(() => {
   return entries
 })
 
-const router = useRouter()
-function jumpTo(id: string, closePanel?: boolean) {
-  const el = document.getElementById(id)
-  if (el) {
-    const top = el.getBoundingClientRect().top + window.scrollY - Math.round(window.innerHeight / 3)
-    window.scrollTo({ top, behavior: 'smooth' })
-  }
-  router.replace({ hash: `#${id}` })
-  if (closePanel) tocOpen.value = false
-}
-
-function updateActiveId() {
-  if (toc.value.length < 2) return
-  const readLine = window.innerHeight * 0.5
-  const headings = [...document.querySelectorAll<HTMLElement>('.post-body h2[id], .post-body h3[id]')]
-  const metaEls  = [...document.querySelectorAll<HTMLElement>('#post-references, #post-comments')]
-  const above = [...headings, ...metaEls].filter(el => el.getBoundingClientRect().top < readLine)
-  if (above.length === 0) {
-    if (toc.value[0]?.level === 'intro') activeId.value = 'post-body-start'
-    return
-  }
-  activeId.value = above.at(-1)!.id
-}
-
-/* Fixed TOC follows the viewport center; near the article's end it would sail
-   past the content, so the scroll handler pushes it up by exactly the amount
-   its bottom overshoots the comments block's bottom. */
-const tocAsideEl = ref<HTMLElement | null>(null)
-function clampToc() {
-  const el = tocAsideEl.value
-  if (!el) return
-  if (!window.matchMedia('(min-width: 72rem)').matches) {
-    el.style.transform = ''
-    return
-  }
-  const comments = document.getElementById('post-comments')
-  if (!comments) return
-  const desiredBottom = window.innerHeight / 2 + el.offsetHeight / 2
-  const overshoot = Math.max(0, desiredBottom - comments.getBoundingClientRect().bottom)
-  el.style.transform = overshoot > 0 ? `translateY(calc(-50% - ${Math.round(overshoot)}px))` : ''
-}
-
 const track = useTrack()
-let postCompleted = false
 
-onMounted(async () => {
+useReadingProgressBar({
+  onComplete: () => track(EV.postCompleted, { slug }),
+})
+
+onMounted(() => {
   track(EV.postRead, { slug })
-
-  /* Reading progress */
-  active.value = true
-  const update = () => {
-    const total = document.documentElement.scrollHeight - window.innerHeight
-    progress.value = total > 0 ? Math.min(100, (window.scrollY / total) * 100) : 0
-    scrolled.value = window.scrollY > 24
-    if (!postCompleted && progress.value >= 95) {
-      postCompleted = true
-      track(EV.postCompleted, { slug })
-    }
-    updateActiveId()
-    clampToc()
-  }
-  window.addEventListener('scroll', update, { passive: true })
-  window.addEventListener('resize', clampToc, { passive: true })
-
-  await nextTick()
-  updateActiveId()
-  clampToc()
-  watch(bodyHtml, async () => { await nextTick(); updateActiveId(); clampToc() })
-
-  onUnmounted(() => {
-    window.removeEventListener('scroll', update)
-    window.removeEventListener('resize', clampToc)
-    active.value = false
-    progress.value = 0
-  })
-})
-
-const md = new Marked({
-  renderer: {
-    heading({ text, depth }) {
-      if (depth === 2 || depth === 3) {
-        const id = slugifyHeading(text)
-        return `<h${depth} id="${id}">${text}</h${depth}>\n`
-      }
-      return `<h${depth}>${text}</h${depth}>\n`
-    },
-    image({ href, title, text }) {
-      const caption = title ? `<figcaption class="post-caption">${title}</figcaption>` : ''
-      return `<figure class="post-figure"><img src="${href}" alt="${text ?? ''}" loading="lazy" class="post-img">${caption}</figure>`
-    },
-  },
-})
-
-const bodyHtml = computed(() => {
-  if (!post.value) return ''
-  const raw = locale.value === 'ru' ? post.value.body.ru : post.value.body.en
-  if (!raw || typeof raw !== 'string') return ''
-  const html = md.parse(raw) as string
-  const withLinks = html.replace(/<a href="(https?:\/\/[^"]+)"/g, '<a href="$1" target="_blank" rel="noopener noreferrer"')
-  return '<span id="post-body-start" aria-hidden="true" style="display:block;height:0;margin:0;padding:0"></span>' + withLinks
 })
 </script>
 
@@ -410,7 +268,7 @@ const bodyHtml = computed(() => {
 
     <!-- References -->
     <footer v-if="post.references?.length" id="post-references" class="post-references">
-      <span class="references-label">источники</span>
+      <span class="references-label">{{ t('writing.toc_references') }}</span>
       <ol class="references-list">
         <li v-for="ref in post.references" :key="ref.href">
           <a :href="ref.href" target="_blank" rel="noopener noreferrer" @click="track(EV.referenceClick, { slug, href: ref.href })">{{ ref.title }}</a>

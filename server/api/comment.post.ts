@@ -8,6 +8,9 @@ interface CommentBody {
   postSlug: string
 }
 
+/** POST /api/comment — submit a post comment. Verifies Turnstile, stores the
+ *  comment unapproved in Sanity, then emails an HMAC-signed one-click approve
+ *  link (see /api/comment/approve). The email send is best-effort. */
 export default defineEventHandler(async (event) => {
   const { token, nick, message, postSlug } = await readBody<CommentBody>(event)
 
@@ -16,8 +19,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // ── Verify Turnstile ───────────────────────────────────────────────────────
-  const valid = await verifyTurnstileToken(token)
-  if (!valid) throw createError({ statusCode: 400, message: 'Captcha failed — please try again' })
+  const valid = await verifyTurnstileToken(token, event)
+  if (!valid.success) throw createError({ statusCode: 400, message: 'Captcha failed — please try again' })
 
   // ── Store in Sanity ────────────────────────────────────────────────────────
   const config = useRuntimeConfig(event)
@@ -45,9 +48,9 @@ export default defineEventHandler(async (event) => {
       to:      config.mailerTo,
       subject: `New comment on /${postSlug}`,
       html: `
-        <p><strong>@${nick.replace(/^@+/, '').trim()}</strong> on <code>${postSlug}</code>:</p>
+        <p><strong>@${escapeHtml(nick.replace(/^@+/, '').trim())}</strong> on <code>${escapeHtml(postSlug)}</code>:</p>
         <blockquote style="border-left:3px solid #ccc;margin:0;padding:0.5em 1em;color:#555">
-          ${message.trim().replace(/\n/g, '<br>')}
+          ${escapeHtml(message.trim()).replace(/\n/g, '<br>')}
         </blockquote>
         <p style="margin-top:1.5em">
           <a href="${approveUrl}" style="background:#d69a6a;color:#fff;padding:0.5em 1.25em;text-decoration:none;border-radius:4px">

@@ -29,7 +29,9 @@ function esc(text: string) {
     .replace(/'/g, '&apos;')
 }
 
-/* Shared between /rss.xml (EN) and /ru/rss.xml (RU). */
+/** Render the RSS 2.0 feed for one locale — shared between /rss.xml (EN) and
+ *  /ru/rss.xml (RU). RU items fall back to EN title/body when the translation
+ *  is missing; descriptions are markdown excerpts. Sets a 1h cache header. */
 export async function renderFeed(event: H3Event, locale: 'en' | 'ru') {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
 

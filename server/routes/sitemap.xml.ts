@@ -25,6 +25,9 @@ function pair(path: string, priority: string, changefreq: string, lastmod?: stri
   ]
 }
 
+/** GET /sitemap.xml — static pages plus every post/work slug, each emitted as
+ *  paired EN + /ru URLs with hreflang alternates. `lastmod` uses the doc's
+ *  `_updatedAt` (falling back to `publishedAt` for posts). */
 export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
 

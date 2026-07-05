@@ -1,5 +1,7 @@
 const BASE = 'https://lyoraeth.art'
 
+/** GET /llms-full.txt — plain-text index of all work + writing (EN, full post
+ *  bodies inline) for LLM crawlers. Empty-ish when the CMS is unconfigured. */
 export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
 

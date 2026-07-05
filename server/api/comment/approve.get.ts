@@ -1,5 +1,9 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
+/** GET /api/comment/approve?id&token — one-click comment approval from the
+ *  notification email. `token` is an HMAC-SHA256 of the doc id keyed by the
+ *  Sanity token, compared in constant time; sets `approved: true` and returns
+ *  a small HTML confirmation page. 403 on mismatch, 400 on missing params. */
 export default defineEventHandler(async (event) => {
   const { id, token } = getQuery(event) as { id?: string; token?: string }
 

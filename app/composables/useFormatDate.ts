@@ -1,3 +1,5 @@
+/** Returns a locale-aware date formatter (en-GB / ru-RU by active locale).
+ *  Takes an ISO string; `'short'` → dd.mm.yyyy, `'long'` → spelled-out month. */
 export function useFormatDate() {
   const { locale } = useI18n()
   const lang = computed(() => locale.value === 'ru' ? 'ru-RU' : 'en-GB')

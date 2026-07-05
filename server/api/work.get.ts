@@ -1,3 +1,5 @@
+/** GET /api/work — work items by manual order. `?limit=N` caps the count
+ *  (`limit=0` returns all). Response cached 5 min, keyed by the limit param. */
 export default defineCachedEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
   if (!sanityProjectId) return []

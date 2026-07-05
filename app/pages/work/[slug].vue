@@ -23,33 +23,13 @@ const metaDescription = computed(() =>
   loc(item.value?.shortDescription) || loc(item.value?.description)
 )
 
-/* social crawlers get a bounded jpeg, not the multi-megabyte original;
-   the static fallback ships as-is — transform params would 404 on it */
-const ogImage = computed(() =>
-  item.value?.coverUrl ? sanityFmt(item.value.coverUrl, 'jpg', { w: 1200, q: 80 }) : 'https://lyoraeth.art/og-image.png'
-)
-const ogImageHeight = computed(() =>
-  item.value?.coverUrl && item.value.coverWidth && item.value.coverHeight
-    ? Math.round(1200 * item.value.coverHeight / item.value.coverWidth)
-    : undefined
-)
-const ogImageAlt = computed(() => item.value?.coverAlt ?? title.value)
-const pageUrl    = computed(() => `https://lyoraeth.art${route.path}`)
-
-useSeoMeta({
-  title:              computed(() => `${title.value} — lyoraeth`),
-  description:        metaDescription,
-  ogTitle:            computed(() => title.value),
-  ogDescription:      metaDescription,
-  ogImage:            ogImage,
-  ogImageWidth:       computed(() => ogImageHeight.value ? 1200 : undefined),
-  ogImageHeight:      ogImageHeight,
-  ogImageAlt:         ogImageAlt,
-  ogType:             'article',
-  ogUrl:              pageUrl,
-  twitterCard:        'summary_large_image',
-  twitterImage:       ogImage,
-  twitterDescription: metaDescription,
+const { ogImage, pageUrl } = useArticleSeo({
+  title:       () => title.value,
+  description: () => metaDescription.value,
+  coverUrl:    () => item.value?.coverUrl,
+  coverWidth:  () => item.value?.coverWidth,
+  coverHeight: () => item.value?.coverHeight,
+  coverAlt:    () => item.value?.coverAlt,
 })
 
 useHead({
@@ -83,25 +63,8 @@ useHead({
 })
 
 /* ── Analytics: case-study funnel ── */
-const track   = useTrack()
-const depthEl = ref<HTMLElement | null>(null)  // body reached
-const endEl   = ref<HTMLElement | null>(null)  // case study finished
-let caseIo: IntersectionObserver | null = null
-
-onMounted(() => {
-  track(EV.workOpen, { slug })
-  caseIo = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue
-      if (e.target === depthEl.value)     track(EV.workDepth, { slug })
-      else if (e.target === endEl.value)  track(EV.workCompleted, { slug })
-      caseIo?.unobserve(e.target)
-    }
-  }, { threshold: 1 })
-  if (depthEl.value) caseIo.observe(depthEl.value)
-  if (endEl.value)   caseIo.observe(endEl.value)
-})
-onUnmounted(() => caseIo?.disconnect())
+const track = useTrack()
+const { depthEl, endEl } = useCaseStudyFunnel(slug)
 </script>
 
 <template>

@@ -14,6 +14,8 @@ const DEFAULTS: SiteSettings = {
   heroPortraitUrl: null,
 }
 
+/** GET /api/settings — site-wide settings singleton (social handles, CV +
+ *  portrait asset URLs). Falls back to DEFAULTS when unset or CMS unconfigured. */
 export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
   if (!sanityProjectId) return DEFAULTS
