@@ -10,8 +10,9 @@ const { data: posts } = await useFetch('/api/posts', { default: () => [] as Post
 const featured  = computed(() => posts.value[0] ?? null)
 const secondary = computed(() => (posts.value ?? []).slice(1))
 
-// No cover → the branded generated OG image doubles as the cover.
-const ogCover = (slug: string) => `/og/writing/${encodeURIComponent(slug)}?l=${locale.value}`
+// No cover → the branded generated OG image doubles as the cover (?cover variant:
+// logo + tags, no title/date — those already sit next to it as text).
+const ogCover = (slug: string) => `/og/writing/${encodeURIComponent(slug)}?l=${locale.value}&cover=1`
 
 const formatDate = useFormatDate()
 

@@ -28,7 +28,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 ## Considering
 
 - [x] RSS-точка в колофон куртины — строка «Feed/Фид» → ссылка RSS с тултипом, ведёт на локале-версию фида (/rss.xml EN, /ru/rss.xml RU), ember-hover как у прочих ссылок
-- [x] `perf` динамические OG images — satori+resvg Nitro-роут /og/[type]/[slug] генерит брендированную 1200×630 (editorial: wordmark+рубрика, заголовок, ember-полоса+mono-мета), билингва через ?l. Интегрировано в useArticleSeo: есть обложка → обложка (Sanity-трансформ), нет → генерация. Шрифты — static Onest latin+cyrillic + JBMono как base64 в server/utils/ogFonts.ts (satori не парсит variable, storage ненадёжен между Nitro-пресетами). Посты + работы
+- [x] `perf` динамические OG images — satori+resvg Nitro-роут /og/[type]/[slug] генерит брендированную 1200×630, билингва через ?l. Два варианта: дефолт (link-preview: логотип+рубрика, заголовок, ember-полоса+дата) для og:image, и ?cover (видимая обложка блога: логотип по центру + рубрика + теги поста, БЕЗ заголовка/даты — они уже стоят текстом рядом; фоллбэк — крупный логотип). Логотип вместо текстового wordmark (server/utils/ogLogo.ts, transparent PNG base64). Фон посветлее + цветные источники (teal/ember/indigo radial). Интегрировано в useArticleSeo (обложка → Sanity-трансформ, нет → генерация) + WritingSection/writing[slug] используют ?cover. Шрифты — static Onest lat+cyr + JBMono base64 в server/utils/ogFonts.ts (satori не парсит variable, storage ненадёжен между пресетами). Посты + работы
 - [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)
 - [ ] `feat` донаты — оценить целесообразность
 - [ ] `dx` Lighthouse CI

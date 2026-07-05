@@ -2,10 +2,15 @@ import satori from 'satori'
 import { Resvg } from '@resvg/resvg-js'
 import { createSanityClient } from '../../../utils/sanity'
 import { onestLat400, onestCyr400, onestLat700, onestCyr700, jbMono } from '../../../utils/ogFonts'
+import { logoPng } from '../../../utils/ogLogo'
 
-/** Satori/resvg dynamic OG image for post & work detail pages — the branded
- *  fallback used when a document has no cover (see useArticleSeo). 1200×630,
- *  editorial layout, bilingual via ?l=ru|en. Cached 1h. */
+/** Satori/resvg dynamic OG image for post & work detail pages. 1200×630,
+ *  bilingual via ?l=ru|en. Two variants:
+ *   • default — link-preview card (logo + rubric, title, ember tick + date/meta),
+ *     used as og:image when a document has no cover (see useArticleSeo).
+ *   • ?cover  — visible blog cover (logo + rubric + post tags, no title/date, since
+ *     those already sit next to it as text). Falls back to a big centred logo.
+ *  Cached 1h. */
 
 // satori font list — Latin + Cyrillic Onest subsets under one name so its
 // font-fallback picks the right glyph per character (EN + RU).
@@ -25,39 +30,82 @@ const h = (type: string, props: any, ...kids: any[]): any => ({
 })
 
 const C = {
-  void: '#0A0C10', deep: '#0E1218', ink: '#E8EAEE',
-  faint: '#5B6573', ember: '#D69A6A', line: 'rgba(255,255,255,0.10)',
+  base: '#10151C', ink: '#E8EAEE', soft: '#C4CCD6',
+  faint: '#5B6573', ember: '#D69A6A', line: 'rgba(255,255,255,0.14)',
 }
 
-function template({ title, eyebrow, meta }: { title: string; eyebrow: string; meta: string }) {
-  return h('div', {
+// Lighter-than-black stage lit by a few coloured sources (teal, indigo, warm
+// ember), plus a soft bottom vignette to keep text legible — same palette as the
+// site, just turned up a notch.
+const BACKGROUND = [
+  `radial-gradient(75% 85% at 6% -5%, rgba(46,116,128,0.34), transparent 60%)`,
+  `radial-gradient(65% 75% at 104% 108%, rgba(96,78,158,0.30), transparent 55%)`,
+  `radial-gradient(48% 60% at 88% 6%, rgba(214,154,106,0.16), transparent 62%)`,
+  `radial-gradient(120% 110% at 50% 128%, #0A0E14 0%, transparent 55%)`,
+].join(', ')
+
+// wordmark logo (transparent PNG). aspect ≈ 1056:423 (2.4965:1)
+const LOGO_AR = 1056 / 423
+const logoSrc = `data:image/png;base64,${logoPng}`
+const logo = (w: number) => {
+  const height = Math.round(w / LOGO_AR)
+  return h('img', { src: logoSrc, width: w, height, style: { display: 'flex', width: `${w}px`, height: `${height}px` } })
+}
+
+const stage = (children: any[]) =>
+  h('div', {
     style: {
       display: 'flex', flexDirection: 'column', width: '1200px', height: '630px',
       padding: '80px', justifyContent: 'space-between',
-      backgroundColor: C.void,
-      backgroundImage: `radial-gradient(120% 90% at 50% -20%, ${C.deep} 0%, ${C.void} 60%), radial-gradient(50% 60% at 12% 8%, rgba(21,65,79,0.35), transparent 70%)`,
+      backgroundColor: C.base, backgroundImage: BACKGROUND,
     },
-  },
-    // top row — wordmark + rubric
+  }, children)
+
+const rubric = (eyebrow: string) =>
+  h('div', { style: { display: 'flex', fontFamily: 'JetBrains Mono', fontSize: '22px', color: C.faint, letterSpacing: '4px' } }, eyebrow)
+
+/** Link-preview variant — logo + rubric, title, ember tick + date/meta. */
+function templateOg({ title, eyebrow, meta }: { title: string; eyebrow: string; meta: string }) {
+  return stage([
     h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' } },
-      h('div', { style: { display: 'flex', fontFamily: 'Onest', fontWeight: 700, fontSize: '30px', color: C.ink, letterSpacing: '-0.5px' } }, 'lyoraeth'),
-      h('div', { style: { display: 'flex', fontFamily: 'JetBrains Mono', fontSize: '22px', color: C.faint, letterSpacing: '4px' } }, eyebrow),
+      logo(150), rubric(eyebrow),
     ),
-    // title — clamped to 3 lines
     h('div', {
       style: {
         display: 'flex', fontFamily: 'Onest', fontWeight: 700, fontSize: '66px',
         color: C.ink, lineHeight: 1.12, letterSpacing: '-1.5px', maxWidth: '1000px',
-        // @ts-expect-error satori-specific
         lineClamp: 3,
       },
     }, title),
-    // bottom — ember tick + mono meta
     h('div', { style: { display: 'flex', alignItems: 'center', gap: '18px' } },
       h('div', { style: { display: 'flex', width: '34px', height: '4px', backgroundColor: C.ember } }),
       h('div', { style: { display: 'flex', fontFamily: 'JetBrains Mono', fontSize: '24px', color: C.faint } }, meta),
     ),
-  )
+  ])
+}
+
+/** Cover variant — rubric, centred logo, post tags. No title/date (they sit next
+ *  to the cover as text). With no tags it's just the big logo, still on-brand. */
+function templateCover({ eyebrow, tags }: { eyebrow: string; tags: string[] }) {
+  return stage([
+    rubric(eyebrow),
+    h('div', { style: { display: 'flex', flex: '1', alignItems: 'center', justifyContent: 'center' } },
+      logo(360),
+    ),
+    tags.length
+      ? h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '16px' } },
+          tags.slice(0, 6).map(tag =>
+            h('div', {
+              style: {
+                display: 'flex', fontFamily: 'JetBrains Mono', fontSize: '30px', color: C.soft,
+                padding: '12px 22px', border: `1px solid ${C.line}`, borderRadius: '12px',
+                backgroundColor: 'rgba(255,255,255,0.03)',
+              },
+            }, tag),
+          ),
+        )
+      : h('div', { style: { display: 'flex', width: '34px', height: '4px', backgroundColor: C.ember } }),
+  ])
 }
 
 export default defineCachedEventHandler(async (event) => {
@@ -65,6 +113,7 @@ export default defineCachedEventHandler(async (event) => {
   const slugRaw = getRouterParam(event, 'slug') || ''
   const slug    = decodeURIComponent(slugRaw).replace(/\.png$/, '')
   const locale  = getQuery(event).l === 'ru' ? 'ru' : 'en'
+  const cover   = getQuery(event).cover != null
 
   if (type !== 'writing' && type !== 'work') throw createError({ statusCode: 404 })
 
@@ -74,25 +123,28 @@ export default defineCachedEventHandler(async (event) => {
 
   let eyebrow: string
   let meta: string
+  let tags: string[] = []
   let titleObj: { en: string; ru?: string } | undefined
 
   if (type === 'writing') {
-    const doc = await client.fetch<{ title: { en: string; ru?: string }; publishedAt: string; readingTime: number } | null>(
-      `*[_type == "post" && slug.current == $s][0]{ title, publishedAt, readingTime }`, { s: slug },
+    const doc = await client.fetch<{ title: { en: string; ru?: string }; publishedAt: string; readingTime: number; tags?: string[] } | null>(
+      `*[_type == "post" && slug.current == $s][0]{ title, publishedAt, readingTime, tags }`, { s: slug },
     )
     if (!doc) throw createError({ statusCode: 404 })
     titleObj = doc.title
+    tags     = doc.tags ?? []
     eyebrow  = locale === 'ru' ? 'БЛОГ' : 'BLOG'
     const date = new Date(doc.publishedAt).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-GB', {
       day: 'numeric', month: 'short', year: 'numeric',
     }).replace(/\s*г\.$/, '') // ru locale appends " г." — drop it
     meta = `${date} · ${doc.readingTime} ${locale === 'ru' ? 'мин' : 'min'}`
   } else {
-    const doc = await client.fetch<{ title: { en: string; ru?: string }; kicker?: { en: string; ru?: string }; year?: number } | null>(
-      `*[_type == "work" && coalesce(slug.current, _id) == $s][0]{ title, kicker, year }`, { s: slug },
+    const doc = await client.fetch<{ title: { en: string; ru?: string }; kicker?: { en: string; ru?: string }; year?: number; tags?: string[] } | null>(
+      `*[_type == "work" && coalesce(slug.current, _id) == $s][0]{ title, kicker, year, tags }`, { s: slug },
     )
     if (!doc) throw createError({ statusCode: 404 })
     titleObj = doc.title
+    tags     = doc.tags ?? []
     eyebrow  = locale === 'ru' ? 'РАБОТА' : 'WORK'
     const kick = locale === 'ru' ? (doc.kicker?.ru ?? doc.kicker?.en) : doc.kicker?.en
     meta = [kick, doc.year].filter(Boolean).join(' · ')
@@ -100,7 +152,8 @@ export default defineCachedEventHandler(async (event) => {
 
   const title = (locale === 'ru' && titleObj?.ru ? titleObj.ru : titleObj?.en) ?? ''
 
-  const svg = await satori(template({ title, eyebrow, meta }), { width: 1200, height: 630, fonts: FONTS })
+  const vnode = cover ? templateCover({ eyebrow, tags }) : templateOg({ title, eyebrow, meta })
+  const svg = await satori(vnode, { width: 1200, height: 630, fonts: FONTS })
   const png = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } }).render().asPng()
 
   setHeader(event, 'content-type', 'image/png')
@@ -109,6 +162,7 @@ export default defineCachedEventHandler(async (event) => {
   maxAge: 60 * 60,
   getKey: (event) => {
     const l = getQuery(event).l === 'ru' ? 'ru' : 'en'
-    return `og-${getRouterParam(event, 'type')}-${getRouterParam(event, 'slug')}-${l}`
+    const c = getQuery(event).cover != null ? 'c' : 'o'
+    return `og-${getRouterParam(event, 'type')}-${getRouterParam(event, 'slug')}-${l}-${c}`
   },
 })

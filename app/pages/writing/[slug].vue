@@ -265,7 +265,7 @@ onMounted(() => {
       />
       <img
         v-else
-        :src="`/og/writing/${encodeURIComponent(slug)}?l=${locale}`"
+        :src="`/og/writing/${encodeURIComponent(slug)}?l=${locale}&cover=1`"
         :alt="title"
         width="1200"
         height="630"
