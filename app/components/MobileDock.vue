@@ -6,6 +6,11 @@ const route = useRoute()
 
 const switchLocalePath = (code: string) => switchLocalePathRaw(code as 'en' | 'ru').split('#')[0] || '/'
 
+const track = useTrack()
+function onLangSwitch(to: string) {
+  if (to !== locale.value) track(EV.langSwitch, { from: locale.value, to })
+}
+
 const isHome = computed(() => {
   const home = localePath('/')
   return route.path === home || route.path === home.replace(/\/$/, '')
@@ -32,12 +37,14 @@ function navTo(hash: string) {
         class="dock-lang-btn"
         :class="{ 'dock-lang-btn--on': locale === 'en' }"
         :aria-current="locale === 'en' ? 'true' : undefined"
+        @click="onLangSwitch('en')"
       >EN</NuxtLink>
       <NuxtLink
         :to="switchLocalePath('ru')"
         class="dock-lang-btn"
         :class="{ 'dock-lang-btn--on': locale === 'ru' }"
         :aria-current="locale === 'ru' ? 'true' : undefined"
+        @click="onLangSwitch('ru')"
       >RU</NuxtLink>
     </div>
   </nav>

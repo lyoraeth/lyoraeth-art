@@ -24,6 +24,11 @@ const { data: navPosts } = useFetch<PostItem[]>('/api/posts', {
 
 const switchLocalePath = (code: string) => switchLocalePathRaw(code as 'en' | 'ru').split('#')[0] || '/'
 
+const track = useTrack()
+function onLangSwitch(to: string) {
+  if (to !== locale.value) track(EV.langSwitch, { from: locale.value, to })
+}
+
 const { data: statusData } = useFetch('/api/status', { default: () => ({ availability: 'available' }) })
 const availability = computed(() => statusData.value?.availability ?? 'available')
 
@@ -133,12 +138,14 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
             class="lang-btn"
             :class="{ 'lang-btn--on': locale === 'en' }"
             :aria-current="locale === 'en' ? 'true' : undefined"
+            @click="onLangSwitch('en')"
           >EN</NuxtLink>
           <NuxtLink
             :to="switchLocalePath('ru')"
             class="lang-btn"
             :class="{ 'lang-btn--on': locale === 'ru' }"
             :aria-current="locale === 'ru' ? 'true' : undefined"
+            @click="onLangSwitch('ru')"
           >RU</NuxtLink>
         </div>
 

@@ -15,6 +15,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [x] `content` локали, быстрый проход — слоган к «результату», RU унифицирован на «вы», approach без оправдательных усилителей (полный проход — после мержа)
 - [x] `docs` README, быстрый проход — концепт/дизайн-секция переписаны под editorial minimalism, поправлены typography/tokens рассинхроны (СКРИНШОТЫ В readme/ УСТАРЕЛИ — переснять после мержа; полный проход — после мержа)
 - [ ] унифицировать высоту хэдера на телефоне. Эталон - страница поста - ~72px. Странно выглядит что на главной он меньше
+- [ ] раздел "как я работаю" на главной возможно отрисовывается в старом стиле и потом перерисовывается - по крайней мере прыжок дизайна есть и не понятно откуда он взялся
 
 ## Todo
 
@@ -29,8 +30,8 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [ ] `content` локали, полный проход — снять пафос, выровнять тон
 - [ ] `docs` обновить README и политики под актуалочку
 - [ ] `docs` убрать претенциозные метафоры из README и код-комментов («editorial minimalism — the browser is a newspaper, not a window manager» и т.п.) — дизайн не уникален и не делает такого заявления; протаскивать «между строк» посыл про природу сайтов как лейтмотив = натужно. Описывать что сделано, а не манифестировать
-- [ ] `analytics` кастомные события Umami — lang-switch, section-view, scroll-depth, cta-click, copy-email, work-open/depth/completed/link, post-read/completed, reference-click, comment-start, contact-start, outbound-click
-- [ ] `analytics` алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env
+- [x] `analytics` **ЧАСТЬ 1** кастомные события Umami — useTrack composable + EV константы (контракт с частью 2) + analytics.client плагин (scroll-depth 25/50/75/100 + outbound-click делегированием). Точечно: lang-switch (nav/dock), section-view (секции главной), cta-click/contact-start (contact), work-open/depth/completed/link (work/[slug]), post-read/completed/reference-click (writing/[slug]), comment-start (Comments). copy-email — N/A (email на сайте не выставлен для копирования)
+- [ ] `analytics` **ЧАСТЬ 2 (отдельно, после накопления трафика)** алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env; читает события post-read/post-completed (из части 1) через Umami API, votes/comments из Sanity; заменяет ручной popularity в сортировке «Популярное». ПРЕДУСЛОВИЕ: создать read-only API key в Umami; данные оживут только через недели трафика
 - [x] `a11y` alt-атрибуты обложек из Sanity — пайплайн был уже прошит (схема+GROQ+рендеры с фоллбэком на title); добавлены warning-валидации в Studio; ЗАПОЛНИТЬ сами alt-тексты в CMS
 
 ## Considering

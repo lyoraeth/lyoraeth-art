@@ -67,6 +67,15 @@ useGlowCard(cardEl)
 /* ── Scroll reveal ── */
 const { observe } = useReveal()
 onMounted(() => observe(cardEl.value))
+
+/* ── Analytics ── */
+const track = useTrack()
+let contactStarted = false
+function onContactStart() {
+  if (contactStarted) return
+  contactStarted = true
+  track(EV.contactStart)
+}
 </script>
 
 <template>
@@ -87,6 +96,7 @@ onMounted(() => observe(cardEl.value))
           class="contact-cta"
           target="_blank"
           rel="noopener noreferrer"
+          @click="track(EV.ctaClick)"
         >
           {{ t('contact.cta') }} <span class="cta-arrow">→</span>
         </a>
@@ -123,7 +133,7 @@ onMounted(() => observe(cardEl.value))
           <button class="form-again" @click="state = 'idle'">{{ t('contact.send_another') }}</button>
         </div>
 
-        <form v-else class="contact-form" novalidate @submit.prevent="onSubmit">
+        <form v-else class="contact-form" novalidate @submit.prevent="onSubmit" @focusin="onContactStart">
           <span class="eyebrow form-label">{{ t('contact.form_label') }}</span>
           <input
             v-model="contact"

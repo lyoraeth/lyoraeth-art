@@ -5,6 +5,14 @@ const { t } = useI18n()
 const plural = usePlural()
 const props = defineProps<{ slug: string; postTitle: string }>()
 
+const track = useTrack()
+let commentStarted = false
+function onCommentStart() {
+  if (commentStarted) return
+  commentStarted = true
+  track(EV.commentStart, { slug: props.slug })
+}
+
 const { data: comments, refresh } = await useFetch<CommentItem[]>(`/api/comments/${props.slug}`)
 
 const token    = ref('')
@@ -87,7 +95,7 @@ async function submit() {
         <button class="another-btn" @click="state = 'idle'">{{ t('post.comments.another') }}</button>
       </div>
 
-      <form v-else class="comment-form" novalidate @submit.prevent="submit">
+      <form v-else class="comment-form" novalidate @submit.prevent="submit" @focusin="onCommentStart">
         <div class="field">
           <label class="field-label" for="c-nick">{{ t('post.comments.nick') }}</label>
           <input id="c-nick" v-model="nick" class="field-input" type="text"

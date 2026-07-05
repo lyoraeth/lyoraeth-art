@@ -188,13 +188,22 @@ function clampToc() {
   el.style.transform = overshoot > 0 ? `translateY(calc(-50% - ${Math.round(overshoot)}px))` : ''
 }
 
+const track = useTrack()
+let postCompleted = false
+
 onMounted(async () => {
+  track(EV.postRead, { slug })
+
   /* Reading progress */
   active.value = true
   const update = () => {
     const total = document.documentElement.scrollHeight - window.innerHeight
     progress.value = total > 0 ? Math.min(100, (window.scrollY / total) * 100) : 0
     scrolled.value = window.scrollY > 24
+    if (!postCompleted && progress.value >= 95) {
+      postCompleted = true
+      track(EV.postCompleted, { slug })
+    }
     updateActiveId()
     clampToc()
   }
@@ -404,7 +413,7 @@ const bodyHtml = computed(() => {
       <span class="references-label">источники</span>
       <ol class="references-list">
         <li v-for="ref in post.references" :key="ref.href">
-          <a :href="ref.href" target="_blank" rel="noopener noreferrer">{{ ref.title }}</a>
+          <a :href="ref.href" target="_blank" rel="noopener noreferrer" @click="track(EV.referenceClick, { slug, href: ref.href })">{{ ref.title }}</a>
         </li>
       </ol>
     </footer>
