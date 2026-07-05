@@ -14,29 +14,30 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [x] `dx` убрать артефакты редизайна — мёртвые .card-glare дивы, токены --duration-blob/--duration-tilt/--duration-metaball/--ease-stage/--duration-magnet, мёртвый .form-privacy; glass-caustic оставлен (док + Approach); тесты useGlowCard переписаны под новый API
 - [x] `content` локали, быстрый проход — слоган к «результату», RU унифицирован на «вы», approach без оправдательных усилителей (полный проход — после мержа)
 - [x] `docs` README, быстрый проход — концепт/дизайн-секция переписаны под editorial minimalism, поправлены typography/tokens рассинхроны (СКРИНШОТЫ В readme/ УСТАРЕЛИ — переснять после мержа; полный проход — после мержа)
+- [ ] унифицировать высоту хэдера на телефоне. Эталон - страница поста - ~72px. Странно выглядит что на главной он меньше
 
 ## Todo
 
-- [ ] `fix` !! lenis — на тачпадах и телефонах отключить полностью
-- [ ] `fix` !! прокрутка на телефонах не работает (репорт: Xiaomi 15T — скролл только двумя пальцами со случайным зумом) — вероятно следствие lenis, проверить связку
-- [ ] `fix` !! всплывашка скрытого футера на телефонах — отключить, футер должен быть виден сразу при прокрутке
-- [ ] `fix` TOC в статьях — прекращать sticky-скролл на уровне конца статьи (там же, где низ блока комментария)
-- [ ] `seo` статьи блога и все индексируемые страницы — превью ссылок без картинки и описания, GSC не парсит; явная локализация (hreflang) для гугла
-- [ ] `fix` webp/png фоллбэки SanityPicture — разобраться, почему картинки иногда падают в raw
-- [ ] `fix` переадресация сбрасывает язык на англ — кейсы перехода на пост/блог/работу/портфолио
+- [x] `fix` !! lenis — на touch не инициализируется вовсе (pointer: coarse), тачпады детектятся по wheel-сигнатуре (дробные/мелкие дельты) → destroy
+- [x] `fix` !! прокрутка на телефонах — lenis на touch убран целиком; ПРОВЕРИТЬ НА XIAOMI 15T после деплоя
+- [x] `fix` !! футер-куртина на touch — обычный статичный футер в потоке (без reveal/hold), на десктопе поведение прежнее
+- [x] `fix` TOC в статьях — остаётся fixed (sticky мёртв при overflow-x:hidden на html/body — НЕ ПЕРЕДЕЛЫВАТЬ НА STICKY), стоп у низа комментариев через clamp в scroll-хендлере
+- [x] `seo` статьи блога и все индексируемые страницы — description-экскерпт из markdown, трансформированный og:image (w1200/jpg) + dims/alt, hreflang/canonical/og:locale глобально через useLocaleHead, sitemap с xhtml-альтернативами + lastmod, обогащённый JSON-LD (BlogPosting/BreadcrumbList/CreativeWork/Blog/CollectionPage), RSS EN+RU, prev/next в статьях, noindex на error, fetchpriority на LCP. Смоук против собранного сервера пройден. РУЧНОЕ ПОСЛЕ ДЕПЛОЯ: GSC + Яндекс.Вебмастер + Bing — скормить sitemap, request indexing
+- [x] `fix` webp/png фоллбэки SanityPicture — причина: любая транзиентная ошибка CDN роняла в нетрансформированный оригинал навсегда; теперь ступенчатая деградация webp → jpg-трансформ (та же w/q) → raw
+- [x] `fix` переадресация сбрасывает язык на англ — виновники: featured/mini-карточки блога на главной (сырые navigateTo без localePath) и redirect error-страницы на '/'
 - [ ] `dx` причесать кодовую базу — артефакты, баги, утечки, небезопасные/ненадёжные места, строго оформить под TSDoc/SOLID
 - [ ] `content` локали, полный проход — снять пафос, выровнять тон
 - [ ] `docs` обновить README и политики под актуалочку
 - [ ] `analytics` кастомные события Umami — lang-switch, section-view, scroll-depth, cta-click, copy-email, work-open/depth/completed/link, post-read/completed, reference-click, comment-start, contact-start, outbound-click
 - [ ] `analytics` алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env
-- [ ] `a11y` alt-атрибуты обложек из Sanity
+- [x] `a11y` alt-атрибуты обложек из Sanity — пайплайн был уже прошит (схема+GROQ+рендеры с фоллбэком на title); добавлены warning-валидации в Studio; ЗАПОЛНИТЬ сами alt-тексты в CMS
 
 ## Considering
 
 - [ ] `perf` динамические OG images — Satori/nuxt-og-image, брендированный шаблон per-post/per-case
 - [ ] `feat` beta-banner — флаг inDevelopment в siteSettings (Sanity) + первый визит, появляется через 15-30с, автоскрытие, крестик, localStorage чтобы не показывать снова
-- [ ] `feat` RSS feed — /rss.xml через Nitro route
-- [ ] `feat` навигация пред/след пост — в конце writing/[slug]
+- [x] `feat` RSS feed — /rss.xml (EN) + /ru/rss.xml через Nitro routes, сделано в рамках SEO-эпика
+- [x] `feat` навигация пред/след пост — в шапке writing/[slug] рядом с back-link (не в конце), сделано в рамках SEO-эпика
 - [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)
 - [ ] `feat` донаты — оценить целесообразность
 - [ ] `dx` Lighthouse CI

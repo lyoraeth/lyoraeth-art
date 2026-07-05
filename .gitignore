@@ -5,6 +5,8 @@
 .nitro
 .cache
 dist
+# @nuxt/test-utils self-registers here on every `pnpm test`
+.nuxtrc
 
 # Node dependencies
 node_modules
