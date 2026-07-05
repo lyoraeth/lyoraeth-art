@@ -6,40 +6,27 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 
 ---
 
-## Done — редизайн (exp/redesign-v2)
-
-- [x] `feat` отсебяшка в хиро из Sanity — image-поле в siteSettings, SanityPicture вместо статики из /public, alt из hero.name; текущий файл остаётся фоллбэком (студии нужен редеплой для нового поля)
-- [x] `design` пересмотреть плейсхолдеры — FPO-система (print-разметка: кроп-марки, обрез, диагонали) вместо косплея ОС; исходники в lyoaeth-brand/placeholders, продовые в public/placeholders; viewport-bar и loading-машинерия убраны
-- [x] `design` ApproachSection — стекло оставить, но подзагасить (интенсивность каустики/блюра вниз)
-- [x] `dx` убрать артефакты редизайна — мёртвые .card-glare дивы, токены --duration-blob/--duration-tilt/--duration-metaball/--ease-stage/--duration-magnet, мёртвый .form-privacy; glass-caustic оставлен (док + Approach); тесты useGlowCard переписаны под новый API
-- [x] `content` локали, быстрый проход — слоган к «результату», RU унифицирован на «вы», approach без оправдательных усилителей (полный проход — после мержа)
-- [x] `docs` README, быстрый проход — концепт/дизайн-секция переписаны под editorial minimalism, поправлены typography/tokens рассинхроны (СКРИНШОТЫ В readme/ УСТАРЕЛИ — переснять после мержа; полный проход — после мержа)
-- [ ] унифицировать высоту хэдера на телефоне. Эталон - страница поста - ~72px. Странно выглядит что на главной он меньше
-- [ ] раздел "как я работаю" на главной возможно отрисовывается в старом стиле и потом перерисовывается - по крайней мере прыжок дизайна есть и не понятно откуда он взялся
-
 ## Todo
 
-- [x] `fix` !! lenis — на touch не инициализируется вовсе (pointer: coarse), тачпады детектятся по wheel-сигнатуре (дробные/мелкие дельты) → destroy
-- [x] `fix` !! прокрутка на телефонах — lenis на touch убран целиком; ПРОВЕРИТЬ НА XIAOMI 15T после деплоя
-- [x] `fix` !! футер-куртина на touch — обычный статичный футер в потоке (без reveal/hold), на десктопе поведение прежнее
-- [x] `fix` TOC в статьях — остаётся fixed (sticky мёртв при overflow-x:hidden на html/body — НЕ ПЕРЕДЕЛЫВАТЬ НА STICKY), стоп у низа комментариев через clamp в scroll-хендлере
-- [x] `seo` статьи блога и все индексируемые страницы — description-экскерпт из markdown, трансформированный og:image (w1200/jpg) + dims/alt, hreflang/canonical/og:locale глобально через useLocaleHead, sitemap с xhtml-альтернативами + lastmod, обогащённый JSON-LD (BlogPosting/BreadcrumbList/CreativeWork/Blog/CollectionPage), RSS EN+RU, prev/next в статьях, noindex на error, fetchpriority на LCP. Смоук против собранного сервера пройден. РУЧНОЕ ПОСЛЕ ДЕПЛОЯ: GSC + Яндекс.Вебмастер + Bing — скормить sitemap, request indexing
-- [x] `fix` webp/png фоллбэки SanityPicture — причина: любая транзиентная ошибка CDN роняла в нетрансформированный оригинал навсегда; теперь ступенчатая деградация webp → jpg-трансформ (та же w/q) → raw
-- [x] `fix` переадресация сбрасывает язык на англ — виновники: featured/mini-карточки блога на главной (сырые navigateTo без localePath) и redirect error-страницы на '/'
+**Хвосты редизайна (UI-баги):**
+- [ ] `fix` унифицировать высоту хэдера на телефоне. Эталон — страница поста ~72px. Странно что на главной он меньше
+- [ ] `fix` раздел «как я работаю» на главной, возможно, отрисовывается в старом стиле и перерисовывается — есть прыжок дизайна, непонятно откуда
+
+**Этап 6 — финальная уборка:**
 - [ ] `dx` причесать кодовую базу — артефакты, баги, утечки, небезопасные/ненадёжные места, строго оформить под TSDoc/SOLID
 - [ ] `content` локали, полный проход — снять пафос, выровнять тон
 - [ ] `docs` обновить README и политики под актуалочку
 - [ ] `docs` убрать претенциозные метафоры из README и код-комментов («editorial minimalism — the browser is a newspaper, not a window manager» и т.п.) — дизайн не уникален и не делает такого заявления; протаскивать «между строк» посыл про природу сайтов как лейтмотив = натужно. Описывать что сделано, а не манифестировать
-- [x] `analytics` **ЧАСТЬ 1** кастомные события Umami — useTrack composable + EV константы (контракт с частью 2) + analytics.client плагин (scroll-depth 25/50/75/100 + outbound-click делегированием). Точечно: lang-switch (nav/dock), section-view (секции главной), cta-click/contact-start (contact), work-open/depth/completed/link (work/[slug]), post-read/completed/reference-click (writing/[slug]), comment-start (Comments). copy-email — N/A (email на сайте не выставлен для копирования)
-- [ ] `analytics` **ЧАСТЬ 2 (отдельно, после накопления трафика)** алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env; читает события post-read/post-completed (из части 1) через Umami API, votes/comments из Sanity; заменяет ручной popularity в сортировке «Популярное». ПРЕДУСЛОВИЕ: создать read-only API key в Umami; данные оживут только через недели трафика
-- [x] `a11y` alt-атрибуты обложек из Sanity — пайплайн был уже прошит (схема+GROQ+рендеры с фоллбэком на title); добавлены warning-валидации в Studio; ЗАПОЛНИТЬ сами alt-тексты в CMS
+- [ ] `docs` переснять скриншоты в readme/ — устарели после редизайна
+
+**Отложено (нужны внешние условия):**
+- [ ] `analytics` **ЧАСТЬ 2 (после накопления трафика)** алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env; читает post-read/post-completed (из части 1) через Umami API, votes/comments из Sanity; заменяет ручной popularity в сортировке «Популярное». ПРЕДУСЛОВИЕ: создать read-only API key в Umami; данные оживут через недели трафика
+- [ ] `seo` РУЧНОЕ ПОСЛЕ ДЕПЛОЯ — GSC + Яндекс.Вебмастер + Bing: скормить sitemap, request indexing ключевых страниц; заполнить alt-тексты обложек в Sanity CMS
 
 ## Considering
 
 - [ ] `perf` динамические OG images — Satori/nuxt-og-image, брендированный шаблон per-post/per-case
 - [ ] `feat` beta-banner — флаг inDevelopment в siteSettings (Sanity) + первый визит, появляется через 15-30с, автоскрытие, крестик, localStorage чтобы не показывать снова
-- [x] `feat` RSS feed — /rss.xml (EN) + /ru/rss.xml через Nitro routes, сделано в рамках SEO-эпика
-- [x] `feat` навигация пред/след пост — в шапке writing/[slug] рядом с back-link (не в конце), сделано в рамках SEO-эпика
 - [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)
 - [ ] `feat` донаты — оценить целесообразность
 - [ ] `dx` Lighthouse CI
@@ -51,6 +38,25 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [ ] `infra` Advanced observability
 - [ ] `feat` PWA
 ---
+
+## Done — редизайн + hardening (июль 2026)
+
+**Редизайн (exp/redesign-v2, замержено):**
+- [x] `design` уход от glassmorphism — плоские карточки с masked-обводкой и курсор-glow, единая геометрия колец, чётная шкала радиусов; фон-сцена статична (temperature shading вместо анимированных блобов)
+- [x] `feat` хиро — editorial-двухколонка с портретом-figure (passe-partout, подпись), CMS-driven из Sanity siteSettings + статичный фоллбэк
+- [x] `design` плейсхолдеры — FPO-система (кроп-марки, обрез, диагонали) вместо косплея ОС; исходники в lyoaeth-brand/placeholders
+- [x] `design` ApproachSection — стекло подзагашено (не убрано)
+- [x] `dx` убраны артефакты редизайна — мёртвые .card-glare, неиспользуемые токены, .form-privacy; тесты useGlowCard переписаны
+- [x] `content`+`docs` быстрый проход локалей (слоган→«результат», RU на «вы») и README (editorial minimalism)
+- [x] `refactor` WorkCompactCard/PostRow вынесены с рабочим edge-glow; сайдбар блога → frosted-панель
+
+**Hardening (этот заход, ещё НЕ запушено — 6+ локальных коммитов):**
+- [x] `chore` dependabot — studio sanity 3.68→6.3 (убиты 4 high), esbuild low принят как dev-only
+- [x] `fix` скролл-стек — lenis off на touch (pointer:coarse) + детект тачпадов по wheel-сигнатуре; футер-куртина статична на touch; TOC clamp у конца статьи (fixed, НЕ sticky). ПРОВЕРИТЬ XIAOMI 15T после деплоя
+- [x] `seo` мега-эпик — description-экскерпты, трансформ og:image+dims/alt, hreflang/canonical/og:locale (useLocaleHead), sitemap xhtml+lastmod, JSON-LD (BlogPosting/BreadcrumbList/CreativeWork/Blog/CollectionPage), RSS EN+RU, prev/next, noindex error, fetchpriority LCP, локализованные крошки. Смоук против собранного сервера пройден
+- [x] `fix` SanityPicture — ступенчатая деградация webp→jpg-трансформ→raw (вместо падения в raw навсегда); alt-warnings в схемах
+- [x] `fix` i18n-редирект — сырые navigateTo без localePath (карточки блога на главной) + error-redirect на EN
+- [x] `analytics` ЧАСТЬ 1 — useTrack + EV + плагин (scroll-depth/outbound) + точечные события (lang-switch, section-view, cta/contact, work-воронка, post read/completed/reference, comment-start)
 
 ## Done
 
