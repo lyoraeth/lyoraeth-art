@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { Marked } from 'marked'
+import type { PostDetail } from '../../../server/api/post/[slug].get'
 
 const { locale, t } = useI18n()
 const localePath    = useLocalePath()
+const loc   = useLoc()
 const route = useRoute()
 const slug  = route.params.slug as string
 
-const { data: post } = await useFetch<import('~/server/api/post/[slug].get').PostDetail | null>(`/api/post/${slug}`)
+const { data: post } = await useFetch<PostDetail | null>(`/api/post/${slug}`)
 
 if (!post.value) {
   throw createError({ statusCode: 404, statusMessage: 'Post not found' })
@@ -16,16 +18,37 @@ const title = computed(() =>
   post.value ? (locale.value === 'ru' && post.value.title.ru ? post.value.title.ru : post.value.title.en) : ''
 )
 
-const ogImage = computed(() => post.value?.coverUrl ?? 'https://lyoraeth.art/og-image.png')
+const excerpt = computed(() =>
+  post.value ? (locale.value === 'ru' && post.value.excerpt.ru ? post.value.excerpt.ru : post.value.excerpt.en) : ''
+)
+
+/* social crawlers get a bounded jpeg, not the multi-megabyte original;
+   the static fallback ships as-is — transform params would 404 on it */
+const ogImage = computed(() =>
+  post.value?.coverUrl ? sanityFmt(post.value.coverUrl, 'jpg', { w: 1200, q: 80 }) : 'https://lyoraeth.art/og-image.png'
+)
+const ogImageHeight = computed(() =>
+  post.value?.coverUrl && post.value.coverWidth && post.value.coverHeight
+    ? Math.round(1200 * post.value.coverHeight / post.value.coverWidth)
+    : undefined
+)
+const ogImageAlt = computed(() => post.value?.coverAlt ?? title.value)
+const pageUrl    = computed(() => `https://lyoraeth.art${route.path}`)
 
 useSeoMeta({
-  title:            computed(() => `${title.value} — lyoraeth`),
-  ogTitle:          computed(() => title.value),
-  ogDescription:    computed(() => post.value?.title.en ?? ''),
-  ogImage:          ogImage,
-  ogType:           'article',
-  twitterCard:      'summary_large_image',
-  twitterImage:     ogImage,
+  title:              computed(() => `${title.value} — lyoraeth`),
+  description:        excerpt,
+  ogTitle:            computed(() => title.value),
+  ogDescription:      excerpt,
+  ogImage:            ogImage,
+  ogImageWidth:       computed(() => ogImageHeight.value ? 1200 : undefined),
+  ogImageHeight:      ogImageHeight,
+  ogImageAlt:         ogImageAlt,
+  ogType:             'article',
+  ogUrl:              pageUrl,
+  twitterCard:        'summary_large_image',
+  twitterImage:       ogImage,
+  twitterDescription: excerpt,
 })
 
 useHead({
@@ -35,9 +58,16 @@ useHead({
       '@context': 'https://schema.org',
       '@type': 'BlogPosting',
       headline: title.value,
+      description: excerpt.value,
       datePublished: post.value?.publishedAt,
-      ...(ogImage.value !== 'https://lyoraeth.art/og-image.png' && { image: ogImage.value }),
-      url: `https://lyoraeth.art/writing/${slug}`,
+      dateModified: post.value?._updatedAt,
+      inLanguage: locale.value === 'ru' ? 'ru-RU' : 'en-US',
+      ...(post.value?.tags?.length && { keywords: post.value.tags.join(', ') }),
+      ...(post.value?.readingTime && { timeRequired: `PT${post.value.readingTime}M` }),
+      wordCount: post.value?.wordCount,
+      ...(post.value?.coverUrl && { image: ogImage.value }),
+      url: pageUrl.value,
+      mainEntityOfPage: pageUrl.value,
       author: {
         '@type': 'Person',
         name: 'Danil Klimov',
@@ -48,6 +78,17 @@ useHead({
         name: 'Danil Klimov',
         url: 'https://lyoraeth.art',
       },
+    })),
+  }, {
+    type: 'application/ld+json',
+    innerHTML: computed(() => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home',             item: `https://lyoraeth.art${localePath('/')}` },
+        { '@type': 'ListItem', position: 2, name: t('nav.writing'),   item: `https://lyoraeth.art${localePath('/writing')}` },
+        { '@type': 'ListItem', position: 3, name: title.value,        item: pageUrl.value },
+      ],
     })),
   }],
 })
@@ -297,13 +338,36 @@ const bodyHtml = computed(() => {
   </aside>
 
   <article class="post-page">
-    <!-- Back -->
-    <NuxtLink :to="localePath('/writing')" class="back-link">
-      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      {{ t('writing.back') }}
-    </NuxtLink>
+    <!-- Back + prev/next -->
+    <div class="post-topnav">
+      <NuxtLink :to="localePath('/writing')" class="back-link">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ t('writing.back') }}
+      </NuxtLink>
+
+      <div v-if="post.prev || post.next" class="adjacent-nav">
+        <NuxtLink
+          v-if="post.prev"
+          :to="localePath(`/writing/${post.prev.slug}`)"
+          class="back-link adjacent-link"
+          :aria-label="t('writing.prev_post')"
+        >
+          <span aria-hidden="true">←</span>
+          <span class="adjacent-title">{{ loc(post.prev.title) }}</span>
+        </NuxtLink>
+        <NuxtLink
+          v-if="post.next"
+          :to="localePath(`/writing/${post.next.slug}`)"
+          class="back-link adjacent-link"
+          :aria-label="t('writing.next_post')"
+        >
+          <span class="adjacent-title">{{ loc(post.next.title) }}</span>
+          <span aria-hidden="true">→</span>
+        </NuxtLink>
+      </div>
+    </div>
 
     <!-- Header -->
     <header class="post-header">
@@ -324,6 +388,7 @@ const bodyHtml = computed(() => {
         :src="post.coverUrl"
         :alt="post.coverAlt ?? title"
         loading="eager"
+        fetchpriority="high"
         :width="900"
         :height="post.coverWidth && post.coverHeight ? Math.round(900 * post.coverHeight / post.coverWidth) : undefined"
       />
@@ -519,7 +584,16 @@ const bodyHtml = computed(() => {
   background: var(--ember-bg);
 }
 
-/* ── Back ── */
+/* ── Back + prev/next row ── */
+.post-topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -527,11 +601,23 @@ const bodyHtml = computed(() => {
   color: var(--faint);
   text-decoration: none;
   font-size: 0.875rem;
-  margin-bottom: 2.5rem;
   transition: color 0.2s;
 }
 .back-link:hover { color: var(--snow); }
 .back-link svg { width: 1rem; height: 1rem; }
+
+.adjacent-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-width: 0;
+}
+.adjacent-title {
+  max-width: 16ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ── Header ── */
 .post-header { margin-bottom: 2rem; }

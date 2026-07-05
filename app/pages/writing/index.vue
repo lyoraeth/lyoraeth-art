@@ -1,12 +1,30 @@
 <script setup lang="ts">
 import type { PostItem } from '../../../server/api/posts.get'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const plural = usePlural()
 const loc    = useLoc()
 
-useSeoMeta({ title: computed(() => `${t('writing.title')} — lyoraeth`) })
+useSeoMeta({
+  title:         computed(() => `${t('writing.title')} — lyoraeth`),
+  description:   computed(() => t('writing.seo_description')),
+  ogTitle:       computed(() => `${t('writing.title')} — lyoraeth`),
+  ogDescription: computed(() => t('writing.seo_description')),
+})
+
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: computed(() => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Blog',
+      name: `${t('writing.title')} — lyoraeth`,
+      url: `https://lyoraeth.art${locale.value === 'ru' ? '/ru' : ''}/writing`,
+      inLanguage: locale.value,
+    })),
+  }],
+})
 
 const { data: allPosts } = await useFetch('/api/posts', {
   query: { limit: 0 },

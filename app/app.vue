@@ -1,6 +1,11 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
+// lang/dir on <html>, canonical, hreflang alternates (+ x-default),
+// og:url and og:locale (+ alternates) — all derived from the i18n routing
+// config, so they stay correct across locale switches and navigation.
+const i18nHead = useLocaleHead()
+
 useSeoMeta({
   title: () => t('seo.title'),
   description: () => t('seo.description'),
@@ -13,6 +18,14 @@ useSeoMeta({
 })
 
 useHead({
+  htmlAttrs: () => i18nHead.value.htmlAttrs,
+  meta: () => i18nHead.value.meta,
+  link: () => [
+    ...i18nHead.value.link,
+    // RSS discovery — routes are served per-locale (see server/routes)
+    { rel: 'alternate', type: 'application/rss+xml', title: 'lyoraeth — writing', href: '/rss.xml' },
+    { rel: 'alternate', type: 'application/rss+xml', title: 'lyoraeth — writing (RU)', href: '/ru/rss.xml' },
+  ],
   script: [
     {
       type: 'application/ld+json',

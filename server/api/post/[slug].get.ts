@@ -8,6 +8,7 @@ export default defineEventHandler(async (event) => {
   const post = await client.fetch(`
     *[_type == "post" && slug.current == $slug][0] {
       _id,
+      _updatedAt,
       "slug": slug.current,
       title,
       publishedAt,
@@ -18,16 +19,34 @@ export default defineEventHandler(async (event) => {
       "coverWidth":  cover.asset->metadata.dimensions.width,
       "coverHeight": cover.asset->metadata.dimensions.height,
       references,
-      "body": { "en": body, "ru": bodyRu }
+      "body": { "en": body, "ru": bodyRu },
+      "prev": *[_type=="post" && publishedAt < ^.publishedAt] | order(publishedAt desc)[0]{ "slug": slug.current, title },
+      "next": *[_type=="post" && publishedAt > ^.publishedAt] | order(publishedAt asc)[0]{ "slug": slug.current, title }
     }
   `, { slug })
 
   if (!post) throw createError({ statusCode: 404, message: 'Post not found' })
+
+  // derived server-side so the page never ships the markdown pipeline twice
+  post.excerpt = {
+    en: post.body.en ? mdExcerpt(post.body.en) : '',
+    ru: post.body.ru ? mdExcerpt(post.body.ru) : null,
+  }
+  post.wordCount = post.body.en
+    ? mdPlainText(post.body.en).split(/\s+/).filter(Boolean).length
+    : 0
+
   return post as PostDetail
 })
 
+export interface AdjacentPost {
+  slug:  string
+  title: { en: string; ru: string }
+}
+
 export interface PostDetail {
   _id:         string
+  _updatedAt:  string
   slug:        string
   title:       { en: string; ru: string }
   publishedAt: string
@@ -38,5 +57,9 @@ export interface PostDetail {
   coverWidth:  number | null
   coverHeight: number | null
   body:        { en: string | null; ru: string | null }
+  excerpt:     { en: string; ru: string | null }
+  wordCount:   number
   references:  { title: string; href: string }[] | null
+  prev:        AdjacentPost | null
+  next:        AdjacentPost | null
 }

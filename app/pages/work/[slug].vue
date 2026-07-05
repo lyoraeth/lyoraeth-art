@@ -19,16 +19,67 @@ const descParagraphs = computed(() =>
   (loc(item.value?.description) ?? '').split(/\n\n+/).filter(Boolean),
 )
 
-const ogImage = computed(() => item.value?.coverUrl ?? 'https://lyoraeth.art/og-image.png')
+const metaDescription = computed(() =>
+  loc(item.value?.shortDescription) || loc(item.value?.description)
+)
+
+/* social crawlers get a bounded jpeg, not the multi-megabyte original;
+   the static fallback ships as-is — transform params would 404 on it */
+const ogImage = computed(() =>
+  item.value?.coverUrl ? sanityFmt(item.value.coverUrl, 'jpg', { w: 1200, q: 80 }) : 'https://lyoraeth.art/og-image.png'
+)
+const ogImageHeight = computed(() =>
+  item.value?.coverUrl && item.value.coverWidth && item.value.coverHeight
+    ? Math.round(1200 * item.value.coverHeight / item.value.coverWidth)
+    : undefined
+)
+const ogImageAlt = computed(() => item.value?.coverAlt ?? title.value)
+const pageUrl    = computed(() => `https://lyoraeth.art${route.path}`)
 
 useSeoMeta({
-  title:         computed(() => `${title.value} — lyoraeth`),
-  ogTitle:       computed(() => title.value),
-  ogDescription: computed(() => loc(item.value?.description)),
-  ogImage:       ogImage,
-  ogType:        'article',
-  twitterCard:   'summary_large_image',
-  twitterImage:  ogImage,
+  title:              computed(() => `${title.value} — lyoraeth`),
+  description:        metaDescription,
+  ogTitle:            computed(() => title.value),
+  ogDescription:      metaDescription,
+  ogImage:            ogImage,
+  ogImageWidth:       computed(() => ogImageHeight.value ? 1200 : undefined),
+  ogImageHeight:      ogImageHeight,
+  ogImageAlt:         ogImageAlt,
+  ogType:             'article',
+  ogUrl:              pageUrl,
+  twitterCard:        'summary_large_image',
+  twitterImage:       ogImage,
+  twitterDescription: metaDescription,
+})
+
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: computed(() => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: title.value,
+      description: metaDescription.value,
+      url: pageUrl.value,
+      ...(item.value?.coverUrl && { image: ogImage.value }),
+      author: {
+        '@type': 'Person',
+        name: 'Danil Klimov',
+        url: 'https://lyoraeth.art',
+      },
+    })),
+  }, {
+    type: 'application/ld+json',
+    innerHTML: computed(() => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home',          item: `https://lyoraeth.art${localePath('/')}` },
+        { '@type': 'ListItem', position: 2, name: t('nav.work'),   item: `https://lyoraeth.art${localePath('/work')}` },
+        { '@type': 'ListItem', position: 3, name: title.value,     item: pageUrl.value },
+      ],
+    })),
+  }],
 })
 </script>
 
@@ -60,6 +111,7 @@ useSeoMeta({
         :src="item.coverUrl"
         :alt="item.coverAlt ?? title"
         loading="eager"
+        fetchpriority="high"
         :width="1100"
         :height="item.coverWidth && item.coverHeight ? Math.round(1100 * item.coverHeight / item.coverWidth) : undefined"
       />

@@ -1,11 +1,28 @@
 <script setup lang="ts">
 import type { WorkItem } from '../../../server/api/work.get'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const plural = usePlural()
 
-useSeoMeta({ title: computed(() => `${t('work.title')} — lyoraeth`) })
+useSeoMeta({
+  title:         computed(() => `${t('work.title')} — lyoraeth`),
+  description:   computed(() => t('work.seo_description')),
+  ogTitle:       computed(() => `${t('work.title')} — lyoraeth`),
+  ogDescription: computed(() => t('work.seo_description')),
+})
+
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: computed(() => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: `${t('work.title')} — lyoraeth`,
+      url: `https://lyoraeth.art${locale.value === 'ru' ? '/ru' : ''}/work`,
+    })),
+  }],
+})
 
 const { data: allWork } = await useFetch('/api/work', {
   query: { limit: 0 },

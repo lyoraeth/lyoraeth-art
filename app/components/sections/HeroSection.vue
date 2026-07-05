@@ -46,10 +46,11 @@ const meta = computed(() =>
           :alt="t('hero.name')"
           class="hero-portrait-img"
           loading="eager"
+          fetchpriority="high"
           :width="800"
         >
           <template #placeholder>
-            <img src="/hero-portrait.png" class="hero-portrait-img" :alt="t('hero.name')" @error="(e) => (e.target as HTMLElement).style.display = 'none'" />
+            <img src="/hero-portrait.png" class="hero-portrait-img" fetchpriority="high" :alt="t('hero.name')" @error="(e) => (e.target as HTMLElement).style.display = 'none'" />
           </template>
         </SanityPicture>
       </div>

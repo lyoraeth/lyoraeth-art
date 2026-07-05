@@ -3,46 +3,59 @@ import type { WorkItem } from '../api/work.get'
 
 const BASE = 'https://lyoraeth.art'
 
-function url(loc: string, priority: string, changefreq: string) {
-  return `  <url><loc>${loc}</loc><priority>${priority}</priority><changefreq>${changefreq}</changefreq></url>`
+type Stamped = { _updatedAt?: string; publishedAt?: string }
+
+/* Sanity timestamps are full ISO — sitemap only needs the date part. */
+const stamp = (d?: string) => d?.slice(0, 10)
+
+function url(loc: string, priority: string, changefreq: string, alt: { en: string; ru: string }, lastmod?: string) {
+  const links =
+    `<xhtml:link rel="alternate" hreflang="en" href="${alt.en}"/>` +
+    `<xhtml:link rel="alternate" hreflang="ru" href="${alt.ru}"/>` +
+    `<xhtml:link rel="alternate" hreflang="x-default" href="${alt.en}"/>`
+  return `  <url><loc>${loc}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}<priority>${priority}</priority><changefreq>${changefreq}</changefreq>${links}</url>`
+}
+
+/* One path → EN + RU entries, each carrying the same set of alternate links. */
+function pair(path: string, priority: string, changefreq: string, lastmod?: string) {
+  const alt = { en: `${BASE}${path}`, ru: `${BASE}/ru${path}` }
+  return [
+    url(alt.en, priority, changefreq, alt, lastmod),
+    url(alt.ru, priority, changefreq, alt, lastmod),
+  ]
 }
 
 export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
 
-  let posts: PostItem[] = []
-  let work:  WorkItem[] = []
+  let posts: (Pick<PostItem, 'slug'> & Stamped)[] = []
+  let work:  (Pick<WorkItem, 'slug'> & Stamped)[] = []
 
   if (sanityProjectId) {
     const client = createSanityClient(sanityProjectId, sanityDataset)
     ;[posts, work] = await Promise.all([
-      client.fetch<PostItem[]>('*[_type == "post"]{ "slug": slug.current }'),
-      client.fetch<WorkItem[]>('*[_type == "work"]{ "slug": coalesce(slug.current, _id) }'),
+      client.fetch('*[_type == "post"]{ "slug": slug.current, _updatedAt, publishedAt }'),
+      client.fetch('*[_type == "work"]{ "slug": coalesce(slug.current, _id), _updatedAt }'),
     ])
   }
 
   const staticUrls = [
-    url(BASE,           '1.0', 'weekly'),
-    url(`${BASE}/writing`, '0.8', 'daily'),
-    url(`${BASE}/work`,    '0.8', 'weekly'),
-    url(`${BASE}/ru`,           '1.0', 'weekly'),
-    url(`${BASE}/ru/writing`,   '0.8', 'daily'),
-    url(`${BASE}/ru/work`,      '0.8', 'weekly'),
+    ...pair('',         '1.0', 'weekly'),
+    ...pair('/writing', '0.8', 'daily'),
+    ...pair('/work',    '0.8', 'weekly'),
   ]
 
-  const postUrls = posts.flatMap(p => [
-    url(`${BASE}/writing/${p.slug}`,    '0.6', 'monthly'),
-    url(`${BASE}/ru/writing/${p.slug}`, '0.6', 'monthly'),
-  ])
+  const postUrls = posts.flatMap(p =>
+    pair(`/writing/${p.slug}`, '0.6', 'monthly', stamp(p._updatedAt ?? p.publishedAt)),
+  )
 
-  const workUrls = work.flatMap(w => [
-    url(`${BASE}/work/${w.slug}`,    '0.6', 'monthly'),
-    url(`${BASE}/ru/work/${w.slug}`, '0.6', 'monthly'),
-  ])
+  const workUrls = work.flatMap(w =>
+    pair(`/work/${w.slug}`, '0.6', 'monthly', stamp(w._updatedAt)),
+  )
 
   const xml = [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     ...staticUrls,
     ...postUrls,
     ...workUrls,

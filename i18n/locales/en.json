@@ -90,6 +90,7 @@
 
   "writing": {
     "title": "Writing",
+    "seo_description": "Notes on frontend, design systems and shipping real products — by Danil Klimov.",
     "see_all": "All posts",
     "read": "Read",
     "min": "{n} min",
@@ -98,6 +99,8 @@
     "posts_few": "{n} posts",
     "posts_many": "{n} posts",
     "back": "Writing",
+    "prev_post": "Previous post",
+    "next_post": "Next post",
     "search": "Search",
     "search_placeholder": "title, tags…",
     "sort_by": "Sort by",
@@ -114,6 +117,7 @@
 
   "work": {
     "title": "Featured",
+    "seo_description": "Selected frontend projects by Danil Klimov — Vue, TypeScript, animation.",
     "subtitle": "things I've built",
     "see_all": "All projects",
     "projects_one": "{n} project",

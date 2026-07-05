@@ -13,6 +13,9 @@ const message = computed(() => is404.value ? t('error.404_message') : t('error.5
 
 useSeoMeta({ title: computed(() => `${code.value} — lyoraeth`) })
 
+// Error pages must never be indexed
+useHead({ meta: [{ name: 'robots', content: 'noindex' }] })
+
 function handleError() {
   // localePath — otherwise a RU visitor lands on the EN home after an error
   clearError({ redirect: localePath('/') })
