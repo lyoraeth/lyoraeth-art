@@ -21,6 +21,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [ ] `docs` переснять скриншоты в readme/ — устарели после редизайна
 
 **Отложено (нужны внешние условия):**
+- [ ] `sec` nginx rate-limit для POST /api/mcp/send — сейчас в limit_req_zone только /api/contact и /api/comment; у mcp/send капчи нет (WebMCP-мост), поэтому лимит на nginx-уровне особенно нужен (добавить в nginx-proxy-manager Advanced, как для contact/comment). В коде уже добавлен size-cap как первый барьер
 - [ ] `analytics` **ЧАСТЬ 2 (после накопления трафика)** алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env; читает post-read/post-completed (из части 1) через Umami API, votes/comments из Sanity; заменяет ручной popularity в сортировке «Популярное». ПРЕДУСЛОВИЕ: создать read-only API key в Umami; данные оживут через недели трафика
 - [ ] `seo` РУЧНОЕ ПОСЛЕ ДЕПЛОЯ — GSC + Яндекс.Вебмастер + Bing: скормить sitemap, request indexing ключевых страниц; заполнить alt-тексты обложек в Sanity CMS
 

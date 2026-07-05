@@ -7,12 +7,18 @@ interface McpContactBody {
 
 /** POST /api/mcp/send — contact endpoint for the WebMCP `send_message` tool.
  *  No captcha (the browser-agent bridge can't solve one); emails via Resend.
- *  400 on empty fields, 503 when the mailer is unconfigured. */
+ *  400 on empty fields, 413 on oversized input, 503 when the mailer is
+ *  unconfigured. Rate-limited at the nginx layer alongside /api/contact. */
 export default defineEventHandler(async (event) => {
   const { contact, message } = await readBody<McpContactBody>(event)
 
   if (!contact?.trim() || !message?.trim()) {
     throw createError({ statusCode: 400, message: 'All fields are required' })
+  }
+
+  // Bound the payload — this endpoint has no captcha, so cap abuse surface.
+  if (contact.length > 200 || message.length > 5000) {
+    throw createError({ statusCode: 413, message: 'Message too long' })
   }
 
   const { resendApiKey, mailerFrom, mailerTo } = useRuntimeConfig(event)
@@ -28,7 +34,7 @@ export default defineEventHandler(async (event) => {
     to:      mailerTo,
     subject: 'New message via WebMCP — lyoraeth.art',
     text:    `From: ${contact.trim()}\n\n${message.trim()}`,
-    html:    `<p><strong>From (WebMCP):</strong> ${contact.trim()}</p><pre style="font-family:inherit">${message.trim()}</pre>`,
+    html:    `<p><strong>From (WebMCP):</strong> ${escapeHtml(contact.trim())}</p><pre style="font-family:inherit">${escapeHtml(message.trim())}</pre>`,
   })
 
   return { ok: true }
