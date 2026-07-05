@@ -254,6 +254,11 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
   align-items: center;
   justify-content: space-between;
   padding: 1.125rem clamp(1.25rem, 0.1538rem + 4.8718vw, 6rem);
+  /* Hold a constant height regardless of what's in the nav-end slot: on post
+     pages a 2.25rem TOC button lands there and defines the height; on other
+     pages the slot is empty, so pin the same total (button + vertical padding)
+     to keep the header the same height everywhere. */
+  min-height: 4.5rem;
 }
 
 /* ── Brand logo ──────────────────────────────────────────────────────────── */

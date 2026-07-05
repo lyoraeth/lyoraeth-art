@@ -43,6 +43,14 @@ onMounted(() => {
   padding: clamp(4.375rem, 9vw, 8.75rem) 0;
 }
 
+/* Reveal this section by opacity only — no transform. The cells' backdrop-filter
+   and the caustic SVG filter break while an ancestor is mid-transform (the
+   default reveal's translateY/scale), which repaints visibly when the transform
+   clears. Fading in place avoids that. */
+.section-approach .reveal {
+  transform: none;
+}
+
 /* ── Grid container — gap: 1px via background bleed ── */
 .approach-grid {
   display: grid;

@@ -9,8 +9,8 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 ## Todo
 
 **Хвосты редизайна (UI-баги):**
-- [ ] `fix` унифицировать высоту хэдера на телефоне. Эталон — страница поста ~72px. Странно что на главной он меньше
-- [ ] `fix` раздел «как я работаю» на главной, возможно, отрисовывается в старом стиле и перерисовывается — есть прыжок дизайна, непонятно откуда
+- [x] `fix` высота хэдера — причина: на постах в #nav-toc-slot садится TOC-кнопка (2.25rem) и задаёт высоту, на других страницах слот пуст; фикс — min-height: 4.5rem на .nav-inner (кнопка + вертикальный padding), высота одинакова везде
+- [x] `fix` прыжок «как я работаю» — причина: backdrop-filter ячеек + SVG-caustic ломаются, пока предок в transform (reveal translateY/scale), и резко перерисовываются на transform:none; фикс — reveal этой секции только по opacity (transform: none)
 
 **Этап 6 — финальная уборка:**
 - [x] `dx` причесать кодовую базу — воркфлоу: багхант (14 находок, 10 подтверждено адверсариально) → фиксы → SOLID-декомпозиция god-компонентов (writing/[slug] 867 строк → useMarkdown/useToc/useArticleSeo/useReadingProgressBar; work/[slug] → useArticleSeo/useCaseStudyFunnel) → TSDoc. Финал: typecheck+tests+build+смоук зелёные, 0 регрессий
