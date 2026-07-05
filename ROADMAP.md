@@ -28,6 +28,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [ ] `dx` причесать кодовую базу — артефакты, баги, утечки, небезопасные/ненадёжные места, строго оформить под TSDoc/SOLID
 - [ ] `content` локали, полный проход — снять пафос, выровнять тон
 - [ ] `docs` обновить README и политики под актуалочку
+- [ ] `docs` убрать претенциозные метафоры из README и код-комментов («editorial minimalism — the browser is a newspaper, not a window manager» и т.п.) — дизайн не уникален и не делает такого заявления; протаскивать «между строк» посыл про природу сайтов как лейтмотив = натужно. Описывать что сделано, а не манифестировать
 - [ ] `analytics` кастомные события Umami — lang-switch, section-view, scroll-depth, cta-click, copy-email, work-open/depth/completed/link, post-read/completed, reference-click, comment-start, contact-start, outbound-click
 - [ ] `analytics` алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env
 - [x] `a11y` alt-атрибуты обложек из Sanity — пайплайн был уже прошит (схема+GROQ+рендеры с фоллбэком на title); добавлены warning-валидации в Studio; ЗАПОЛНИТЬ сами alt-тексты в CMS

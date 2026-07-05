@@ -74,7 +74,7 @@ useHead({
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home',          item: `https://lyoraeth.art${localePath('/')}` },
+        { '@type': 'ListItem', position: 1, name: t('nav.home'),   item: `https://lyoraeth.art${localePath('/')}` },
         { '@type': 'ListItem', position: 2, name: t('nav.work'),   item: `https://lyoraeth.art${localePath('/work')}` },
         { '@type': 'ListItem', position: 3, name: title.value,     item: pageUrl.value },
       ],
