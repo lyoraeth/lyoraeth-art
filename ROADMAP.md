@@ -21,15 +21,14 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [ ] `docs` переснять скриншоты в readme/ — устарели после редизайна (РУЧНОЕ — нужен браузер)
 
 **Отложено (нужны внешние условия):**
-- [ ] `sec` nginx rate-limit для POST /api/mcp/send — сейчас в limit_req_zone только /api/contact и /api/comment; у mcp/send капчи нет (WebMCP-мост), поэтому лимит на nginx-уровне особенно нужен (добавить в nginx-proxy-manager Advanced, как для contact/comment). В коде уже добавлен size-cap как первый барьер
+- [x] `sec` nginx rate-limit для POST /api/mcp/send — добавлен location-блок (limit_req zone=lyoraeth_api burst=5 nodelay), как у contact/comment. Закрыто
 - [ ] `analytics` **ЧАСТЬ 2 (после накопления трафика)** алгоритм релевантности блога — score = log(views+1)×w₁ + completions×w₂ + votes×w₃ + comments×w₄ + boost×freshness_decay; Nitro-утилита fetchUmamiEvents с кешем ~1ч; UMAMI_API_URL + UMAMI_API_KEY в env; читает post-read/post-completed (из части 1) через Umami API, votes/comments из Sanity; заменяет ручной popularity в сортировке «Популярное». ПРЕДУСЛОВИЕ: создать read-only API key в Umami; данные оживут через недели трафика
 - [ ] `seo` РУЧНОЕ ПОСЛЕ ДЕПЛОЯ — GSC + Яндекс.Вебмастер + Bing: скормить sitemap, request indexing ключевых страниц; заполнить alt-тексты обложек в Sanity CMS
 
 ## Considering
 
 - [x] RSS-точка в колофон куртины — строка «Feed/Фид» → ссылка RSS с тултипом, ведёт на локале-версию фида (/rss.xml EN, /ru/rss.xml RU), ember-hover как у прочих ссылок
-- [ ] `perf` динамические OG images — Satori/nuxt-og-image, брендированный шаблон per-post/per-case
-- [ ] `feat` beta-banner — флаг inDevelopment в siteSettings (Sanity) + первый визит, появляется через 15-30с, автоскрытие, крестик, localStorage чтобы не показывать снова
+- [ ] `perf` динамические OG images — генерация брендированного шаблона per-post через Satori/nuxt-og-image (заголовок+брендинг+фон, рисуется на лету). НЕ ПУТАТЬ с уже сделанным: сейчас og:image = обложка поста через Sanity-трансформ (jpg w1200). Это про генерацию картинки для постов БЕЗ обложки / единый брендовый вид
 - [ ] `dx` расширить Playwright — покрытие writing/[slug], work/[slug], форм (scaffold уже есть)
 - [ ] `feat` донаты — оценить целесообразность
 - [ ] `dx` Lighthouse CI
@@ -53,7 +52,7 @@ Labels: `fix` `feat` `design` `content` `sec` `perf` `infra` `analytics` `a11y` 
 - [x] `content`+`docs` быстрый проход локалей (слоган→«результат», RU на «вы») и README (editorial minimalism)
 - [x] `refactor` WorkCompactCard/PostRow вынесены с рабочим edge-glow; сайдбар блога → frosted-панель
 
-**Hardening (этот заход, ещё НЕ запушено — 6+ локальных коммитов):**
+**Hardening (июльский заход):**
 - [x] `chore` dependabot — studio sanity 3.68→6.3 (убиты 4 high), esbuild low принят как dev-only
 - [x] `fix` скролл-стек — lenis off на touch (pointer:coarse) + детект тачпадов по wheel-сигнатуре; футер-куртина статична на touch; TOC clamp у конца статьи (fixed, НЕ sticky). ПРОВЕРИТЬ XIAOMI 15T после деплоя
 - [x] `seo` мега-эпик — description-экскерпты, трансформ og:image+dims/alt, hreflang/canonical/og:locale (useLocaleHead), sitemap xhtml+lastmod, JSON-LD (BlogPosting/BreadcrumbList/CreativeWork/Blog/CollectionPage), RSS EN+RU, prev/next, noindex error, fetchpriority LCP, локализованные крошки. Смоук против собранного сервера пройден
