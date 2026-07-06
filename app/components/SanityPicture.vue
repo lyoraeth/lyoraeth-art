@@ -9,7 +9,7 @@ const props = withDefaults(defineProps<{
   quality?: number
   loading?: 'lazy' | 'eager'
 }>(), {
-  quality: 80,
+  quality: 92,
   loading: 'lazy',
 })
 
