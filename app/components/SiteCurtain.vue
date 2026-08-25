@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
-const { $lenis } = useNuxtApp() as any
 
 // RSS feed for the active locale — the visible, human-facing counterpart to the
 // discovery <link> tags already in <head>.
@@ -8,36 +7,15 @@ const rssUrl = computed(() => locale.value === 'ru' ? '/ru/rss.xml' : '/rss.xml'
 
 const curtainEl = ref<HTMLElement | null>(null)
 let ro: ResizeObserver | null = null
-let held = false
-const HOLD_MS = 350
 
 function updateMargin(page: HTMLElement) {
   if (!curtainEl.value) return
   page.style.marginBottom = `${curtainEl.value.offsetHeight}px`
 }
 
-function onScroll() {
-  if (!curtainEl.value) return
-  const scrollY   = window.scrollY
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-  const threshold = maxScroll - curtainEl.value.offsetHeight
-
-  // reset if scrolled back above the curtain zone
-  if (scrollY < threshold - 40) {
-    held = false
-    return
-  }
-
-  if (!held && scrollY >= threshold) {
-    held = true
-    $lenis?.stop()
-    setTimeout(() => $lenis?.start(), HOLD_MS)
-  }
-}
-
 onMounted(() => {
   // Touch devices: the curtain is a plain in-flow footer (see CSS) — no page
-  // margin trick, no reveal, no scroll hold.
+  // margin trick, no reveal.
   if (window.matchMedia('(pointer: coarse)').matches) return
 
   const page = document.querySelector('.page') as HTMLElement | null
@@ -46,13 +24,10 @@ onMounted(() => {
   ro = new ResizeObserver(() => updateMargin(page))
   ro.observe(curtainEl.value)
   updateMargin(page)
-
-  window.addEventListener('scroll', onScroll, { passive: true })
 })
 
 onUnmounted(() => {
   ro?.disconnect()
-  window.removeEventListener('scroll', onScroll)
 })
 </script>
 

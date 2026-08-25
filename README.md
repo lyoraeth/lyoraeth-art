@@ -1,5 +1,5 @@
 ![Project Status](https://img.shields.io/badge/Status-Live-green.svg)
-![Technologies](https://img.shields.io/badge/Tech-Nuxt%204%2C%20Vue%203%2C%20Tailwind%2C%20Sanity%2C%20Lenis-blue.svg)
+![Technologies](https://img.shields.io/badge/Tech-Nuxt%204%2C%20Vue%203%2C%20Tailwind%2C%20Sanity-blue.svg)
 ![License](https://img.shields.io/badge/License-Source%20Reference-red.svg)
 
 # lyoraeth.art
@@ -37,7 +37,6 @@ EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
 | **Tailwind CSS v4** | Utility-first, reads design tokens from CSS variables |
 | **Sanity** | Headless CMS — work items and writing posts |
 | **@nuxtjs/i18n** | EN / RU, `prefix_except_default`, cookie-persisted locale |
-| **Lenis** | Smooth scroll, desktop only — off on touch devices and touchpads |
 | **Resend** | Contact form email delivery |
 | **Cloudflare Turnstile** | Invisible CAPTCHA — no fingerprinting, no tracking cookies |
 | **Umami** | Self-hosted analytics — cookie-free, no third parties |
@@ -69,7 +68,7 @@ All design tokens — color, spacing, radius, easing, blur — are CSS custom pr
 Every transition duration and animation is a token (`--duration-reveal`, `--ease-out-expo`, etc.). A single `@media (prefers-reduced-motion: reduce)` block sets them all to zero — no conditional logic scattered across components.
 
 ### Motion
-Scroll reveals and entrance transitions run on `IntersectionObserver` — no scroll event listeners, no layout thrashing. Lenis takes over smooth scroll on fine-pointer devices only: it never initializes on touch (native scrolling), and destroys itself if a touchpad is detected by its wheel-event signature. Client-side only, so SSR stays clean.
+Scroll reveals and entrance transitions run on `IntersectionObserver` — no scroll event listeners, no layout thrashing. Scrolling itself is the browser's: nothing intercepts wheel or touch events, so momentum, find-in-page and keyboard paging behave as the platform intends. Smooth behaviour is limited to anchor jumps via `scroll-behavior`.
 
 Reading progress bar on post pages — a passive `scroll` listener updates shared `useState`, rendered as a 1.5px ember line at the bottom of the nav. Activates only on `writing/[slug]`, resets and cleans up on unmount.
 
@@ -90,7 +89,7 @@ Comments on writing posts are stored in Sanity and fetched client-side with a pu
 - Images: WebP via Sanity CDN (`?fm=webp`), `loading="lazy"` everywhere except above-the-fold covers; cover dimensions pulled from Sanity asset metadata and passed as explicit `width`/`height` — zero CLS. AVIF was dropped after CDN pre-hydration failures caused broken `<picture>` fallback chains in SSR.
 - Static assets (avatar, logo, favicons): `Cache-Control: public, max-age=31536000, immutable`
 - Stage background: a single static layered gradient (`contain: layout style paint`) — zero per-frame JS, no animated blur layers to composite
-- JS: SSR-first — the page is readable before any script runs; Lenis and observers are progressive enhancement
+- JS: SSR-first — the page is readable before any script runs; observers are progressive enhancement
 - Work cards: `loading="eager"` on all card images (above-the-fold section); `/api/work` response cached for 5 minutes server-side
 - Analytics: Umami script is a single lightweight beacon, no tracking cookies, no external calls
 - Server-Timing: a Nitro plugin hooks into `request` and `beforeResponse` to emit an `app;dur=` metric — visible in DevTools → Network → Timing, no overhead in production
