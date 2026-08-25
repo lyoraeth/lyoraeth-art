@@ -1,0 +1,359 @@
+/*
+ * Design system of the light catalog redesign: fonts, tokens, grid, type utilities.
+ *
+ * Imported from main.css so both design systems share one Tailwind graph. The
+ * dark system still in main.css uses a disjoint set of token names, so the two
+ * coexist until the inner pages migrate.
+ *
+ * Media queries can't read var(), so breakpoint thresholds are literals here and
+ * in the markup — when one moves, fix both.
+ */
+
+/* ─────────────────────────── Fonts ───────────────────────────
+ * Only the weights the design uses. The files are licensed but not
+ * redistributable, so they stay out of the repository (.gitignore) — nginx
+ * serves /fonts/ in production, the dev server from public/fonts.
+ */
+
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('/fonts/PPNeueMontreal-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PP Pangram Sans';
+  src: url('/fonts/PPPangramSans-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─────────────────────────── Tokens ─────────────────────────── */
+
+/*
+ * static, because component styles reach for these variables from inside
+ * <style scoped>, which Vite compiles outside the Tailwind graph. Without it
+ * Tailwind drops every token no utility happens to use.
+ */
+@theme static {
+
+  /* ── Color ───────────────────────────────────────────────────────────
+     Names are Figma's. Values are oklch, with the exported hex kept as the
+     fallback below — a color changes in both places. */
+
+  --color-surface-page:         oklch(98.51% 0.0000 0);
+  --color-surface-header:       oklch(100.00% 0.0000 0);
+  --color-surface-hover:        oklch(96.02% 0.0034 247.86);
+  --color-surface-hover-strong: oklch(96.89% 0.0025 228.78);
+  --color-surface-raised:       oklch(90.55% 0.0063 255.48);
+  --color-surface-panel:        oklch(95.39% 0.0025 228.78);
+  --color-surface-field:        oklch(100.00% 0.0000 0);
+
+  --color-border-default:         oklch(87.46% 0.0053 247.88);
+  --color-border-input:           oklch(66.48% 0.0281 253.64);
+  --color-border-raised:          oklch(78.55% 0.0126 247.99);
+  --color-border-raised-inversed: oklch(32.65% 0.0127 252.99);
+
+  --color-text-primary:            oklch(24.65% 0.0048 248.02);
+  --color-text-secondary:          oklch(49.56% 0.0162 248.15);
+  --color-text-decorative:         oklch(71.97% 0.0104 252.84);
+  --color-text-inverse:            oklch(100.00% 0.0000 0);
+  --color-text-secondary-inversed: oklch(59.19% 0.0206 250.71);
+
+  --color-fill-strong: oklch(18.09% 0.0052 248.12);
+
+  --color-accent-default:      oklch(62.71% 0.1853 39.89);
+  --color-accent-strong:       oklch(57.89% 0.1702 39.97);
+  --color-accent-strong-hover: oklch(55.92% 0.1741 38.73);
+
+  --color-icon-default: oklch(66.86% 0.0200 250.68);
+
+  /* --default-font-family is left alone: setting it would change <html> for the
+     pages still on the dark system. The redesign shell sets its own. */
+  --font-sans: 'PP Neue Montreal', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'PP Pangram Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Type scale ──────────────────────────────────────────────────────
+     Figma values: 402px is the lower bound, 1680px the upper one. Sizes equal
+     across all columns are fixed. */
+  --text-display-3xl: clamp(5rem, 4.2136rem + 3.1299vw, 7.5rem);
+  --text-display-3xl--line-height: 110%;
+  --text-display-3xl--font-weight: 600;
+  --text-display-3xl--letter-spacing: 0.02em;
+  --text-display-2xl: clamp(1.75rem, 1.3568rem + 1.5649vw, 3rem);
+  --text-display-2xl--line-height: 120%;
+  --text-display-2xl--font-weight: 600;
+  --text-display-2xl--letter-spacing: 0.02em;
+  --text-display-xl: clamp(1.5rem, 1.3427rem + 0.626vw, 2rem);
+  --text-display-xl--line-height: 120%;
+  --text-display-xl--font-weight: 600;
+  --text-display-xl--letter-spacing: 0.02em;
+  --text-display-lg: clamp(1.125rem, 1.007rem + 0.4695vw, 1.5rem);
+  --text-display-lg--line-height: 125%;
+  --text-display-lg--font-weight: 600;
+  --text-display-lg--letter-spacing: 0.02em;
+  --text-display-md: 1.25rem;
+  --text-display-md--line-height: 125%;
+  --text-display-md--font-weight: 600;
+  --text-display-md--letter-spacing: 0.02em;
+  --text-cta: 1.125rem;
+  --text-cta--line-height: 100%;
+  --text-cta--font-weight: 500;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 135%;
+  --text-body-lg--font-weight: 500;
+  --text-text: 1rem;
+  --text-text--line-height: 125%;
+  --text-text--font-weight: 500;
+  --text-ui: 0.875rem;
+  --text-ui--line-height: 100%;
+  --text-ui--font-weight: 500;
+
+  /* nav switches size on the token itself (media query below), so the markup
+     only ever uses one class */
+  --text-nav: 0.875rem;
+  --text-nav--line-height: normal;
+  --text-nav--font-weight: 500;
+
+  /* ── Spacing and sizes ───────────────────────────────────────────────
+     Same 402 → 1680 interpolation unless noted. */
+  --spacing-page-padding-x: clamp(1.5rem, 1.1854rem + 1.252vw, 2.5rem);
+  --spacing-grid-gap: clamp(1.375rem, 1.1784rem + 0.7825vw, 2rem);
+  --spacing-section-gap: clamp(4rem, 2.7418rem + 5.0078vw, 8rem);
+  --spacing-section-padding-y: clamp(2rem, 1.3709rem + 2.5039vw, 4rem);
+  --spacing-section-header-gap: clamp(2rem, 1.6854rem + 1.252vw, 3rem);
+  --spacing-hero-gap-y: clamp(2rem, -0.7523rem + 10.9546vw, 10.75rem);
+  --spacing-hero-intro-gap: clamp(2rem, 1.3709rem + 2.5039vw, 4rem);
+  --spacing-hero-heading-gap: clamp(0.5rem, -0.0505rem + 2.1909vw, 2.25rem);
+  --spacing-hero-subtitle-gap: clamp(0.375rem, 0.2964rem + 0.313vw, 0.625rem);
+  --spacing-footer-padding-top: clamp(6.5rem, 4.77rem + 6.8858vw, 12rem);
+  /* runs the other way: 16px on a phone, 4px on a wide screen */
+  --spacing-footer-bar-padding-y: clamp(0.25rem, 1.2359rem - 0.939vw, 1rem);
+  /* zero below 1024, grows only above it */
+  --spacing-contact-intro-padding-y: clamp(0rem, -6.2439rem + 9.7561vw, 4rem);
+  /* maxes out at 1024 */
+  --spacing-contact-field-padding-x: clamp(1rem, 0.6768rem + 1.2862vw, 1.5rem);
+
+  /* md (768), lg (1024) and xl (1280) already match Tailwind's defaults, so only
+     2xl moves. In rem, not px: Tailwind sorts media queries by value without
+     converting units, so a px breakpoint lands at the top of the file and loses
+     the cascade to every rem query below it.
+
+     sm is switched off — the design has no 640px step, and a stray sm: would
+     introduce a layout state that exists in no layout. */
+  --breakpoint-2xl: 105rem;
+  --breakpoint-sm: initial;
+
+  --container-shell: 1680px;
+
+  /* the menu and anchor scrolling are measured from it */
+  --spacing-header-height: 7rem;
+
+  /* Repeat Tailwind's defaults on purpose: component styles call these from
+     <style scoped>, which Tailwind never scans, so they have to be declared to
+     exist at runtime. Figma has no radius scale yet; when it does, it lands here. */
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --spacing: 0.25rem;
+
+  /* ── Motion ──────────────────────────────────────────────────────────
+     A first pass, tuned once the sections are in place. Two rules stay through
+     the tuning: an exit is 25–50ms shorter than its entry, and everything eases
+     out — hence no ease-in token. */
+  --ease-base: cubic-bezier(0.35, 0.05, 0.35, 0.95);
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+
+  --duration-hover: 180ms;
+  --duration-press: 90ms;
+  --duration-exit: 140ms;
+  --duration-dropdown: 200ms;
+  --delay-dropdown: 300ms;      /* filters accidental hovers */
+  --duration-panel-in: 240ms;
+  --duration-panel-out: 180ms;
+  --duration-page: 220ms;
+  --duration-page-touch: 350ms;
+  --duration-reveal: 500ms;
+  --delay-remote: 80ms;         /* feedback landing away from the cursor */
+  --duration-menu: 120ms;       /* full-viewport panel, where hover timing drags */
+
+  --default-transition-timing-function: var(--ease-base);
+  --default-transition-duration: var(--duration-hover);
+}
+
+/*
+ * Hex fallback. Custom properties aren't validated when parsed, so an unknown
+ * oklch() would be kept and then break at substitution instead of falling back —
+ * @supports is the only real guard. Outside @layer theme, so it wins the cascade.
+ */
+@supports not (color: oklch(0 0 0)) {
+  :root {
+    --color-surface-page:         #FAFAFA;
+    --color-surface-header:       #FFFFFF;
+    --color-surface-hover:        #F0F2F4;
+    --color-surface-hover-strong: #F3F5F6;
+    --color-surface-raised:       #DDE0E4;
+    --color-surface-panel:        #EEF0F1;
+    --color-surface-field:        #FFFFFF;
+
+    --color-border-default:         #D3D6D9;
+    --color-border-input:           #8895A5;
+    --color-border-raised:          #B3BAC1;
+    --color-border-raised-inversed: #30353B;
+
+    --color-text-primary:            #1F2123;
+    --color-text-secondary:          #5B636B;
+    --color-text-decorative:         #A0A5AB;
+    --color-text-inverse:            #FFFFFF;
+    --color-text-secondary-inversed: #757F8A;
+
+    --color-fill-strong: #101214;
+
+    --color-accent-default:      #E0551A;
+    --color-accent-strong:       #C94C17;
+    --color-accent-strong-hover: #C4430D;
+
+    --color-icon-default: #8C96A1;
+  }
+}
+
+/* Redefining the token instead of adding a second one keeps text-nav a single
+   class in the markup. */
+@media (width < 64rem) {
+  :root {
+    --text-nav: 2.875rem;
+  }
+}
+
+/* ────────────────────────── Components ────────────────────────── */
+
+@layer components {
+
+  /*
+   * Sets no horizontal padding — that goes on at the point of use, where
+   * border-box counts it inside max-width rather than on top of it.
+   */
+  .wrapper {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--container-shell);
+    margin-inline: auto;
+  }
+
+  /*
+   * Columns per the layouts: 12 → 8 → 4. Column gap from the token, row gaps are
+   * each section's own. Thresholds run widest to narrowest, each overriding the
+   * one before.
+   */
+  .layout-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--spacing-grid-gap);
+  }
+
+  /* strict "<": at 1280 it's twelve, matching xl: */
+  @media (width < 80rem) {
+    .layout-grid {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+  }
+
+  @media (width < 48rem) {
+    .layout-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+}
+
+/* ═══════════════════ Text styles ═══════════════════
+ *
+ * One class per Figma text style, typeface included, instead of
+ * text-* + font-* + tracking-*. Sizes come from the tokens of the same name.
+ */
+
+/* h1 — the name in the hero */
+@utility type-display-3xl {
+  font-family: var(--font-display);
+  font-size: var(--text-display-3xl);
+  font-weight: var(--text-display-3xl--font-weight);
+  line-height: var(--text-display-3xl--line-height);
+  letter-spacing: var(--text-display-3xl--letter-spacing);
+}
+
+/* footer tagline */
+@utility type-display-2xl {
+  font-family: var(--font-display);
+  font-size: var(--text-display-2xl);
+  font-weight: var(--text-display-2xl--font-weight);
+  line-height: var(--text-display-2xl--line-height);
+  letter-spacing: var(--text-display-2xl--letter-spacing);
+}
+
+/* h2 — section headings */
+@utility type-display-xl {
+  font-family: var(--font-display);
+  font-size: var(--text-display-xl);
+  font-weight: var(--text-display-xl--font-weight);
+  line-height: var(--text-display-xl--line-height);
+  letter-spacing: var(--text-display-xl--letter-spacing);
+}
+
+/* hero subtitle */
+@utility type-display-lg {
+  font-family: var(--font-display);
+  font-size: var(--text-display-lg);
+  font-weight: var(--text-display-lg--font-weight);
+  line-height: var(--text-display-lg--line-height);
+  letter-spacing: var(--text-display-lg--letter-spacing);
+}
+
+/* h3 — headings inside sections */
+@utility type-display-md {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: var(--text-display-md--font-weight);
+  line-height: var(--text-display-md--line-height);
+  letter-spacing: var(--text-display-md--letter-spacing);
+}
+
+/* button and CTA labels */
+@utility type-cta {
+  font-family: var(--font-sans);
+  font-size: var(--text-cta);
+  font-weight: var(--text-cta--font-weight);
+  line-height: var(--text-cta--line-height);
+}
+
+/* body copy: paragraphs, card excerpts, descriptions */
+@utility type-body-lg {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-lg);
+  font-weight: var(--text-body-lg--font-weight);
+  line-height: var(--text-body-lg--line-height);
+}
+
+/* short labels and values, not paragraphs */
+@utility type-text {
+  font-family: var(--font-sans);
+  font-size: var(--text-text);
+  font-weight: var(--text-text--font-weight);
+  line-height: var(--text-text--line-height);
+}
+
+/* small UI text: labels, captions */
+@utility type-ui {
+  font-family: var(--font-sans);
+  font-size: var(--text-ui);
+  font-weight: var(--text-ui--font-weight);
+  line-height: var(--text-ui--line-height);
+}
+
+/* header nav and phone menu items */
+@utility type-nav {
+  font-family: var(--font-sans);
+  font-size: var(--text-nav);
+  font-weight: var(--text-nav--font-weight);
+  line-height: var(--text-nav--line-height);
+}
