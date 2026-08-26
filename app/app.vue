@@ -64,6 +64,7 @@ useHead({
 
     <a href="#main-content" class="skip-link">{{ t('a11y.skip') }}</a>
     <NuxtRouteAnnouncer />
+    <MaintenanceNotice />
     <Grain />
     <SiteNav />
     <MobileDock />
@@ -103,6 +104,7 @@ body {
 .page {
   position: relative;
   z-index: 1;
+  padding-top: var(--notice-h, 0);
   background: var(--void);
   min-height: 100vh;
   min-height: 100svh;

@@ -227,7 +227,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
 /* ── Nav shell ───────────────────────────────────────────────────────────── */
 .nav {
   position: fixed;
-  top: 0;
+  top: var(--notice-h, 0);
   left: 0;
   right: 0;
   z-index: 50;

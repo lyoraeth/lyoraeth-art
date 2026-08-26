@@ -1,4 +1,8 @@
 {
+  "maintenance": {
+    "notice": "Technical hiccups: the site is being updated"
+  },
+
   "a11y": {
     "skip": "Skip to content"
   },
