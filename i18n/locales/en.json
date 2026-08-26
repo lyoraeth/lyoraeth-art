@@ -8,13 +8,6 @@
     "work": "Work",
     "stack": "Stack",
     "writing": "Writing",
-    "available": "Available",
-    "status": {
-      "available":   "Available",
-      "part_time":   "Part-time",
-      "busy":        "Busy",
-      "unavailable": "Unavailable"
-    },
     "contact": "Contact",
     "cv": "CV",
     "lang_toggle": "Language",

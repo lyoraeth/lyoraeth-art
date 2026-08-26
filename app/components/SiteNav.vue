@@ -29,26 +29,6 @@ function onLangSwitch(to: string) {
   if (to !== locale.value) track(EV.langSwitch, { from: locale.value, to })
 }
 
-const { data: statusData } = useFetch('/api/status', { default: () => ({ availability: 'available' }) })
-const availability = computed(() => statusData.value?.availability ?? 'available')
-
-const DOT_COLORS: Record<string, string> = {
-  available:   '#D69A6A',           /* ember — оригинальный акцент */
-  part_time:   'oklch(78% 0.1 88)', /* тёплый золотисто-жёлтый */
-  busy:        'oklch(58% 0.12 22)',/* тёплый rust/кирпич */
-  unavailable: '#5B6573',           /* var(--faint) — приглушённый серый */
-}
-const DOT_ANIMATION: Record<string, string> = {
-  available:   'pulse 2.8s ease-in-out infinite',
-  part_time:   'pulse 4.5s ease-in-out infinite',
-  busy:        'none',
-  unavailable: 'none',
-}
-const dotStyle = computed(() => ({
-  background: DOT_COLORS[availability.value] ?? DOT_COLORS.available,
-  animation:  DOT_ANIMATION[availability.value] ?? 'none',
-}))
-
 const isHome = computed(() => {
   const home = localePath('/')
   return route.path === home || route.path === home.replace(/\/$/, '')
@@ -127,10 +107,7 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
           <NuxtLink :to="navTo('writing', '/writing')" class="navlink">{{ t('nav.writing') }}</NuxtLink>
         </div>
 
-        <NuxtLink :to="navTo('contact')" class="avail">
-          <span class="avail-dot" :style="dotStyle" aria-hidden="true" />
-          <span>{{ t(`nav.status.${availability}`) }}</span>
-        </NuxtLink>
+        <NuxtLink :to="navTo('contact')" class="navlink">{{ t('nav.contact') }}</NuxtLink>
 
         <div class="lang" role="group" :aria-label="t('nav.lang_toggle')">
           <NuxtLink
@@ -319,32 +296,6 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
 }
 
 /* ── Available indicator ─────────────────────────────────────────────────── */
-.avail {
-  display: flex;
-  align-items: center;
-  gap: 0.4375rem;
-  color: var(--mist);
-  text-decoration: none;
-  font-size: 0.84375rem;
-  transition: color 0.3s var(--ease-silk);
-}
-
-.avail:hover {
-  color: var(--ink);
-}
-
-.avail-dot {
-  width: 0.375rem;
-  height: 0.375rem;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1;    transform: scale(1); }
-  50%       { opacity: 0.8; transform: scale(0.9); }
-}
-
 /* ── Lang switcher — sliding pill ───────────────────────────────────────── */
 .lang {
   position: relative;
@@ -573,7 +524,6 @@ const writingPos = computed(() => anchorPos(writingAnchor.value))
 @media (max-width: 47.5em) {
   .navlink,
   .nav-cv,
-  .avail,
   .lang {
     display: none;
   }

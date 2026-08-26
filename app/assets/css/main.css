@@ -353,10 +353,6 @@
     .dock, .loading-dot {
       animation: none !important;
     }
-    /* availability pulse */
-    .avail-dot {
-      animation: none !important;
-    }
   }
 }
 

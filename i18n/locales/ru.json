@@ -8,13 +8,6 @@
     "work": "Работы",
     "stack": "Стек",
     "writing": "Блог",
-    "available": "Свободен",
-    "status": {
-      "available":   "Свободен",
-      "part_time":   "Частично",
-      "busy":        "Занят",
-      "unavailable": "Недоступен"
-    },
     "contact": "Контакты",
     "cv": "CV",
     "lang_toggle": "Язык",
