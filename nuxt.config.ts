@@ -40,6 +40,16 @@ export default defineNuxtConfig({
         { rel: "preconnect", href: "https://challenges.cloudflare.com" },
         { rel: "preconnect", href: "https://stat.lyoraeth.art" },
       ],
+      style: [
+        // Cascade layer order, pinned before any stylesheet loads. Nuxt inlines
+        // component styles ahead of the main bundle, so without this the order
+        // is decided by whichever file happens to be parsed first — and the
+        // legacy globals end up outranking the shell that should override them.
+        {
+          innerHTML: '@layer theme, base, legacy, shell, components, utilities;',
+          tagPriority: -100,
+        },
+      ],
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: "theme-color", content: "#0A0C10" },

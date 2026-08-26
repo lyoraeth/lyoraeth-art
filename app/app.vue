@@ -61,19 +61,20 @@ useHead({
 </template>
 
 <style>
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
+/*
+ * No manual reset here: Preflight already zeroes margin, padding and box-sizing
+ * inside @layer base. Repeating it outside the layers would outrank every
+ * utility, and spacing classes would silently stop working.
+ */
+@layer base {
   html {
-    scroll-behavior: auto;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
 </style>
