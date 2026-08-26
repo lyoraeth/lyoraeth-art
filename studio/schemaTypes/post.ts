@@ -1,95 +1,72 @@
 import { defineType, defineField } from 'sanity'
+import { coverImage, localeString, localeText } from './locale'
 
+/**
+ * A blog post. The body stays two plain markdown fields rather than one
+ * bilingual object: unlike a case study, a post is formatted text, and the
+ * editor wants the whole document height for it.
+ */
 export default defineType({
   name: 'post',
   title: 'Post',
   type: 'document',
+  groups: [
+    { name: 'content', title: 'Content', default: true },
+    { name: 'body',    title: 'Body' },
+    { name: 'media',   title: 'Media' },
+    { name: 'meta',    title: 'Meta' },
+  ],
   fields: [
-    defineField({
+    localeString({
       name: 'title',
       title: 'Title',
-      type: 'object',
-      fields: [
-        { name: 'en', title: 'English', type: 'string' },
-        { name: 'ru', title: 'Russian', type: 'string' },
-      ],
+      group: 'content',
+      requireEn: true,
     }),
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: { source: 'title.en', maxLength: 96 },
-    }),
-    defineField({
-      name: 'publishedAt',
-      title: 'Published at',
-      type: 'datetime',
-    }),
-    defineField({
-      name: 'readingTime',
-      title: 'Reading time (min)',
-      type: 'number',
-    }),
-    defineField({
+    localeString({
       name: 'topic',
-      title: 'Topic (card label)',
-      type: 'object',
-      description: 'One word above the title on a card. One per post, unlike tags.',
-      fields: [
-        { name: 'en', title: 'English', type: 'string', validation: (rule: any) => rule.max(24) },
-        { name: 'ru', title: 'Russian', type: 'string', validation: (rule: any) => rule.max(24) },
-      ],
+      title: 'Topic',
+      description: 'Single label above the title on a card. One per post, unlike tags.',
+      group: 'content',
+      maxChars: 24,
     }),
-    defineField({
+    localeText({
       name: 'excerpt',
-      title: 'Excerpt (card)',
-      type: 'object',
-      description: 'Written for the card, not lifted from the opening. Falls back to the start of the body when empty.',
-      fields: [
-        { name: 'en', title: 'English', type: 'text', rows: 3, validation: (rule: any) => rule.max(240).warning('Over 240 characters the card grows past its design height') },
-        { name: 'ru', title: 'Russian', type: 'text', rows: 3, validation: (rule: any) => rule.max(240).warning('Over 240 characters the card grows past its design height') },
-      ],
+      title: 'Excerpt',
+      description: 'Written for the card rather than lifted from the opening. Falls back to the start of the body when left empty.',
+      group: 'content',
+      maxChars: 240,
+      soft: true,
+    }),
+
+    defineField({
+      name: 'body',
+      title: 'Body — English',
+      type: 'text',
+      rows: 30,
+      group: 'body',
+      description: 'Markdown: **bold**, *italic*, ## H2, ### H3, > quote, --- divider, ![alt](url "caption")',
     }),
     defineField({
-      name: 'tags',
-      title: 'Tags',
-      type: 'array',
-      of: [{ type: 'string' }],
-      description: 'Search and filtering in the blog — separate from the topic label.',
-      options: { layout: 'tags' },
-    }),
-    defineField({
-      name: 'cover',
-      title: 'Cover image',
-      type: 'image',
-      options: { hotspot: true },
-      fields: [
-        {
-          name: 'alt',
-          title: 'Alt text',
-          type: 'string',
-          description: 'Describes the cover for screen readers and search engines',
-          validation: (rule: any) => rule.required().warning('Add alt text — the site falls back to the post title otherwise'),
-        },
-      ],
-    }),
-    defineField({
-      name: 'popularity',
-      title: 'Popularity (0–100)',
-      type: 'number',
-      description: 'Manual ranking for "Popular" sort — higher = shown first',
-      initialValue: 0,
+      name: 'bodyRu',
+      title: 'Body — Russian',
+      type: 'text',
+      rows: 30,
+      group: 'body',
+      description: 'Same markdown as the English body.',
     }),
     defineField({
       name: 'references',
       title: 'References',
       type: 'array',
+      group: 'body',
+      description: 'Numbered source list at the end of the post.',
       of: [
         {
           type: 'object',
           fields: [
-            { name: 'title', title: 'Title', type: 'string' },
-            { name: 'href',  title: 'URL',   type: 'url' },
+            { name: 'title', title: 'Title', type: 'string', validation: rule => rule.required() },
+            { name: 'href',  title: 'URL',   type: 'url',    validation: rule => rule.required() },
           ],
           preview: {
             select: { title: 'title', subtitle: 'href' },
@@ -97,18 +74,52 @@ export default defineType({
         },
       ],
     }),
+
+    coverImage({
+      title: 'Cover image',
+      group: 'media',
+      altHint: 'Add alt text — the site falls back to the post title otherwise',
+    }),
+
     defineField({
-      name: 'body',
-      title: 'Body (English)',
-      type: 'text',
-      rows: 30,
-      description: 'Markdown: **bold**, *italic*, ## H2, ### H3, > quote, --- divider, ![alt](url "caption")',
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      group: 'meta',
+      options: { source: 'title.en', maxLength: 96 },
+      validation: rule => rule.required(),
     }),
     defineField({
-      name: 'bodyRu',
-      title: 'Body (Russian)',
-      type: 'text',
-      rows: 30,
+      name: 'publishedAt',
+      title: 'Published at',
+      type: 'datetime',
+      group: 'meta',
+      validation: rule => rule.required(),
+    }),
+    defineField({
+      name: 'readingTime',
+      title: 'Reading time (min)',
+      type: 'number',
+      group: 'meta',
+      validation: rule => rule.positive().integer(),
+    }),
+    defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      of: [{ type: 'string' }],
+      group: 'meta',
+      description: 'Search and filtering in the blog — separate from the topic label.',
+      options: { layout: 'tags' },
+    }),
+    defineField({
+      name: 'popularity',
+      title: 'Popularity',
+      type: 'number',
+      group: 'meta',
+      description: 'Manual ranking for the "Popular" sort — higher comes first.',
+      initialValue: 0,
+      validation: rule => rule.min(0).max(100),
     }),
   ],
   orderings: [
@@ -120,12 +131,10 @@ export default defineType({
   ],
   preview: {
     select: { title: 'title.en', subtitle: 'publishedAt', media: 'cover' },
-    prepare({ title, subtitle, media }: any) {
-      return {
-        title,
-        subtitle: subtitle ? new Date(subtitle).toLocaleDateString() : 'No date',
-        media,
-      }
-    },
+    prepare: ({ title, subtitle, media }) => ({
+      title,
+      subtitle: subtitle ? new Date(subtitle).toLocaleDateString() : 'No date',
+      media,
+    }),
   },
 })
