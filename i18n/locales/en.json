@@ -65,30 +65,6 @@
     }
   },
 
-  "approach": {
-    "title": "My Approach",
-    "steps": [
-      {
-        "num": "01",
-        "name": "dive in",
-        "title": "What's actually needed",
-        "desc": "I study the task and design to figure out what matters. Questions when they count — and I keep moving."
-      },
-      {
-        "num": "02",
-        "name": "build",
-        "title": "No corners cut",
-        "desc": "I don't just check off the ticket — I test across devices and hunt down places where the UI might break."
-      },
-      {
-        "num": "03",
-        "name": "ship",
-        "title": "Done means working",
-        "desc": "I hand over a product that behaves exactly as intended. With documentation if needed."
-      }
-    ]
-  },
-
   "writing": {
     "title": "Writing",
     "seo_description": "Notes on frontend, design systems and shipping real products — by Danil Klimov.",
