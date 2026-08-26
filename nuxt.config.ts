@@ -61,6 +61,9 @@ export default defineNuxtConfig({
   routeRules: {
     '/llms-full.txt':  { headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' } },
     '/avatar.webp':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    // Portrait variants: cached long, but not immutable — the file names carry
+    // no hash, so a new photo has to be able to replace them.
+    '/face/**':        { headers: { 'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' } },
     '/logo.svg':       { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon.ico':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon-32.png': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
