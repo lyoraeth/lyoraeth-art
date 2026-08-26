@@ -37,3 +37,10 @@ concept-darkstage (trying4_i_hate_figma).html
 список фиксов.txt
 юридическая залупа/
 commits.txt
+
+# Licensed typefaces — served from the VPS, never committed
+/public/fonts/
+
+# Playwright run artifacts
+/test-results/
+/playwright-report/
