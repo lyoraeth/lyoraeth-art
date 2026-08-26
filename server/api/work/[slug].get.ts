@@ -1,5 +1,8 @@
 import type { WorkItem } from '../work.get'
 
+/** A case page adds the full body on top of the list fields. */
+export type WorkDetail = WorkItem & { body: { en: string; ru: string } | null }
+
 /** GET /api/work/:slug — one work item, matched by slug or raw `_id`.
  *  404 when not found; null when the CMS is unconfigured. */
 export default defineEventHandler(async (event) => {
@@ -9,16 +12,16 @@ export default defineEventHandler(async (event) => {
 
   const client = createSanityClient(sanityProjectId, sanityDataset)
 
-  const result = await client.fetch<WorkItem | null>(`
+  const result = await client.fetch<WorkDetail | null>(`
     *[_type == "work" && (slug.current == $slug || _id == $slug)][0] {
       _id,
       "slug": coalesce(slug.current, _id),
       title,
       kicker,
-      shortDescription,
-      description,
+      teaser,
+      excerpt,
+      body,
       tags,
-      tagWarm,
       url,
       showLink,
       year,

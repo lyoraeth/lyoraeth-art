@@ -15,12 +15,12 @@ if (!item.value) {
 
 const title = computed(() => loc(item.value?.title))
 
-const descParagraphs = computed(() =>
-  (loc(item.value?.description) ?? '').split(/\n\n+/).filter(Boolean),
+const bodyParagraphs = computed(() =>
+  (loc(item.value?.body) ?? '').split(/\n\n+/).filter(Boolean),
 )
 
 const metaDescription = computed(() =>
-  loc(item.value?.shortDescription) || loc(item.value?.description)
+  loc(item.value?.excerpt) || loc(item.value?.teaser)
 )
 
 const { ogImage, pageUrl } = useArticleSeo({
@@ -86,7 +86,6 @@ const { depthEl, endEl } = useCaseStudyFunnel(slug)
       <h1 class="work-title">{{ title }}</h1>
 
       <div class="work-tags">
-        <span v-if="item.tagWarm" class="tag tag--warm">{{ item.tagWarm }}</span>
         <span v-for="tag in item.tags" :key="tag" class="tag">{{ tag }}</span>
       </div>
     </header>
@@ -103,7 +102,7 @@ const { depthEl, endEl } = useCaseStudyFunnel(slug)
     </div>
 
     <span ref="depthEl" aria-hidden="true" />
-    <p v-for="(para, i) in descParagraphs" :key="i" class="work-desc">{{ para }}</p>
+    <p v-for="(para, i) in bodyParagraphs" :key="i" class="work-desc">{{ para }}</p>
     <span ref="endEl" aria-hidden="true" />
 
     <a

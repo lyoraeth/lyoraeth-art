@@ -31,10 +31,31 @@ export default defineType({
       type: 'number',
     }),
     defineField({
+      name: 'topic',
+      title: 'Topic (card label)',
+      type: 'object',
+      description: 'One word above the title on a card. One per post, unlike tags.',
+      fields: [
+        { name: 'en', title: 'English', type: 'string', validation: (rule: any) => rule.max(24) },
+        { name: 'ru', title: 'Russian', type: 'string', validation: (rule: any) => rule.max(24) },
+      ],
+    }),
+    defineField({
+      name: 'excerpt',
+      title: 'Excerpt (card)',
+      type: 'object',
+      description: 'Written for the card, not lifted from the opening. Falls back to the start of the body when empty.',
+      fields: [
+        { name: 'en', title: 'English', type: 'text', rows: 3, validation: (rule: any) => rule.max(240).warning('Over 240 characters the card grows past its design height') },
+        { name: 'ru', title: 'Russian', type: 'text', rows: 3, validation: (rule: any) => rule.max(240).warning('Over 240 characters the card grows past its design height') },
+      ],
+    }),
+    defineField({
       name: 'tags',
       title: 'Tags',
       type: 'array',
       of: [{ type: 'string' }],
+      description: 'Search and filtering in the blog — separate from the topic label.',
       options: { layout: 'tags' },
     }),
     defineField({

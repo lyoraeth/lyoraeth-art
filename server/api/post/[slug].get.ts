@@ -16,7 +16,9 @@ export default defineEventHandler(async (event) => {
       title,
       publishedAt,
       readingTime,
+      topic,
       tags,
+      "cmsExcerpt": excerpt,
       "coverUrl":    cover.asset->url,
       "coverAlt":    cover.alt,
       "coverWidth":  cover.asset->metadata.dimensions.width,
@@ -30,11 +32,13 @@ export default defineEventHandler(async (event) => {
 
   if (!post) throw createError({ statusCode: 404, message: 'Post not found' })
 
-  // derived server-side so the page never ships the markdown pipeline twice
+  // hand-written where the CMS has it, derived otherwise — either way the page
+  // never ships the markdown pipeline twice
   post.excerpt = {
-    en: post.body.en ? mdExcerpt(post.body.en) : '',
-    ru: post.body.ru ? mdExcerpt(post.body.ru) : null,
+    en: post.cmsExcerpt?.en || (post.body.en ? mdExcerpt(post.body.en) : ''),
+    ru: post.cmsExcerpt?.ru || (post.body.ru ? mdExcerpt(post.body.ru) : null),
   }
+  delete post.cmsExcerpt
   post.wordCount = post.body.en
     ? mdPlainText(post.body.en).split(/\s+/).filter(Boolean).length
     : 0

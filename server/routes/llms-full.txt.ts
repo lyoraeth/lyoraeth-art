@@ -14,13 +14,13 @@ export default defineEventHandler(async (event) => {
       client.fetch<any[]>(`
         *[_type == "work"] | order(order asc) {
           "slug": coalesce(slug.current, _id),
-          title, kicker, description, tags, tagWarm, url, year
+          title, kicker, excerpt, body, tags, url, year
         }
       `),
       client.fetch<any[]>(`
         *[_type == "post"] | order(publishedAt desc) {
           "slug": slug.current,
-          title, publishedAt, readingTime, tags, body
+          title, publishedAt, readingTime, topic, tags, body
         }
       `),
     ])
@@ -47,9 +47,10 @@ export default defineEventHandler(async (event) => {
       lines.push(`### ${item.title?.en ?? 'Untitled'}`)
       if (item.kicker?.en)       lines.push(`*${item.kicker.en}*`)
       if (item.year)             lines.push(`Year: ${item.year}`)
-      const tags = [item.tagWarm, ...(item.tags ?? [])].filter(Boolean)
+      const tags = item.tags ?? []
       if (tags.length)           lines.push(`Tags: ${tags.join(', ')}`)
-      if (item.description?.en)  lines.push('', item.description.en)
+      if (item.body?.en)         lines.push('', item.body.en)
+      else if (item.excerpt?.en) lines.push('', item.excerpt.en)
       if (item.url)              lines.push('', `URL: ${item.url}`)
       lines.push(`Case page: ${BASE}/work/${item.slug}`)
       lines.push('')

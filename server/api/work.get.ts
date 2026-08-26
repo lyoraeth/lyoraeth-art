@@ -16,10 +16,9 @@ export default defineCachedEventHandler(async (event) => {
       "slug": coalesce(slug.current, _id),
       title,
       kicker,
-      shortDescription,
-      description,
+      teaser,
+      excerpt,
       tags,
-      tagWarm,
       url,
       showLink,
       year,
@@ -34,10 +33,11 @@ export interface WorkItem {
   slug:        string
   title:       { en: string; ru: string }
   kicker:      { en: string; ru: string }
-  shortDescription: { en: string; ru: string } | null
-  description: { en: string; ru: string }
+  /** One line under the title on a resting card. */
+  teaser:      { en: string; ru: string } | null
+  /** Replaces the teaser on hover, and carries the work listing. */
+  excerpt:     { en: string; ru: string } | null
   tags:        string[]
-  tagWarm:     string | null
   url?:        string
   showLink?:   boolean
   year?:       number

@@ -24,22 +24,33 @@ export default defineType({
       ],
     }),
     defineField({
-      name: 'shortDescription',
-      title: 'Short description (cards)',
+      name: 'teaser',
+      title: 'Teaser (card at rest)',
       type: 'object',
-      description: 'Shown on homepage and work listing. 1–2 sentences.',
+      description: 'One line under the title on a resting card. Hard limit — longer text breaks the card.',
       fields: [
-        { name: 'en', title: 'English', type: 'text', rows: 2 },
-        { name: 'ru', title: 'Russian', type: 'text', rows: 2 },
+        { name: 'en', title: 'English', type: 'string', validation: (rule: any) => rule.max(60) },
+        { name: 'ru', title: 'Russian', type: 'string', validation: (rule: any) => rule.max(60) },
       ],
     }),
     defineField({
-      name: 'description',
-      title: 'Full description (case page)',
+      name: 'excerpt',
+      title: 'Excerpt (card on hover, work listing)',
       type: 'object',
+      description: 'Replaces the teaser when the card is hovered, and carries the work listing. 2–3 sentences.',
       fields: [
-        { name: 'en', title: 'English', type: 'text', rows: 3 },
-        { name: 'ru', title: 'Russian', type: 'text', rows: 3 },
+        { name: 'en', title: 'English', type: 'text', rows: 3, validation: (rule: any) => rule.max(240).warning('Over 240 characters the card grows past its design height') },
+        { name: 'ru', title: 'Russian', type: 'text', rows: 3, validation: (rule: any) => rule.max(240).warning('Over 240 characters the card grows past its design height') },
+      ],
+    }),
+    defineField({
+      name: 'body',
+      title: 'Body (case page)',
+      type: 'object',
+      description: 'Full text of the case. Blank lines separate paragraphs.',
+      fields: [
+        { name: 'en', title: 'English', type: 'text', rows: 12 },
+        { name: 'ru', title: 'Russian', type: 'text', rows: 12 },
       ],
     }),
     defineField({
@@ -48,12 +59,6 @@ export default defineType({
       type: 'array',
       of: [{ type: 'string' }],
       options: { layout: 'tags' },
-    }),
-    defineField({
-      name: 'tagWarm',
-      title: 'Highlighted tag (amber)',
-      type: 'string',
-      description: 'Displayed in amber, e.g. "Design system" or "Prod"',
     }),
     defineField({
       name: 'cover',
@@ -110,6 +115,6 @@ export default defineType({
     },
   ],
   preview: {
-    select: { title: 'title.en', subtitle: 'tagWarm', media: 'cover' },
+    select: { title: 'title.en', subtitle: 'teaser.en', media: 'cover' },
   },
 })

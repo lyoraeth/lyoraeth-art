@@ -33,10 +33,9 @@ onMounted(() => {
     <div class="card-body">
       <p class="eyebrow card-kicker">{{ loc(item.kicker) }}</p>
       <h3 class="card-title">{{ loc(item.title) }}</h3>
-      <p class="card-desc">{{ loc(item.shortDescription) || loc(item.description) }}</p>
+      <p class="card-desc">{{ loc(item.excerpt) || loc(item.teaser) }}</p>
       <div class="card-tags">
         <span v-for="tag in item.tags" :key="tag" class="tag">{{ tag }}</span>
-        <span v-if="item.tagWarm" class="tag tag--warm">{{ item.tagWarm }}</span>
       </div>
     </div>
 

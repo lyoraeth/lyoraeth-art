@@ -3,7 +3,6 @@ export interface SiteSettings {
   githubHandle:    string
   cvUrlEn:         string | null
   cvUrlRu:         string | null
-  heroPortraitUrl: string | null
 }
 
 const DEFAULTS: SiteSettings = {
@@ -11,11 +10,10 @@ const DEFAULTS: SiteSettings = {
   githubHandle:    'lyoraeth',
   cvUrlEn:         null,
   cvUrlRu:         null,
-  heroPortraitUrl: null,
 }
 
-/** GET /api/settings — site-wide settings singleton (social handles, CV +
- *  portrait asset URLs). Falls back to DEFAULTS when unset or CMS unconfigured. */
+/** GET /api/settings — site-wide settings singleton (social handles, CV asset
+ *  URLs). Falls back to DEFAULTS when unset or CMS unconfigured. */
 export default defineEventHandler(async (event) => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
   if (!sanityProjectId) return DEFAULTS
@@ -27,8 +25,7 @@ export default defineEventHandler(async (event) => {
       telegramHandle,
       githubHandle,
       "cvUrlEn": cvEn.asset->url,
-      "cvUrlRu": cvRu.asset->url,
-      "heroPortraitUrl": heroPortrait.asset->url
+      "cvUrlRu": cvRu.asset->url
     }
   `)
 
