@@ -40,3 +40,7 @@ commits.txt
 
 # Licensed typefaces — served from the VPS, never committed (see design-system.css)
 /public/fonts/
+
+# Playwright run artifacts
+/test-results/
+/playwright-report/
