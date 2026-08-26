@@ -58,6 +58,24 @@ test.describe('header', () => {
   })
 })
 
+test.describe('hero', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+  })
+
+  test('name, portrait and the latest post are rendered', async ({ page }) => {
+    await expect(page.locator('#hero-title')).toBeVisible()
+
+    const img = page.locator('.hero-portrait img')
+    await expect(img).toBeVisible()
+    // the browser picked a source and decoded it, rather than falling back to alt
+    expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0)
+
+    await expect(page.locator('.hero-meta a')).toHaveAttribute('href', /\/writing\//)
+  })
+})
+
 test.describe('phone menu', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 

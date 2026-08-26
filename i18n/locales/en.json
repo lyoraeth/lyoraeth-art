@@ -39,18 +39,13 @@
   },
 
   "hero": {
-    "eyebrow": "Frontend · Remote · Available July 2026",
     "name": "Danil Klimov",
-    "subtitle": "I take a task and {em} {acc}",
-    "subtitle_em": "get it",
-    "subtitle_acc": "done.",
-    "meta": [
-      { "label": "Now", "value": "Open to projects, from July" },
-      { "label": "Stack", "value": "Vue · TypeScript · Animation" }
-    ],
-    "fig_label": "fig. 01",
-    "fig_caption": "author & builder",
-    "scroll": "scroll ↓"
+    "role": "Frontend developer.",
+    "stack": "Vue, TypeScript, Nuxt, GSAP.",
+    "cta": "Get in touch",
+    "about": "About me, briefly",
+    "meta": "St. Petersburg, office or remote. Open to offers. I write about websites.",
+    "latest": "Latest post:"
   },
 
   "stack": {

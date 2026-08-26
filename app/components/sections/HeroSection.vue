@@ -1,200 +1,178 @@
 <script setup lang="ts">
-import type { SiteSettings } from '../../../server/api/settings.get'
+import type { PostItem } from '../../../server/api/posts.get'
 
-const { t, tm, rt } = useI18n()
-const ready = ref(false)
+const { t } = useI18n()
+const loc = useLoc()
+const localePath = useLocalePath()
 
-// Explicit shared key — ContactSection uses the same one, so both sections
-// share a single request and hydration payload entry per SSR render.
-const { data: settings } = await useFetch<SiteSettings>('/api/settings', { key: 'site-settings' })
+const { data: posts } = await useFetch<PostItem[]>('/api/posts', {
+  query: { limit: 1 },
+  key: 'latest-post',
+  default: () => [] as PostItem[],
+})
 
-onMounted(() => requestAnimationFrame(() => { ready.value = true }))
-
-const meta = computed(() =>
-  (tm('hero.meta') as any[]).map(item => ({
-    label: rt(item.label),
-    value: rt(item.value),
-  }))
-)
+const latest = computed(() => posts.value[0] ?? null)
 </script>
 
 <template>
-  <header :class="['hero', { 'hero-ready': ready }]">
-    <div class="hero-content">
-      <p class="eyebrow hero-eyebrow lo d1">{{ t('hero.eyebrow') }}</p>
+  <!--
+    Rows are auto rather than fractions: their height is set by the portrait and
+    the text under it. Equal fractions would level the rows to the tallest one,
+    and the empty second row would take as much as the portrait.
+  -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-intro">
+      <hgroup class="flex flex-col gap-hero-heading-gap">
+        <h1 id="hero-title" class="type-display-3xl text-text-primary">{{ t('hero.name') }}</h1>
+        <p class="flex flex-col gap-hero-subtitle-gap">
+          <span class="type-display-lg text-text-secondary">{{ t('hero.role') }}</span>
+          <span class="type-display-lg text-text-primary">{{ t('hero.stack') }}</span>
+        </p>
+      </hgroup>
 
-      <h1 class="hero-name lo d2">
-        {{ t('hero.name') }}
-        <i18n-t keypath="hero.subtitle" tag="span" class="hero-sub lo d3">
-          <template #em><em>{{ t('hero.subtitle_em') }}</em></template>
-          <template #acc><span class="hero-sub-acc">{{ t('hero.subtitle_acc') }}</span></template>
-        </i18n-t>
-      </h1>
-
-      <div class="hero-foot lo d4">
-        <div v-for="item in meta" :key="item.label" class="hero-meta">
-          <span class="eyebrow">{{ item.label }}</span>
-          <b>{{ item.value }}</b>
-        </div>
-      </div>
+      <NuxtLink
+        :to="`${localePath('/')}#contact`"
+        class="py-4 px-9 bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-default w-fit text-text-inverse rounded-full type-cta"
+      >
+        {{ t('hero.cta') }}
+      </NuxtLink>
     </div>
 
-    <figure class="hero-portrait lo d3">
-      <div class="hero-portrait-frame">
-        <SanityPicture
-          :src="settings?.heroPortraitUrl"
-          :alt="t('hero.name')"
-          class="hero-portrait-img"
-          loading="eager"
-          fetchpriority="high"
-          :width="800"
-        >
-          <template #placeholder>
-            <img src="/hero-portrait.png" class="hero-portrait-img" fetchpriority="high" :alt="t('hero.name')" @error="(e) => (e.target as HTMLElement).style.display = 'none'" />
-          </template>
-        </SanityPicture>
-      </div>
-      <figcaption class="hero-portrait-caption">
-        <span class="eyebrow fig-label">{{ t('hero.fig_label') }}</span>
-        <span class="fig-text">{{ t('hero.fig_caption') }}</span>
-      </figcaption>
-    </figure>
+    <!--
+      Reference for how images are served across the site.
 
-    <p class="scroll-cue eyebrow lo d4">{{ t('hero.scroll') }}</p>
-  </header>
+      The source is a high-resolution png; 1x/2x/3x are derived from the actual
+      maximum display size, and each runs through the formats with its own
+      compression settings. Sources go newest to oldest — jxl, avif, webp, jpeg:
+      the browser takes the first it understands.
+
+      jxl leads deliberately, though on this image it's ~16% heavier than avif:
+      it decodes progressively, resolving from a blurred frame on a slow
+      connection, where avif waits for the whole file.
+
+      sizes describes the real display width and has to match the CSS: it doesn't
+      read var(), and it sets the image's own size as well as which file to pick
+      — when the two disagree, the image sticks to the value from sizes.
+    -->
+    <picture class="hero-portrait">
+      <source
+        type="image/jxl"
+        srcset="/face/face-400.jxl 400w, /face/face-800.jxl 800w, /face/face-1200.jxl 1200w"
+        sizes="(min-width: 48rem) 20rem, calc(100vw - 3rem)"
+      >
+      <source
+        type="image/avif"
+        srcset="/face/face-400.avif 400w, /face/face-800.avif 800w, /face/face-1200.avif 1200w"
+        sizes="(min-width: 48rem) 20rem, calc(100vw - 3rem)"
+      >
+      <source
+        type="image/webp"
+        srcset="/face/face-400.webp 400w, /face/face-800.webp 800w, /face/face-1200.webp 1200w"
+        sizes="(min-width: 48rem) 20rem, calc(100vw - 3rem)"
+      >
+      <img
+        src="/face/face-800.jpg"
+        srcset="/face/face-400.jpg 400w, /face/face-800.jpg 800w, /face/face-1200.jpg 1200w"
+        sizes="(min-width: 48rem) 20rem, calc(100vw - 3rem)"
+        :alt="t('hero.name')"
+        width="400"
+        height="500"
+        fetchpriority="high"
+        loading="eager"
+      >
+    </picture>
+
+    <aside class="hero-meta" :aria-label="t('hero.about')">
+      <p class="type-body-lg text-text-secondary">
+        {{ t('hero.meta') }} {{ t('hero.latest') }}
+        <!-- inline element: the link runs on with the text instead of starting a line -->
+        <NuxtLink
+          v-if="latest"
+          :to="localePath(`/writing/${latest.slug}`)"
+          class="text-text-primary hover:text-accent-strong-hover active:text-accent-default transition-colors"
+        >
+          {{ loc(latest.title) }}
+        </NuxtLink>
+      </p>
+    </aside>
+  </section>
 </template>
 
 <style scoped>
-.hero {
-  min-height: 100vh;
-  min-height: 100svh;
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: center;
-  padding: 5.625rem 0 3.75rem;
-  position: relative;
-}
-
-@media (min-width: 64em) {
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  /*
+   * Three layouts, collected here rather than spread across four elements as
+   * utilities. Read top to bottom, narrow to wide:
+   *
+   *   < 768     no columns: portrait → intro → text, three rows by content
+   *   768…1024  two columns: intro and portrait in the first row, text below
+   *             them across the full width, ranged left, no width limit
+   *   >= 1024   intro spans both rows on the left; on the right the portrait
+   *             and, under it, the text — ranged right and width-limited
+   */
   .hero {
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: clamp(2rem, 5vw, 4.5rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(3, auto);
+    column-gap: var(--spacing-grid-gap);
+    row-gap: var(--spacing-hero-gap-y);
+    padding-block: var(--spacing-section-padding-y);
   }
-}
 
-.hero-content {
-  min-width: 0;
-}
+  .hero-portrait { grid-area: 1 / 1 / 2 / 2; }
+  .hero-intro    { grid-area: 2 / 1 / 3 / 2; }
+  .hero-meta     { grid-area: 3 / 1 / 4 / 2; }
 
-.hero-eyebrow {
-  margin-bottom: 1.875rem;
-}
+  .hero-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: var(--spacing-hero-intro-gap);
+    height: 100%;
+  }
 
-/* ── Portrait — a figure with a hairline frame, an inner gap (photo inset,
-   radii kept concentric with the frame), and a mono caption underneath.
-   Intentionally not a card (cards here are clickable teasers) and not a
-   mock-browser frame. Photo comes from Sanity site settings, with the
-   bundled static file as fallback while it's unset. */
-.hero-portrait {
-  display: none;
-}
-@media (min-width: 64em) {
-  .hero-portrait {
+  /* on a phone the portrait takes the full width, with no height ceiling */
+  .hero-portrait img {
     display: block;
-    margin: 0;
     width: 100%;
-    max-width: 22rem;
-    justify-self: end;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    /* Figma has no radius token for this yet */
+    border-radius: 1.75rem;
   }
-}
-.hero-portrait-frame {
-  padding: 0.375rem;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-card);
-}
-/* :deep() because the class lands on SanityPicture's inner <img>, which never
-   receives this component's scope attribute; same rule also covers the static
-   placeholder <img> in the slot. */
-.hero-portrait-frame :deep(.hero-portrait-img) {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  max-height: 30rem;
-  object-fit: cover;
-  object-position: center top;
-  /* concentric with the frame: outer radius − (padding + border) */
-  border-radius: calc(var(--radius-card) - 0.375rem - 1px);
-}
-.hero-portrait-caption {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-  padding: 0 0.4375rem;
-}
-.fig-label {
-  color: var(--ember);
-  flex-shrink: 0;
-}
-.fig-text {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.02em;
-  color: var(--faint);
-}
 
-.hero-name {
-  font-family: 'Golos Text', 'Onest', sans-serif;
-  font-size: clamp(2.125rem, 0.125rem + 6.6vw, 5.75rem);
-  font-weight: 700;
-  line-height: 1.0;
-  letter-spacing: -0.03em;
-  margin-bottom: 1.75rem;
-}
+  @media (width >= 48rem) {
+    .hero {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, auto);
+    }
 
-.hero-sub {
-  font-family: 'Onest', sans-serif;
-  display: block;
-  color: var(--mist);
-  font-weight: 400;
-  font-size: clamp(1.25rem, 0.5rem + 2.2vw, 2.125rem);
-  letter-spacing: -0.02em;
-  margin-top: 1.625rem;
-  max-width: 21ch;
-  line-height: 1.18;
-}
-.hero-sub em {
-  color: var(--ink);
-  font-style: normal;
-  font-weight: 500;
-}
-.hero-sub-acc {
-  color: var(--ember);
-  font-style: normal;
-  font-weight: 500;
-}
+    .hero-intro    { grid-area: 1 / 1 / 2 / 2; }
+    .hero-portrait { grid-area: 1 / 2 / 2 / 3; justify-self: end; width: fit-content; }
+    .hero-meta     { grid-area: 2 / 1 / 3 / 3; }
 
-.hero-foot {
-  display: flex;
-  gap: 2.125rem;
-  align-items: flex-end;
-  margin-top: 3.375rem;
-  flex-wrap: wrap;
-}
-.hero-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-.hero-meta b {
-  font-weight: 500;
-  font-size: 0.875rem;
-  color: var(--ink);
-}
+    /* from here the portrait lives by its height ceiling, width follows from it */
+    .hero-portrait img {
+      width: auto;
+      max-height: 25rem;
+    }
+  }
 
-.scroll-cue {
-  position: absolute;
-  bottom: 1.875rem;
-  left: 0;
+  @media (width >= 64rem) {
+    /* the intro unfolds across both rows, the text moves under the portrait */
+    .hero-intro { grid-area: 1 / 1 / 3 / 2; }
+
+    .hero-meta {
+      grid-area: 2 / 2 / 3 / 3;
+      justify-self: end;
+      max-width: 27.5rem;
+      text-align: right;
+    }
+  }
+
+  @media (width >= 80rem) {
+    .hero-intro { justify-content: flex-end; }
+  }
 }
 </style>

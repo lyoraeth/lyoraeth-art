@@ -3,5 +3,5 @@ definePageMeta({ layout: 'redesign' })
 </script>
 
 <template>
-  <div class="contents" />
+  <HeroSection />
 </template>
