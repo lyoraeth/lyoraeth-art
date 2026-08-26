@@ -25,9 +25,11 @@ export default defineType({
     localeString({
       name: 'teaser',
       title: 'Teaser',
-      description: 'One line under the title while the card rests. Hard limit — a longer line breaks the card.',
+      description: 'Sits under the title while the card rests, and gives way to the excerpt on hover.',
       group: 'content',
-      maxChars: 60,
+      maxChars: 80,
+      soft: true,
+      hint: 'Past 80 characters the teaser stops hinting and starts competing with the hovered state',
     }),
     localeText({
       name: 'excerpt',

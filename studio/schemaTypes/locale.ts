@@ -19,16 +19,18 @@ interface LocaleFieldOptions {
   maxChars?: number
   /** Warn instead of blocking — for limits the layout survives crossing. */
   soft?: boolean
+  /** Replaces the default warning text. */
+  hint?: string
   /** English is the source language: required where the field itself is. */
   requireEn?: boolean
   /** Height of the input in the Studio. */
   rows?: number
 }
 
-const limit = (rule: Rule, { maxChars, soft }: LocaleFieldOptions): Rule => {
+const limit = (rule: Rule, { maxChars, soft, hint }: LocaleFieldOptions): Rule => {
   if (!maxChars) return rule
   return soft
-    ? rule.max(maxChars).warning(`Over ${maxChars} characters the card grows past its design height`)
+    ? rule.max(maxChars).warning(hint ?? `Over ${maxChars} characters the card grows past its design height`)
     : rule.max(maxChars)
 }
 
