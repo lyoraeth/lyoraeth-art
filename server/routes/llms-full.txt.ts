@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       client.fetch<any[]>(`
         *[_type == "work"] | order(order asc) {
           "slug": coalesce(slug.current, _id),
-          title, kicker, excerpt, body, tags, url, year
+          title, teaser, excerpt, body, tags, url, year
         }
       `),
       client.fetch<any[]>(`
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
 
     for (const item of work) {
       lines.push(`### ${item.title?.en ?? 'Untitled'}`)
-      if (item.kicker?.en)       lines.push(`*${item.kicker.en}*`)
+      if (item.teaser?.en)       lines.push(`*${item.teaser.en}*`)
       if (item.year)             lines.push(`Year: ${item.year}`)
       const tags = item.tags ?? []
       if (tags.length)           lines.push(`Tags: ${tags.join(', ')}`)

@@ -79,7 +79,7 @@ const { depthEl, endEl } = useCaseStudyFunnel(slug)
 
     <header class="work-header">
       <div class="work-meta">
-        <span class="eyebrow">{{ loc(item.kicker) }}</span>
+        <span class="eyebrow">{{ loc(item.teaser) }}</span>
         <span v-if="item.year" class="eyebrow meta-dot-sep">{{ item.year }}</span>
       </div>
 

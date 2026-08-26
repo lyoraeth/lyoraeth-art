@@ -23,12 +23,6 @@ export default defineType({
       requireEn: true,
     }),
     localeString({
-      name: 'kicker',
-      title: 'Kicker',
-      description: 'Eyebrow line above the title on the case page.',
-      group: 'content',
-    }),
-    localeString({
       name: 'teaser',
       title: 'Teaser',
       description: 'One line under the title while the card rests. Hard limit — a longer line breaks the card.',

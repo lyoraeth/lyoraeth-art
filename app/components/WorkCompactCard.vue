@@ -22,7 +22,7 @@ useGlowCard(cardRef)
       @click="navigate"
     >
       <div class="wc-top">
-        <span class="eyebrow wc-kicker">{{ loc(item.kicker) }}</span>
+        <span class="eyebrow wc-teaser">{{ loc(item.teaser) }}</span>
       </div>
       <h2 class="wc-title">{{ loc(item.title) }}</h2>
       <p class="wc-desc">{{ loc(item.excerpt) || loc(item.teaser) }}</p>
@@ -56,7 +56,7 @@ useGlowCard(cardRef)
   justify-content: space-between;
   gap: 0.75rem;
 }
-.wc-kicker { color: var(--faint); }
+.wc-teaser { color: var(--faint); }
 
 .wc-title {
   font-size: clamp(1.0625rem, 0.875rem + 0.5vw, 1.3125rem);

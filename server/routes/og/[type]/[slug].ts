@@ -122,13 +122,13 @@ export default defineCachedEventHandler(async (event) => {
     }).replace(/\s*г\.$/, '') // ru locale appends " г." — drop it
     meta = `${date} · ${doc.readingTime} ${locale === 'ru' ? 'мин' : 'min'}`
   } else {
-    const doc = await client.fetch<{ title: { en: string; ru?: string }; kicker?: { en: string; ru?: string }; year?: number } | null>(
-      `*[_type == "work" && coalesce(slug.current, _id) == $s][0]{ title, kicker, year }`, { s: slug },
+    const doc = await client.fetch<{ title: { en: string; ru?: string }; teaser?: { en: string; ru?: string }; year?: number } | null>(
+      `*[_type == "work" && coalesce(slug.current, _id) == $s][0]{ title, teaser, year }`, { s: slug },
     )
     if (!doc) throw createError({ statusCode: 404 })
     titleObj = doc.title
     eyebrow  = locale === 'ru' ? 'РАБОТА' : 'WORK'
-    const kick = locale === 'ru' ? (doc.kicker?.ru ?? doc.kicker?.en) : doc.kicker?.en
+    const kick = locale === 'ru' ? (doc.teaser?.ru ?? doc.teaser?.en) : doc.teaser?.en
     meta = [kick, doc.year].filter(Boolean).join(' · ')
   }
 

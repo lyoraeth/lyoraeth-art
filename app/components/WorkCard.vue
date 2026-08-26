@@ -31,7 +31,7 @@ onMounted(() => {
     :class="[`rv-d${index + 1}`, { 'work-card--reverse': reverse }]"
   >
     <div class="card-body">
-      <p class="eyebrow card-kicker">{{ loc(item.kicker) }}</p>
+      <p class="eyebrow card-teaser">{{ loc(item.teaser) }}</p>
       <h3 class="card-title">{{ loc(item.title) }}</h3>
       <p class="card-desc">{{ loc(item.excerpt) || loc(item.teaser) }}</p>
       <div class="card-tags">
@@ -116,7 +116,7 @@ onMounted(() => {
 @media (max-width: 47.5em) {
   .card-divider { display: none; }
 }
-.card-kicker { margin-bottom: auto; }
+.card-teaser { margin-bottom: auto; }
 .card-title {
   font-size: clamp(1.25rem, 0.875rem + 1vw, 1.6875rem);
   font-weight: 600;

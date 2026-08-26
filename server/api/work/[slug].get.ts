@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
       _id,
       "slug": coalesce(slug.current, _id),
       title,
-      kicker,
       teaser,
       excerpt,
       body,
