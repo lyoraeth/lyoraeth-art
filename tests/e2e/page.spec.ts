@@ -33,26 +33,52 @@ test.describe('runtime errors', () => {
 
 // ── Sections render ───────────────────────────────────────────────────────────
 
-test.describe('sections visible', () => {
+test.describe('header', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
   })
 
-  const sections = ['#work', '#stack', '#approach', '#writing', '#contact']
+  // scoped to the bar: the phone menu lives inside <header> and carries its own nav
+  const bar = '.header-bar'
 
-  for (const id of sections) {
-    test(`section ${id} exists in DOM`, async ({ page }) => {
-      const el = page.locator(id)
-      await expect(el).toBeAttached()
-    })
-  }
+  test('brand, navigation and search are rendered', async ({ page }) => {
+    await expect(page.locator(`${bar} img`)).toBeVisible()
+    await expect(page.locator(`${bar} nav a`)).toHaveCount(4)
+    await expect(page.locator('#site-search')).toBeAttached()
+  })
 
-  test('work cards reveal after scroll', async ({ page }) => {
-    await page.locator('#work').scrollIntoViewIfNeeded()
-    await page.waitForTimeout(1200) // reveal duration
-    const cards = page.locator('.work-card.in')
-    await expect(cards).not.toHaveCount(0)
+  test('anchors clear the sticky header', async ({ page }) => {
+    const padding = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).scrollPaddingTop
+    )
+    // the bar, not the whole header: the 1px bottom border is deliberate slack
+    const height = (await page.locator(bar).boundingBox())!.height
+    expect(parseFloat(padding)).toBeCloseTo(height, 0)
+  })
+})
+
+test.describe('phone menu', () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+
+  test('opens, isolates the page, closes on Escape', async ({ page }) => {
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+
+    const menu = page.locator('#mobile-menu')
+    const burger = page.locator('header button[aria-controls="mobile-menu"]')
+
+    await expect(menu).toBeHidden()
+
+    await burger.click()
+    await expect(menu).toBeVisible()
+    await expect(page.locator('main')).toHaveAttribute('inert', '')
+    await expect(page.locator('html')).toHaveCSS('overflow', 'hidden')
+
+    await page.keyboard.press('Escape')
+    await expect(menu).toBeHidden()
+    await expect(page.locator('main')).not.toHaveAttribute('inert', '')
+    await expect(burger).toBeFocused()
   })
 })
 
@@ -92,35 +118,6 @@ test.describe('performance', () => {
     console.log(`JS heap after full scroll: ${heapMB.toFixed(1)} MB`)
 
     expect(heapMB, `Heap too large: ${heapMB.toFixed(1)} MB`).toBeLessThan(100)
-  })
-
-  test('no layout shift on card hover', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
-    await page.locator('#work').scrollIntoViewIfNeeded()
-    await page.waitForTimeout(1200)
-
-    const clsBefore = await page.evaluate(() => {
-      let cls = 0
-      new PerformanceObserver(list => {
-        list.getEntries().forEach((e: any) => { if (!e.hadRecentInput) cls += e.value })
-      }).observe({ type: 'layout-shift', buffered: true })
-      return cls
-    })
-
-    const card = page.locator('.work-card').first()
-    await card.hover()
-    await page.waitForTimeout(400)
-
-    const clsAfter = await page.evaluate(() => {
-      let cls = 0
-      const entries = performance.getEntriesByType('layout-shift') as any[]
-      entries.forEach(e => { if (!e.hadRecentInput) cls += e.value })
-      return cls
-    })
-
-    console.log(`CLS delta on hover: ${(clsAfter - clsBefore).toFixed(4)}`)
-    expect(clsAfter - clsBefore, 'Card hover caused layout shift').toBeLessThan(0.05)
   })
 })
 

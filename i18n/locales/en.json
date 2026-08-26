@@ -19,10 +19,23 @@
     "cv": "CV",
     "lang_toggle": "Language",
     "site_nav": "Site navigation",
+    "experience": "Experience",
+    "brand": "lyoraeth, to the home page",
+    "lang_switch": "Switch language, currently English",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu",
+    "mobile_nav": "Mobile navigation",
     "drop_work_label": "featured",
     "drop_writing_label": "latest",
     "drop_all_work": "All work",
     "drop_all_posts": "All posts"
+  },
+
+  "search": {
+    "placeholder": "Search",
+    "label": "Search the site",
+    "submit": "Find",
+    "toggle": "Search"
   },
 
   "hero": {

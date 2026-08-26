@@ -15,14 +15,27 @@
       "busy":        "Занят",
       "unavailable": "Недоступен"
     },
-    "contact": "Контакт",
+    "contact": "Контакты",
     "cv": "CV",
     "lang_toggle": "Язык",
     "site_nav": "Навигация по сайту",
+    "experience": "Опыт",
+    "brand": "lyoraeth, на главную",
+    "lang_switch": "Сменить язык, сейчас русский",
+    "menu_open": "Открыть меню",
+    "menu_close": "Закрыть меню",
+    "mobile_nav": "Мобильная навигация",
     "drop_work_label": "избранное",
     "drop_writing_label": "последние",
     "drop_all_work": "Все работы",
     "drop_all_posts": "Все посты"
+  },
+
+  "search": {
+    "placeholder": "Поиск",
+    "label": "Поиск по сайту",
+    "submit": "Найти",
+    "toggle": "Поиск"
   },
 
   "hero": {

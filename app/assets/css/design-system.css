@@ -350,6 +350,87 @@
   line-height: var(--text-ui--line-height);
 }
 
+/* ═══════════════════════ Elements ═══════════════════════ */
+
+/*
+ * 180ms on hover, 90ms on press — the response to a click has to outrun the
+ * response to a pointer, or the control feels stuck. The property list is
+ * explicit: Tailwind's own transition utility also covers filter,
+ * backdrop-filter and display, which nothing here animates.
+ */
+@utility interactive {
+  transition-property: color, background-color, border-color, outline-color, box-shadow, opacity, transform;
+  transition-timing-function: var(--ease-base);
+  transition-duration: var(--duration-hover);
+
+  &:active {
+    transition-duration: var(--duration-press);
+  }
+}
+
+/* Header navigation item. Phone menu items look the same — the size swaps
+   itself through --text-nav, so there's no second class. */
+@utility nav-link {
+  display: inline-flex;
+  align-items: center;
+  height: calc(var(--spacing) * 10);
+  padding-inline: calc(var(--spacing) * 3);
+  border-radius: calc(infinity * 1px);
+  font-size: var(--text-nav);
+  color: var(--color-text-primary);
+  transition: background-color var(--duration-hover) var(--ease-base),
+              color var(--duration-hover) var(--ease-base);
+
+  &:hover { background-color: var(--color-surface-hover); }
+  &:active {
+    background-color: var(--color-fill-strong);
+    color: var(--color-text-inverse);
+    transition-duration: var(--duration-press);
+  }
+}
+
+/* Pill with an icon and a label: language, CV. Fill and text color are set
+   where it's used — the frame is shared, the paint isn't. */
+@utility pill-button {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 1.5);
+  height: calc(var(--spacing) * 10);
+  padding-inline: calc(var(--spacing) * 3);
+  border-radius: calc(infinity * 1px);
+  font-size: var(--text-ui);
+  cursor: pointer;
+  transition: background-color var(--duration-hover) var(--ease-base),
+              color var(--duration-hover) var(--ease-base);
+
+  &:active { transition-duration: var(--duration-press); }
+}
+
+/* Round single-icon button. The icon runs on currentColor, so it inverts with
+   the fill on press. */
+@utility icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: calc(var(--spacing) * 10);
+  height: calc(var(--spacing) * 10);
+  border-radius: calc(infinity * 1px);
+  outline: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--duration-hover) var(--ease-base),
+              color var(--duration-hover) var(--ease-base),
+              outline-color var(--duration-hover) var(--ease-base);
+
+  &:hover { background-color: var(--color-surface-hover); }
+  &:active {
+    background-color: var(--color-fill-strong);
+    color: var(--color-text-inverse);
+    transition-duration: var(--duration-press);
+  }
+}
+
 /* header nav and phone menu items */
 @utility type-nav {
   font-family: var(--font-sans);
