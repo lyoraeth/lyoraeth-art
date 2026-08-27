@@ -200,7 +200,7 @@ function onFormStart() {
           class="contact-input"
           @input="errors.from = ''"
         >
-        <p id="contact-from-error" class="contact-error">{{ errors.from }}</p>
+        <p id="contact-from-error" class="contact-error"><span>{{ errors.from }}</span></p>
       </div>
 
       <div class="contact-field flex flex-col gap-2 pt-3" :data-invalid="errors.message || undefined">
@@ -217,7 +217,7 @@ function onFormStart() {
           class="contact-input contact-input--message"
           @input="errors.message = ''"
         />
-        <p id="contact-message-error" class="contact-error">{{ errors.message }}</p>
+        <p id="contact-message-error" class="contact-error"><span>{{ errors.message }}</span></p>
       </div>
 
       <div class="pt-4 gap-4 flex flex-col">
@@ -231,7 +231,7 @@ function onFormStart() {
           />
         </div>
 
-        <div class="contact-field flex flex-col gap-2" :data-invalid="errors.consent || undefined">
+        <div class="contact-field contact-field--consent flex flex-col gap-2" :data-invalid="errors.consent || undefined">
           <div class="contact-consent">
             <input
               id="contact-consent"
@@ -259,7 +259,7 @@ function onFormStart() {
               </i18n-t>
             </label>
           </div>
-          <p id="contact-consent-error" class="contact-error">{{ errors.consent }}</p>
+          <p id="contact-consent-error" class="contact-error"><span>{{ errors.consent }}</span></p>
         </div>
 
         <button
@@ -320,12 +320,44 @@ function onFormStart() {
     gap: calc(var(--spacing) * 2);
   }
 
+  /*
+   * Drawn by hand: the native control ignores the palette and brings its own
+   * proportions. Centred against the first line of the label, not the block —
+   * a wrapped second line goes below it, as it should.
+   */
   .contact-consent__box {
+    appearance: none;
     flex: none;
     width: calc(var(--spacing) * 4);
     height: calc(var(--spacing) * 4);
-    margin-top: 0.15em;
-    accent-color: var(--color-accent-strong);
+    /* takes the label's type so that 1lh below is the label's line, not the
+       one inherited from the page */
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    margin-top: calc((1lh - var(--spacing) * 4) / 2);
+    border: 1px solid var(--color-border-input);
+    border-radius: calc(var(--spacing) * 1);
+    background-color: var(--color-surface-field);
+    cursor: pointer;
+    transition: background-color var(--duration-hover) var(--ease-base),
+                border-color var(--duration-hover) var(--ease-base);
+  }
+
+  .contact-consent__box:hover {
+    border-color: var(--color-text-secondary);
+  }
+
+  .contact-consent__box:checked {
+    border-color: var(--color-fill-strong);
+    background-color: var(--color-fill-strong);
+    /* the tick is a mask, so it takes the colour of the surface underneath */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.4 2.4L9.5 4' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  .contact-field[data-invalid] .contact-consent__box {
+    border-color: var(--color-text-critical);
   }
 
   .contact-consent__link {
@@ -348,23 +380,42 @@ function onFormStart() {
   }
 
   /*
-   * The palette has no dedicated error colour, so the hint and the field's
-   * outline both use the accent — the one signalling colour in the system.
+   * Hints unfold rather than blink into place: a grid row animates from 0fr to
+   * 1fr, which is the one way height goes from nothing to content smoothly.
+   * The child clips itself, so the text doesn't spill while the row is short.
    */
   .contact-error {
-    display: none;
-    color: var(--color-accent-strong);
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    color: var(--color-text-critical);
     font-size: var(--text-ui);
     line-height: var(--text-ui--line-height);
     font-weight: var(--text-ui--font-weight);
+    transition: grid-template-rows var(--duration-hover) var(--ease-out),
+                opacity var(--duration-hover) var(--ease-out);
+  }
+
+  .contact-error > span {
+    overflow: hidden;
+    min-height: 0;
   }
 
   .contact-field[data-invalid] .contact-error {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  /* under the label's text rather than under the checkbox, and with a line of
+     air above it — otherwise it reads as a third link in the sentence */
+  .contact-field--consent .contact-error > span {
     display: block;
+    padding-top: calc(var(--spacing) * 1.5);
+    padding-left: calc(var(--spacing) * 6);
   }
 
   .contact-field[data-invalid] .contact-input {
-    outline-color: var(--color-accent-strong);
+    outline-color: var(--color-text-critical);
   }
 
   /* an empty outcome takes no space: no padding, no border, nothing */
@@ -380,7 +431,7 @@ function onFormStart() {
   }
 
   .contact-status[data-state='error'] {
-    color: var(--color-accent-strong);
+    color: var(--color-text-critical);
   }
 
   /* while it's sending, pressing again would only queue a duplicate */
