@@ -150,27 +150,42 @@
       "submit": "Submit",
       "success": "Comment submitted — it will appear after moderation.",
       "another": "Write another",
-      "error": "Something went wrong"
+      "error": "Something went wrong",
+      "consent": "I consent to my nickname being processed and the comment published — {consent} and {policy}",
+      "consent_link": "consent",
+      "policy_link": "policy"
     }
   },
 
   "contact": {
-    "heading_before_acc": "Got a project? ",
-    "heading_acc": "Let's talk.",
-    "lead": "Vague specs, a half-finished project, or just an idea? No worries. We'll figure it out.",
-    "cta": "Via Telegram",
-    "form_label": "or right here",
-    "contact_placeholder": "Your Telegram / {'@'}handle",
-    "message_placeholder": "Briefly, what do you need?",
-    "submit": "Send →",
-    "success": "Message sent — thank you!",
-    "send_another": "Send another",
-    "error": "Something went wrong",
-    "consent_pre": "I agree to the ",
-    "consent_link": "Privacy Policy",
-    "github": "GitHub",
+    "title": "Contact",
+    "lead": [
+      "Telegram is fastest. I usually reply the same day.",
+      "For a role: a link to the company and the range.",
+      "For a project: what exists already and by when."
+    ],
+    "telegram": "Telegram",
     "cv": "CV",
-    "cv_note": "pdf ↓"
+    "github": "GitHub",
+    "form_note": "Or through the form — I'll reply to whatever you leave.",
+    "from_label": "Telegram or e-mail",
+    "from_placeholder": "{'@'}example",
+    "message_label": "What it's about",
+    "message_placeholder": "A role, a project or a question — and a couple of details",
+    "consent": "I consent to my data being processed and transferred abroad — {consent} and {policy}",
+    "consent_link": "consent",
+    "policy_link": "policy",
+    "submit": "Send →",
+    "sending": "Sending…",
+    "errors": {
+      "from_empty": "Without a contact I have no way to reply",
+      "from_malformed": "Looks incomplete — an {'@'}handle or an e-mail address",
+      "message_empty": "A couple of words is enough — otherwise there's nothing to go on",
+      "consent_empty": "Consent is required by law before this can be sent"
+    },
+    "sent": "Sent. I'll reply to the contact you left — usually the same day.",
+    "failed": "Didn't go through. Try again, or write to me on Telegram — {'@'}lyoraeth.",
+    "captcha_failed": "The check didn't pass. Refresh the page and try again."
   },
 
   "form": {

@@ -118,15 +118,14 @@ async function submit() {
 
         <label class="consent-label" :class="{ 'consent-error': ve.consent }">
           <input type="checkbox" v-model="consent" class="consent-check" />
-          <span v-if="locale === 'ru'">
-            Я даю согласие на обработку никнейма и публикацию комментария —
-            <NuxtLink :to="localePath('/personal-data')" target="_blank" class="consent-link">согласие</NuxtLink>
-            и
-            <NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">политика</NuxtLink>
-          </span>
-          <span v-else>
-            {{ t('contact.consent_pre') }}<NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
-          </span>
+          <i18n-t keypath="post.comments.consent" tag="span" scope="global">
+            <template #consent>
+              <NuxtLink :to="localePath('/personal-data')" target="_blank" class="consent-link">{{ t('post.comments.consent_link') }}</NuxtLink>
+            </template>
+            <template #policy>
+              <NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">{{ t('post.comments.policy_link') }}</NuxtLink>
+            </template>
+          </i18n-t>
         </label>
         <p v-if="ve.consent" class="field-err" aria-live="polite">{{ t('form.required_consent') }}</p>
 
