@@ -1,9 +1,18 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /*
  * Waits are on 'load', not 'networkidle': the contact form embeds a Turnstile
  * widget that keeps a connection open, so the network never goes idle.
+ *
+ * 'load' alone isn't enough to interact, though — the markup is there but the
+ * handlers are not, and a click on a submit button would post the form the
+ * native way, reloading the page. Vue sets __vue_app__ on the root once it has
+ * hydrated, which is the moment the page becomes clickable.
  */
+async function ready(page: Page) {
+  await page.waitForLoadState('load')
+  await page.waitForFunction(() => Boolean((document.querySelector('#__nuxt') as any)?.__vue_app__))
+}
 
 // ── Console error / warning collector ────────────────────────────────────────
 
@@ -16,7 +25,7 @@ test.describe('runtime errors', () => {
     page.on('pageerror', err => errors.push(err.message))
 
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
 
     expect(errors, `Console errors:\n${errors.join('\n')}`).toHaveLength(0)
   })
@@ -30,7 +39,7 @@ test.describe('runtime errors', () => {
     })
 
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
 
     expect(hydrationWarnings, `Hydration warnings:\n${hydrationWarnings.join('\n')}`).toHaveLength(0)
   })
@@ -41,7 +50,7 @@ test.describe('runtime errors', () => {
 test.describe('header', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
   })
 
   // scoped to the bar: the phone menu lives inside <header> and carries its own nav
@@ -66,7 +75,7 @@ test.describe('header', () => {
 test.describe('hero', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
   })
 
   test('name, portrait and the latest post are rendered', async ({ page }) => {
@@ -84,7 +93,7 @@ test.describe('hero', () => {
 test.describe('work', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
   })
 
   test('header counts every work, the grid shows the first four', async ({ page }) => {
@@ -115,7 +124,7 @@ test.describe('work', () => {
 test.describe('writing', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
   })
 
   test('three cards, each linking to its post', async ({ page }) => {
@@ -141,7 +150,7 @@ test.describe('writing', () => {
 test.describe('card text stays selectable', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
   })
 
   test('dragging across a post excerpt selects it instead of following the card', async ({ page }) => {
@@ -201,7 +210,7 @@ test.describe('cards on touch', () => {
 
   test('a tap opens the card, and hover states never latch', async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
 
     const card = page.locator('.work-card').first()
     await card.scrollIntoViewIfNeeded()
@@ -218,7 +227,7 @@ test.describe('cards on touch', () => {
 test.describe('contact form', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
     await page.locator('#contact').scrollIntoViewIfNeeded()
   })
 
@@ -252,7 +261,7 @@ test.describe('phone menu', () => {
 
   test('opens, isolates the page, closes on Escape', async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
 
     const menu = page.locator('#mobile-menu')
     const burger = page.locator('header button[aria-controls="mobile-menu"]')
@@ -283,7 +292,8 @@ test.describe('performance', () => {
       }).observe({ type: 'largest-contentful-paint', buffered: true })
     })
 
-    await page.goto('/', { waitUntil: 'load' })
+    await page.goto('/')
+    await ready(page)
     await page.waitForTimeout(500)
     lcp = await page.evaluate(() => (window as any).__lcp ?? 0)
 
@@ -293,7 +303,7 @@ test.describe('performance', () => {
 
   test('JS heap stays under 100MB after full scroll', async ({ page }) => {
     await page.goto('/')
-    await page.waitForLoadState('load')
+    await ready(page)
 
     // scroll through the entire page
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
@@ -317,7 +327,7 @@ test('event listener count does not grow on navigation', async ({ page }) => {
     page.evaluate(() => (window as any).__listenerCount ?? 'unsupported')
 
   await page.goto('/')
-  await page.waitForLoadState('load')
+  await ready(page)
   await page.waitForTimeout(500)
 
   const heap1 = await page.evaluate(
@@ -325,7 +335,7 @@ test('event listener count does not grow on navigation', async ({ page }) => {
   )
 
   await page.reload()
-  await page.waitForLoadState('load')
+  await ready(page)
   await page.waitForTimeout(500)
 
   const heap2 = await page.evaluate(
