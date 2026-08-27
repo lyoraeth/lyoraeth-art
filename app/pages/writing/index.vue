@@ -74,7 +74,7 @@ const sorts = computed(() => [
   <div class="writing-page">
     <header class="page-head">
       <h1>{{ t('writing.title') }}</h1>
-      <span class="eyebrow">{{ t(`writing.posts_${plural(filtered.length)}`, { n: filtered.length }) }}</span>
+      <span class="eyebrow">{{ t(`writing.count_${plural(filtered.length)}`, { n: filtered.length }) }}</span>
     </header>
 
     <div class="writing-layout">
