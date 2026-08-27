@@ -1,65 +1,57 @@
-  <script setup lang="ts">
-  const { t } = useI18n()
-  const localePath = useLocalePath()
+<script setup lang="ts">
+import type { WorkItem } from '../../../server/api/work.get'
 
-  const { data: items } = await useFetch('/api/work', { default: () => [] })
+const { t } = useI18n()
+const localePath = useLocalePath()
+const plural = usePlural()
 
-  const headRef = ref<HTMLElement | null>(null)
-  const { observe } = useReveal()
-  onMounted(() => observe(headRef.value))
+// the whole list: the count in the header speaks for all of them, the grid
+// shows the first few
+const { data: items } = await useFetch<WorkItem[]>('/api/work', {
+  query: { limit: 0 },
+  key: 'work-all',
+  default: () => [] as WorkItem[],
+})
 
+const CARDS = 4
 
-  </script>
+const shown = computed(() => items.value.slice(0, CARDS))
+const total = computed(() => items.value.length)
+</script>
 
-  <template>
-    <section id="work" class="section-work">
-      <div class="sec-head reveal" ref="headRef">
-        <h2>{{ t('work.title') }}</h2>
-        <span class="eyebrow">{{ t('work.subtitle') }}</span>
-      </div>
+<template>
+  <section
+    id="work"
+    class="flex flex-col gap-y-section-header-gap py-section-padding-y"
+    aria-labelledby="work-title"
+  >
+    <div class="section-header">
+      <h2 id="work-title" class="section-header__title type-display-xl text-text-primary">
+        {{ t('work.title') }}
+      </h2>
+      <span class="section-header__count type-ui text-text-secondary">
+        {{ t(`work.count_${plural(total)}`, { n: total }) }}
+      </span>
+      <NuxtLink
+        :to="localePath('/work')"
+        class="section-header__action h-10 w-40 inline-flex justify-center items-center rounded-full type-ui text-text-inverse bg-fill-strong hover:bg-accent-strong-hover active:bg-accent-default"
+      >
+        {{ t('work.see_all') }}
+      </NuxtLink>
+    </div>
 
-      <div class="work-list">
-        <WorkCard
-          v-for="(item, i) in items"
-          :key="item._id"
-          :item="item"
-          :index="i"
-          :reverse="i % 2 === 1"
-        />
-      </div>
-
-      <div class="view-all-wrap">
-        <NuxtLink :to="localePath('/work')" class="view-all">{{ t('work.see_all') }} <span class="va-arrow">→</span></NuxtLink>
-      </div>
-    </section>
-  </template>
-
-  <style scoped>
-  .section-work {
-    padding: clamp(4.375rem, 9vw, 8.75rem) 0;
-  }
-  .work-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.375rem;
-  }
-  .view-all-wrap {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-  }
-  .view-all {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--ember);
-    font-size: 0.9375rem;
-    text-decoration: none;
-  }
-  .va-arrow {
-    display: inline-block;
-    vertical-align: middle;
-    transition: transform 0.3s var(--ease-out-expo);
-  }
-  .view-all:hover .va-arrow { transform: translateX(0.25rem); }
-  </style>
+    <!--
+      auto-rows-fr levels the cards against the tallest one, both within a row
+      and across rows: fractions in a container with no set height resolve to
+      the largest content. The floor of 320px lives in the card.
+    -->
+    <div class="layout-grid gap-grid-gap auto-rows-fr">
+      <WorkCard
+        v-for="item in shown"
+        :key="item._id"
+        :item="item"
+        class="col-span-4 xl:col-span-6 2xl:col-span-3"
+      />
+    </div>
+  </section>
+</template>

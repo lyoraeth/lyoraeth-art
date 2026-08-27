@@ -76,6 +76,37 @@ test.describe('hero', () => {
   })
 })
 
+test.describe('work', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+  })
+
+  test('header counts every work, the grid shows the first four', async ({ page }) => {
+    const cards = page.locator('.work-card')
+    await expect(cards).toHaveCount(4)
+
+    const count = await page.locator('#work .section-header__count').textContent()
+    const total = Number(count!.match(/\d+/)![0])
+    expect(total).toBeGreaterThanOrEqual(4)
+
+    await expect(cards.first().locator('a')).toHaveAttribute('href', /\/work\//)
+  })
+
+  test('hover swaps the teaser for the excerpt', async ({ page }) => {
+    const card = page.locator('.work-card').first()
+    await card.scrollIntoViewIfNeeded()
+
+    await expect(card.locator('.work-card__state--full')).toBeHidden()
+    await card.hover()
+    // both states share one grid cell, so the swap must not resize the card
+    const before = (await card.boundingBox())!.height
+    await expect(card.locator('.work-card__state--full')).toBeVisible()
+    await expect(card.locator('.work-card__state--short')).toBeHidden()
+    expect((await card.boundingBox())!.height).toBe(before)
+  })
+})
+
 test.describe('phone menu', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 

@@ -1,207 +1,221 @@
 <script setup lang="ts">
 import type { WorkItem } from '../../server/api/work.get'
 
-const props = defineProps<{
-  item:    WorkItem
-  index:   number
-  reverse: boolean
-}>()
+/**
+ * Work card. At rest it shows the teaser; on hover a fill sweeps out from the
+ * pointer and the excerpt takes the teaser's place.
+ */
+const props = defineProps<{ item: WorkItem }>()
 
+const { t } = useI18n()
 const loc = useLoc()
+const localePath = useLocalePath()
 
-const cardRef = ref<HTMLElement | null>(null)
+/** The design fits three; the CMS holds as many as the project earned. */
+const tags = computed(() => (props.item.tags ?? []).slice(0, 3))
 
-useGlowCard(cardRef)
-
-onMounted(() => {
-  if (!cardRef.value) return
-  const io = new IntersectionObserver(([entry]) => {
-    if (!entry?.isIntersecting) return
-    ;(entry.target as HTMLElement).classList.add('in')
-    io.disconnect()
-  }, { threshold: 0.12 })
-  io.observe(cardRef.value)
-})
+/*
+ * The fill spreads as a circle from wherever the pointer entered. Coordinates
+ * are written once on entry — the circle starts from that point regardless, so
+ * there is nothing to recompute on every move.
+ */
+function onPointerEnter(event: PointerEvent) {
+  const card = event.currentTarget as HTMLElement
+  const rect = card.getBoundingClientRect()
+  card.style.setProperty('--x', `${event.clientX - rect.left}px`)
+  card.style.setProperty('--y', `${event.clientY - rect.top}px`)
+}
 </script>
 
 <template>
-  <article
-    ref="cardRef"
-    class="work-card glass-card reveal"
-    :class="[`rv-d${index + 1}`, { 'work-card--reverse': reverse }]"
-  >
-    <div class="card-body">
-      <p class="eyebrow card-teaser">{{ loc(item.teaser) }}</p>
-      <h3 class="card-title">{{ loc(item.title) }}</h3>
-      <p class="card-desc">{{ loc(item.excerpt) || loc(item.teaser) }}</p>
-      <div class="card-tags">
-        <span v-for="tag in item.tags" :key="tag" class="tag">{{ tag }}</span>
+  <article class="work-card" @pointerenter="onPointerEnter">
+    <span class="work-card__fill" aria-hidden="true" />
+
+    <!-- stretched over the card: the whole area is the target, not the heading -->
+    <NuxtLink
+      :to="localePath(`/work/${item.slug}`)"
+      class="work-card__link"
+      :aria-label="loc(item.title)"
+    />
+
+    <div class="work-card__header">
+      <div v-if="tags.length" class="work-card__tags type-ui">
+        <span v-for="tag in tags" :key="tag">{{ tag }}</span>
       </div>
+      <p v-if="item.year" class="work-card__date type-ui">{{ item.year }}</p>
     </div>
 
-    <div class="card-divider" aria-hidden="true"></div>
+    <h3 class="work-card__title type-display-md">{{ loc(item.title) }}</h3>
 
-    <div class="card-viewport">
-      <div class="viewport-media">
-        <SanityPicture
-          :src="item.coverUrl"
-          :alt="item.coverAlt ?? loc(item.title)"
-          class="viewport-img"
-          loading="eager"
-          draggable="false"
-          :width="700"
-        >
-          <template #placeholder>
-            <!-- FPO sheet — print-production placeholder, see lyoaeth-brand/placeholders -->
-            <img src="/placeholders/work.svg" alt="" class="viewport-img" aria-hidden="true" draggable="false" />
-          </template>
-        </SanityPicture>
+    <div class="work-card__stack">
+      <div class="work-card__state work-card__state--short">
+        <p class="type-body-lg">{{ loc(item.teaser) }}</p>
+      </div>
+
+      <div class="work-card__state work-card__state--full">
+        <p class="type-body-lg">{{ loc(item.excerpt) }}</p>
+
+        <!-- not interactive: the whole card is the link, a second target would
+             only get in the way -->
+        <span class="work-card__action type-ui" aria-hidden="true">
+          <span>{{ t('work.view_case') }}</span>
+        </span>
       </div>
     </div>
   </article>
 </template>
 
 <style scoped>
-.work-card {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  align-items: stretch;
-  border-radius: var(--radius-card);
-}
-.work-card--reverse {
-  grid-template-columns: 0.95fr 1.05fr;
-}
-.work-card--reverse .card-body     { order: 2; }
-.work-card--reverse .card-viewport { order: 1; }
-
-.card-body {
-  padding: clamp(1.5rem, 3vw, 2.5rem);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 2;
-}
-
-/* Divider — a single masked container (no native `border`) so the static line and
-   its hover glow share one clip and can't drift apart into a stepped double-edge.
-   Trimmed 1px top/bottom so it doesn't overlap the outer ring's horizontal runs. */
-.card-divider {
-  position: absolute;
-  inset: 1px 0;
-  pointer-events: none;
-  z-index: 3;
-  background: var(--line-soft);
-  -webkit-mask: linear-gradient(to right, transparent calc(52.5% - 0.5px), #fff calc(52.5% - 0.5px), #fff calc(52.5% + 0.5px), transparent calc(52.5% + 0.5px));
-  mask: linear-gradient(to right, transparent calc(52.5% - 0.5px), #fff calc(52.5% - 0.5px), #fff calc(52.5% + 0.5px), transparent calc(52.5% + 0.5px));
-}
-.work-card--reverse .card-divider {
-  -webkit-mask: linear-gradient(to right, transparent calc(47.5% - 0.5px), #fff calc(47.5% - 0.5px), #fff calc(47.5% + 0.5px), transparent calc(47.5% + 0.5px));
-  mask: linear-gradient(to right, transparent calc(47.5% - 0.5px), #fff calc(47.5% - 0.5px), #fff calc(47.5% + 0.5px), transparent calc(47.5% + 0.5px));
-}
-/* Cursor-tracked glow, nested so it inherits the parent's mask/clip for free
-   (--gx/--gy from useGlowCard on cardRef) — only lights up when the cursor is
-   actually near it, like a continuation of the ring rather than a separate
-   effect tied to "hovering the card at all". */
-.card-divider::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(16rem circle at var(--gx, 50%) var(--gy, 50%), oklch(72% 0.1 58 / 90%), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s var(--ease-silk);
-}
-.work-card:hover .card-divider::after {
-  opacity: 1;
-}
-@media (max-width: 47.5em) {
-  .card-divider { display: none; }
-}
-.card-teaser { margin-bottom: auto; }
-.card-title {
-  font-size: clamp(1.25rem, 0.875rem + 1vw, 1.6875rem);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  margin: 1.625rem 0 0.75rem;
-  line-height: 1.14;
-}
-.card-desc {
-  color: var(--mist);
-  font-size: 0.9375rem;
-  max-width: 44ch;
-}
-
-.card-tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 1.5rem;
-}
-.tag {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 0.6875rem;
-  color: var(--mist);
-  padding: 0.3125rem 0.625rem;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-tag);
-  background: rgba(255, 255, 255, 0.02);
-  background: oklch(100% 0 0 / 2%);
-}
-.tag--warm {
-  color: var(--ember);
-  border-color: var(--ember-border);
-  background: var(--ember-bg);
-}
-
-.card-viewport {
-  position: relative;
-  overflow: hidden;
-  z-index: 2;
-  background: linear-gradient(135deg, #0c1016, #0a0d12);
-}
-
-/* Sunk 1px on the 3 sides touching the card's own border (so it shows through
-   unbroken) — flush against the divider, which already separates it from the text.
-   Radius nudged in by the same 1px so the corner stays concentric with the card. */
-@media (min-width: 47.5em) {
-  .work-card:not(.work-card--reverse) .card-viewport {
-    margin: 1px 1px 1px 0;
-    border-radius: 0 calc(var(--radius-card) - 1px) calc(var(--radius-card) - 1px) 0;
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  /*
+   * Cards are all as tall as the tallest one and never shorter than 320px: the
+   * grid's auto-rows-fr does the levelling, min-height sets the floor.
+   *
+   * Hovering doesn't move the height — both states share one cell of the inner
+   * grid and swap by visibility, so the card always occupies the taller one.
+   */
+  .work-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 6);
+    min-height: calc(var(--spacing) * 80);
+    padding: calc(var(--spacing) * 8);
+    border-radius: var(--radius-3xl);
+    background-color: var(--color-surface-raised);
+    overflow: hidden;
   }
-  .work-card--reverse .card-viewport {
-    margin: 1px 0 1px 1px;
-    border-radius: calc(var(--radius-card) - 1px) 0 0 calc(var(--radius-card) - 1px);
-  }
-}
 
-@media (max-width: 47.5em) {
-  .card-viewport {
-    min-height: 12.5rem;
-    margin: 1px;
+  .work-card__fill {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-color: var(--color-fill-strong);
+    clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
+    transition: clip-path 500ms ease-out;
+    pointer-events: none;
   }
-}
-.viewport-media {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.viewport-img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: top;
-  display: block;
-}
 
-@media (max-width: 47.5em) {
-  .work-card,
-  .work-card--reverse {
-    grid-template-columns: 1fr;
+  .work-card:hover .work-card__fill {
+    clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
   }
-  .work-card--reverse .card-body,
-  .work-card--reverse .card-viewport {
-    order: unset;
+
+  .work-card__link {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
   }
-  .work-card--reverse .card-viewport { order: -1; }
-  .card-viewport { min-height: 12.5rem; }
+
+  .work-card__header,
+  .work-card__title,
+  .work-card__stack {
+    position: relative;
+    z-index: 10;
+  }
+
+  .work-card__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .work-card__tags {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: calc(var(--spacing) * 3.75);
+    padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2);
+    border-radius: calc(infinity * 1px);
+    outline: 1px solid var(--color-border-raised);
+    color: var(--color-text-secondary);
+    transition: color 500ms var(--ease-base), outline-color 500ms var(--ease-base);
+
+    /* separator drawn by a pseudo-element rather than typed into the text */
+    & span + span::before {
+      content: '•';
+      margin-right: calc(var(--spacing) * 3.75);
+    }
+  }
+
+  .work-card__date {
+    color: var(--color-text-secondary);
+    transition: color 500ms var(--ease-base);
+  }
+
+  .work-card__title {
+    color: var(--color-text-primary);
+    transition: color 500ms var(--ease-base);
+  }
+
+  .work-card:hover :is(.work-card__tags, .work-card__date) {
+    color: var(--color-text-secondary-inversed);
+  }
+
+  .work-card:hover .work-card__tags {
+    outline-color: var(--color-border-raised-inversed);
+  }
+
+  .work-card:hover .work-card__title {
+    color: var(--color-text-inverse);
+  }
+
+  .work-card__stack {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    margin-top: auto;
+  }
+
+  .work-card__state {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 500ms ease-out, translate 500ms ease-out,
+                visibility 500ms ease-out;
+  }
+
+  .work-card__state--short {
+    justify-content: flex-end;
+    color: var(--color-text-primary);
+  }
+
+  .work-card__state--full {
+    align-items: flex-start;
+    gap: calc(var(--spacing) * 6);
+    color: var(--color-text-inverse);
+    visibility: hidden;
+    opacity: 0;
+    translate: 0 -0.25rem;
+    pointer-events: none;
+  }
+
+  .work-card:hover .work-card__state--short {
+    visibility: hidden;
+    opacity: 0;
+    translate: 0 0.25rem;
+    pointer-events: none;
+  }
+
+  .work-card:hover .work-card__state--full {
+    visibility: visible;
+    opacity: 1;
+    translate: 0 0;
+    pointer-events: auto;
+  }
+
+  .work-card__action {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: calc(var(--spacing) * 1.5);
+    height: calc(var(--spacing) * 10);
+    padding-inline: calc(var(--spacing) * 3);
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
+    pointer-events: none;
+  }
 }
 </style>
