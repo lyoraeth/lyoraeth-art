@@ -267,6 +267,41 @@
   }
 }
 
+/* ═══════════════════ Section header ═══════════════════
+ *
+ * Shared by every listing section: title, count, and the link to the full
+ * listing.
+ *
+ *   >= 768  one row over four columns: title, count, action pinned right
+ *   < 768   two by two: title and action on top, count under the title, the
+ *           bottom right cell empty. Rows size to content — the top one is set
+ *           by the action, which is taller than the heading, and the heading
+ *           centres against it.
+ */
+
+@layer components {
+  .section-header {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: center;
+  }
+
+  .section-header__title  { grid-column: 1; }
+  .section-header__count  { grid-column: 2; }
+  .section-header__action { grid-column: 4; justify-self: end; }
+
+  @media (width < 48rem) {
+    .section-header {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto auto;
+    }
+
+    .section-header__title  { grid-area: 1 / 1; }
+    .section-header__action { grid-area: 1 / 2; }
+    .section-header__count  { grid-area: 2 / 1; }
+  }
+}
+
 /* ═══════════════════ Text styles ═══════════════════
  *
  * One class per Figma text style, typeface included, instead of
