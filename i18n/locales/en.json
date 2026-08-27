@@ -41,29 +41,53 @@
     "latest": "Latest post:"
   },
 
-  "stack": {
-    "title": "Stack",
-    "label": "My toolkit",
-    "daily": "Daily driver",
-    "also": "Also use",
-    "chips": {
-      "daily": [
-        { "name": "Vue 3", "tip": "my go-to framework, powers almost everything" },
-        { "name": "TypeScript", "tip": "default for anything bigger than a snippet" },
-        { "name": "Nuxt", "tip": "SSR, routing, backend right in the project" },
-        { "name": "Tailwind", "tip": "love it, use it every single day", "warm": true },
-        { "name": "GSAP", "tip": "animations, scroll effects, complex motion" },
-        { "name": "SCSS", "tip": "when there's no utility layer" }
-      ],
-      "also": [
-        { "name": "React", "tip": "happy to use it if the project requires it" },
-        { "name": "Pinia", "tip": "state management without the boilerplate" },
-        { "name": "Motion", "tip": "declarative animations without manual lifecycle" },
-        { "name": "Lenis", "tip": "smooth scrolling" },
-        { "name": "Node", "tip": "bots, forms, lightweight backend" },
-        { "name": "Figma", "tip": "inspecting designs and building straight from them" }
-      ]
-    }
+  "experience": {
+    "title": "Experience",
+    "specs": [
+      {
+        "label": "Language",
+        "value": "TypeScript"
+      },
+      {
+        "label": "Frameworks",
+        "value": "Vue, Nuxt, Pinia, TanStack"
+      },
+      {
+        "label": "Animation",
+        "value": "GSAP, Lenis, Lottie"
+      },
+      {
+        "label": "Testing",
+        "value": "Vitest, Playwright"
+      },
+      {
+        "label": "Styling",
+        "value": "SCSS, Tailwind"
+      },
+      {
+        "label": "Adjacent",
+        "value": "FastAPI, Laravel, Docker"
+      }
+    ],
+    "jobs": [
+      {
+        "period": "Freelance · since January 2025, ongoing",
+        "title": "A CRM with one backend developer, on an incomplete brief",
+        "description": [
+          "We started on React with Inertia, which left the frontend entirely dependent on the backend. Requirements were settled as we went, contracts were never fixed, and the first six months went into rework. Moving to an SPA with a separate API made it possible to run the frontend on its own. The contract kept changing — three times in two weeks at one point — so I pulled the mapping into a DTO layer and stood up a FastAPI mock beside it, reproducing the real API along with its inconsistencies.",
+          "Alongside that I build Telegram bots that take payments: the sale itself as a state machine, with YooKassa, Robokassa, and a personal wallet through its API."
+        ]
+      },
+      {
+        "period": "Dancecolor web studio · November 2025 — July 2026",
+        "title": "Four projects, every one of them inherited",
+        "description": [
+          "Spliteks — a Bitrix portal that arrived as a single main.css and a single main.js. I broke it into modules and moved it to SCSS and TypeScript. The build was rewritten on Gulp: Vite and Bitrix's requirements never met. PageSpeed went from 69 to 89, part of that from the markup and the way images were handled. The hardest piece was a GSAP animation that had to hold its behaviour through zoom and resize.",
+          "Apple Inside — a shared foundation for A+ product pages: assembling a new one went from two days to three or six hours.",
+          "Legacy CRM had neither a repository nor any access beyond FTP, so I built the repository, wrote a sync utility, and worked through it from then on. Reckful — search in the header and fixes from review notes; a small contribution at the scale of that project."
+        ]
+      }
+    ]
   },
 
   "writing": {
