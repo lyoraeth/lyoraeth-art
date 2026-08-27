@@ -71,6 +71,11 @@
 
   --color-icon-default: oklch(66.86% 0.0200 250.68);
 
+  /* Validation. Not the accent: that one belongs to buttons and links, and a
+     warning next to a link in the same colour reads as another link. Same
+     family, pulled towards red and darkened. */
+  --color-text-critical: oklch(47.00% 0.1500 22.00);
+
   /* --default-font-family is left alone: setting it would change <html> for the
      pages still on the dark system. The redesign shell sets its own. */
   --font-sans: 'PP Neue Montreal', ui-sans-serif, system-ui, sans-serif;
@@ -216,6 +221,8 @@
     --color-accent-strong-hover: #C4430D;
 
     --color-icon-default: #8C96A1;
+
+    --color-text-critical: #9E2B32;
   }
 }
 
