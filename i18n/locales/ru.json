@@ -94,16 +94,15 @@
   },
 
   "work": {
-    "title": "Избранное",
+    "title": "Работы",
     "seo_description": "Избранные фронтенд-проекты Данила Климова — Vue, TypeScript, анимация.",
-    "subtitle": "что успел собрать",
-    "see_all": "Все проекты",
-    "projects_one": "{n} проект",
-    "projects_few": "{n} проекта",
-    "projects_many": "{n} проектов",
+    "see_all": "Все работы →",
+    "view_case": "Смотреть кейс",
+    "count_one": "{n} работа",
+    "count_few": "{n} работы",
+    "count_many": "{n} работ",
     "view_project": "Открыть проект",
-    "back": "Работы",
-    "items": []
+    "back": "Работы"
   },
 
   "post": {

@@ -94,16 +94,15 @@
   },
 
   "work": {
-    "title": "Featured",
+    "title": "Work",
     "seo_description": "Selected frontend projects by Danil Klimov — Vue, TypeScript, animation.",
-    "subtitle": "things I've built",
-    "see_all": "All projects",
-    "projects_one": "{n} project",
-    "projects_few": "{n} projects",
-    "projects_many": "{n} projects",
-    "view_project": "View project",
-    "back": "Work",
-    "items": []
+    "see_all": "All work →",
+    "view_case": "Open the case",
+    "count_one": "{n} project",
+    "count_few": "{n} projects",
+    "count_many": "{n} projects",
+    "view_project": "Open project",
+    "back": "Work"
   },
 
   "post": {

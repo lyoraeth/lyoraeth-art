@@ -51,7 +51,7 @@ const grouped = computed(() => {
   <div class="work-page">
     <header class="page-head">
       <h1>{{ t('work.title') }}</h1>
-      <span class="eyebrow">{{ t(`work.projects_${plural((allWork ?? []).length)}`, { n: (allWork ?? []).length }) }}</span>
+      <span class="eyebrow">{{ t(`work.count_${plural((allWork ?? []).length)}`, { n: (allWork ?? []).length }) }}</span>
     </header>
 
     <div v-for="[year, items] in grouped" :key="String(year)" class="year-group">
