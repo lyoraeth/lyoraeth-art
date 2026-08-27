@@ -5,12 +5,13 @@ import type { PostItem } from '../../server/api/posts.get'
  * Post card. Unlike a work card, the title and the excerpt stay put — only the
  * action appears on hover, from the place already held for it.
  */
-defineProps<{ item: PostItem }>()
+const props = defineProps<{ item: PostItem }>()
 
 const { t } = useI18n()
 const loc = useLoc()
 const localePath = useLocalePath()
 const formatDate = useFormatDate()
+const onCardClick = useCardLink(() => `/writing/${props.item.slug}`)
 
 /** Coordinates written once on entry — the fill starts from that point anyway. */
 function onPointerEnter(event: PointerEvent) {
@@ -22,21 +23,19 @@ function onPointerEnter(event: PointerEvent) {
 </script>
 
 <template>
-  <article class="post-card" @pointerenter="onPointerEnter">
+  <article class="post-card" @pointerenter="onPointerEnter" @click="onCardClick">
     <span class="post-card__fill" aria-hidden="true" />
-
-    <NuxtLink
-      :to="localePath(`/writing/${item.slug}`)"
-      class="post-card__link"
-      :aria-label="loc(item.title)"
-    />
 
     <div class="post-card__header type-ui">
       <p v-if="loc(item.topic)">{{ loc(item.topic) }}</p>
       <p class="post-card__date">{{ formatDate(item.publishedAt, 'medium') }}</p>
     </div>
 
-    <h3 class="post-card__title type-display-md">{{ loc(item.title) }}</h3>
+    <h3 class="post-card__title type-display-md">
+      <NuxtLink :to="localePath(`/writing/${item.slug}`)" class="post-card__link">
+        {{ loc(item.title) }}
+      </NuxtLink>
+    </h3>
 
     <div class="post-card__body">
       <p class="type-body-lg">{{ loc(item.excerpt) }}</p>
@@ -62,6 +61,7 @@ function onPointerEnter(event: PointerEvent) {
     border-radius: var(--radius-3xl);
     background-color: var(--color-surface-raised);
     overflow: hidden;
+    cursor: pointer;
   }
 
   .post-card__fill {
@@ -72,6 +72,8 @@ function onPointerEnter(event: PointerEvent) {
     clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     transition: clip-path 500ms ease-out;
     pointer-events: none;
+    /* decoration — never part of what gets selected */
+    user-select: none;
   }
 
   .post-card:hover .post-card__fill {
@@ -79,9 +81,8 @@ function onPointerEnter(event: PointerEvent) {
   }
 
   .post-card__link {
-    position: absolute;
-    inset: 0;
-    z-index: 20;
+    color: inherit;
+    text-decoration: none;
   }
 
   .post-card__header,

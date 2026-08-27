@@ -133,6 +133,38 @@ test.describe('writing', () => {
   })
 })
 
+test.describe('card text stays selectable', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+  })
+
+  test('dragging across a post excerpt selects it instead of following the card', async ({ page }) => {
+    await page.locator('.post-card').first().scrollIntoViewIfNeeded()
+    const box = (await page.locator('.post-card__body p').first().boundingBox())!
+
+    await page.mouse.move(box.x + 10, box.y + 6)
+    await page.mouse.down()
+    for (let i = 1; i <= 10; i++) {
+      await page.mouse.move(box.x + 10 + ((box.width - 30) * i) / 10, box.y + 6 + (30 * i) / 10)
+    }
+    await page.mouse.up()
+
+    expect(await page.evaluate(() => window.getSelection()?.toString() ?? '')).not.toBe('')
+    // the drag ended on the card, but it was a selection, not a click
+    expect(new URL(page.url()).pathname).not.toContain('/writing/')
+  })
+
+  test('a plain click still opens the post', async ({ page }) => {
+    const card = page.locator('.post-card').first()
+    await card.scrollIntoViewIfNeeded()
+    const box = (await card.boundingBox())!
+
+    await page.mouse.click(box.x + box.width - 40, box.y + 20)
+    await page.waitForURL(/\/writing\//)
+  })
+})
+
 test.describe('phone menu', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 

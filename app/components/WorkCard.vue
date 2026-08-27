@@ -10,6 +10,7 @@ const props = defineProps<{ item: WorkItem }>()
 const { t } = useI18n()
 const loc = useLoc()
 const localePath = useLocalePath()
+const onCardClick = useCardLink(() => `/work/${props.item.slug}`)
 
 /** The design fits three; the CMS holds as many as the project earned. */
 const tags = computed(() => (props.item.tags ?? []).slice(0, 3))
@@ -28,15 +29,8 @@ function onPointerEnter(event: PointerEvent) {
 </script>
 
 <template>
-  <article class="work-card" @pointerenter="onPointerEnter">
+  <article class="work-card" @pointerenter="onPointerEnter" @click="onCardClick">
     <span class="work-card__fill" aria-hidden="true" />
-
-    <!-- stretched over the card: the whole area is the target, not the heading -->
-    <NuxtLink
-      :to="localePath(`/work/${item.slug}`)"
-      class="work-card__link"
-      :aria-label="loc(item.title)"
-    />
 
     <div class="work-card__header">
       <div v-if="tags.length" class="work-card__tags type-ui">
@@ -45,7 +39,11 @@ function onPointerEnter(event: PointerEvent) {
       <p v-if="item.year" class="work-card__date type-ui">{{ item.year }}</p>
     </div>
 
-    <h3 class="work-card__title type-display-md">{{ loc(item.title) }}</h3>
+    <h3 class="work-card__title type-display-md">
+      <NuxtLink :to="localePath(`/work/${item.slug}`)" class="work-card__link">
+        {{ loc(item.title) }}
+      </NuxtLink>
+    </h3>
 
     <div class="work-card__stack">
       <div class="work-card__state work-card__state--short">
@@ -85,6 +83,7 @@ function onPointerEnter(event: PointerEvent) {
     border-radius: var(--radius-3xl);
     background-color: var(--color-surface-raised);
     overflow: hidden;
+    cursor: pointer;
   }
 
   .work-card__fill {
@@ -95,6 +94,8 @@ function onPointerEnter(event: PointerEvent) {
     clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
     transition: clip-path 500ms ease-out;
     pointer-events: none;
+    /* decoration — never part of what gets selected */
+    user-select: none;
   }
 
   .work-card:hover .work-card__fill {
@@ -102,9 +103,8 @@ function onPointerEnter(event: PointerEvent) {
   }
 
   .work-card__link {
-    position: absolute;
-    inset: 0;
-    z-index: 20;
+    color: inherit;
+    text-decoration: none;
   }
 
   .work-card__header,
