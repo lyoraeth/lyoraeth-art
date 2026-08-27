@@ -11,7 +11,7 @@ const { t } = useI18n()
 const loc = useLoc()
 const localePath = useLocalePath()
 const formatDate = useFormatDate()
-const onCardClick = useCardLink(() => `/writing/${props.item.slug}`)
+const cardLink = useCardLink(() => `/writing/${props.item.slug}`)
 
 /** Coordinates written once on entry — the fill starts from that point anyway. */
 function onPointerEnter(event: PointerEvent) {
@@ -23,7 +23,7 @@ function onPointerEnter(event: PointerEvent) {
 </script>
 
 <template>
-  <article class="post-card" @pointerenter="onPointerEnter" @click="onCardClick">
+  <article class="post-card" v-on="cardLink" @pointerenter="onPointerEnter">
     <span class="post-card__fill" aria-hidden="true" />
 
     <div class="post-card__header type-ui">
@@ -76,10 +76,7 @@ function onPointerEnter(event: PointerEvent) {
     user-select: none;
   }
 
-  .post-card:hover .post-card__fill {
-    clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
-  }
-
+  
   .post-card__link {
     color: inherit;
     text-decoration: none;
@@ -108,14 +105,8 @@ function onPointerEnter(event: PointerEvent) {
     transition: color 500ms var(--ease-base);
   }
 
-  .post-card:hover :is(.post-card__header, .post-card__title, .post-card__body) {
-    color: var(--color-text-inverse);
-  }
-
-  .post-card:hover .post-card__header {
-    color: var(--color-text-secondary-inversed);
-  }
-
+  
+  
   /* Takes the rest of the card and splits it: excerpt against the top, action
      against the bottom edge. The action holds its place while hidden, so
      nothing shifts when it appears. */
@@ -149,10 +140,26 @@ function onPointerEnter(event: PointerEvent) {
                 visibility 500ms ease-out;
   }
 
+  
+  /*
+   * Hover states only where a pointer can hover. On touch :hover latches after
+   * a tap, which would leave a card stuck open behind the navigation.
+   */
+  @media (hover: hover) {
+  .post-card:hover .post-card__fill {
+      clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+    }
+  .post-card:hover :is(.post-card__header, .post-card__title, .post-card__body) {
+      color: var(--color-text-inverse);
+    }
+  .post-card:hover .post-card__header {
+      color: var(--color-text-secondary-inversed);
+    }
   .post-card:hover .post-card__action {
-    visibility: visible;
-    opacity: 1;
-    translate: 0 0;
+      visibility: visible;
+      opacity: 1;
+      translate: 0 0;
+    }
   }
 }
 </style>

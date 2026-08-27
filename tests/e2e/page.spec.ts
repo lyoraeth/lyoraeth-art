@@ -163,6 +163,51 @@ test.describe('card text stays selectable', () => {
     await page.mouse.click(box.x + box.width - 40, box.y + 20)
     await page.waitForURL(/\/writing\//)
   })
+
+  test('a double click selects a word instead of navigating', async ({ page }) => {
+    await page.locator('.post-card').first().scrollIntoViewIfNeeded()
+    await page.locator('.post-card__body p').first().dblclick()
+    // long enough for the deferred single-click navigation to have fired
+    await page.waitForTimeout(600)
+
+    expect(await page.evaluate(() => window.getSelection()?.toString().trim() ?? '')).not.toBe('')
+    expect(new URL(page.url()).pathname).not.toContain('/writing/')
+  })
+
+  test('ctrl+click opens the post in a new tab, like a link would', async ({ page, context }) => {
+    const card = page.locator('.post-card').first()
+    await card.scrollIntoViewIfNeeded()
+    const box = (await card.boundingBox())!
+
+    const opened = context.waitForEvent('page')
+    await page.keyboard.down('Control')
+    await page.mouse.click(box.x + box.width - 40, box.y + 20)
+    await page.keyboard.up('Control')
+
+    const tab = await opened
+    expect(new URL(tab.url()).pathname).toContain('/writing/')
+    // and the page we clicked from stayed put
+    expect(new URL(page.url()).pathname).not.toContain('/writing/')
+  })
+})
+
+test.describe('cards on touch', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+
+  test('a tap opens the card, and hover states never latch', async ({ page }) => {
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+
+    const card = page.locator('.work-card').first()
+    await card.scrollIntoViewIfNeeded()
+
+    // the resting state is what a touch device sees, before and after the tap
+    await expect(card.locator('.work-card__state--short')).toBeVisible()
+    await expect(card.locator('.work-card__state--full')).toBeHidden()
+
+    await card.tap()
+    await page.waitForURL(/\/work\//)
+  })
 })
 
 test.describe('phone menu', () => {

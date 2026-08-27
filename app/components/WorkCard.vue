@@ -10,7 +10,7 @@ const props = defineProps<{ item: WorkItem }>()
 const { t } = useI18n()
 const loc = useLoc()
 const localePath = useLocalePath()
-const onCardClick = useCardLink(() => `/work/${props.item.slug}`)
+const cardLink = useCardLink(() => `/work/${props.item.slug}`)
 
 /** The design fits three; the CMS holds as many as the project earned. */
 const tags = computed(() => (props.item.tags ?? []).slice(0, 3))
@@ -29,7 +29,7 @@ function onPointerEnter(event: PointerEvent) {
 </script>
 
 <template>
-  <article class="work-card" @pointerenter="onPointerEnter" @click="onCardClick">
+  <article class="work-card" v-on="cardLink" @pointerenter="onPointerEnter">
     <span class="work-card__fill" aria-hidden="true" />
 
     <div class="work-card__header">
@@ -98,10 +98,7 @@ function onPointerEnter(event: PointerEvent) {
     user-select: none;
   }
 
-  .work-card:hover .work-card__fill {
-    clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
-  }
-
+  
   .work-card__link {
     color: inherit;
     text-decoration: none;
@@ -149,18 +146,9 @@ function onPointerEnter(event: PointerEvent) {
     transition: color 500ms var(--ease-base);
   }
 
-  .work-card:hover :is(.work-card__tags, .work-card__date) {
-    color: var(--color-text-secondary-inversed);
-  }
-
-  .work-card:hover .work-card__tags {
-    outline-color: var(--color-border-raised-inversed);
-  }
-
-  .work-card:hover .work-card__title {
-    color: var(--color-text-inverse);
-  }
-
+  
+  
+  
   .work-card__stack {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -191,20 +179,8 @@ function onPointerEnter(event: PointerEvent) {
     pointer-events: none;
   }
 
-  .work-card:hover .work-card__state--short {
-    visibility: hidden;
-    opacity: 0;
-    translate: 0 0.25rem;
-    pointer-events: none;
-  }
-
-  .work-card:hover .work-card__state--full {
-    visibility: visible;
-    opacity: 1;
-    translate: 0 0;
-    pointer-events: auto;
-  }
-
+  
+  
   .work-card__action {
     display: flex;
     flex-direction: row;
@@ -216,6 +192,37 @@ function onPointerEnter(event: PointerEvent) {
     background-color: var(--color-surface-hover);
     color: var(--color-text-primary);
     pointer-events: none;
+  }
+
+  /*
+   * Hover states only where a pointer can hover. On touch :hover latches after
+   * a tap, which would leave a card stuck open behind the navigation.
+   */
+  @media (hover: hover) {
+  .work-card:hover .work-card__fill {
+      clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+    }
+  .work-card:hover :is(.work-card__tags, .work-card__date) {
+      color: var(--color-text-secondary-inversed);
+    }
+  .work-card:hover .work-card__tags {
+      outline-color: var(--color-border-raised-inversed);
+    }
+  .work-card:hover .work-card__title {
+      color: var(--color-text-inverse);
+    }
+  .work-card:hover .work-card__state--short {
+      visibility: hidden;
+      opacity: 0;
+      translate: 0 0.25rem;
+      pointer-events: none;
+    }
+  .work-card:hover .work-card__state--full {
+      visibility: visible;
+      opacity: 1;
+      translate: 0 0;
+      pointer-events: auto;
+    }
   }
 }
 </style>
