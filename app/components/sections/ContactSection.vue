@@ -1,510 +1,392 @@
 <script setup lang="ts">
 import type { SiteSettings } from '../../../server/api/settings.get'
 
-const { t, locale } = useI18n()
+const { t, tm, rt } = useI18n()
+const localePath = useLocalePath()
 const { public: { turnstileContactSiteKey } } = useRuntimeConfig()
+const track = useTrack()
 
 const { data: settings } = await useFetch<SiteSettings>('/api/settings', { key: 'site-settings' })
+const cvUrl = await useCvUrl()
 
 const telegramUrl = computed(() =>
-  settings.value?.telegramHandle ? `https://t.me/${settings.value.telegramHandle}` : undefined
+  settings.value?.telegramHandle ? `https://t.me/${settings.value.telegramHandle}` : undefined,
 )
 const githubUrl = computed(() =>
-  settings.value?.githubHandle ? `https://github.com/${settings.value.githubHandle}` : undefined
+  settings.value?.githubHandle ? `https://github.com/${settings.value.githubHandle}` : undefined,
 )
-const githubHandle = computed(() => settings.value?.githubHandle ?? '')
-const cvUrl = computed(() => {
-  const s = settings.value
-  if (!s) return undefined
-  return locale.value === 'ru'
-    ? (s.cvUrlRu ?? s.cvUrlEn ?? undefined)
-    : (s.cvUrlEn ?? s.cvUrlRu ?? undefined)
-})
 
-const contact = ref('')
+const lead = computed(() => (tm('contact.lead') as unknown[]).map((line: any) => rt(line)))
+
+/* ── Form ─────────────────────────────────────────────────────────────────── */
+
+const from = ref('')
 const message = ref('')
-const token   = ref('')
 const consent = ref(false)
+const token = ref('')
 
-type State = 'idle' | 'loading' | 'success' | 'error'
-const state    = ref<State>('idle')
-const errMsg   = ref('')
-const attempted = ref(false)
+type Field = 'from' | 'message' | 'consent'
+const errors = reactive<Record<Field, string>>({ from: '', message: '', consent: '' })
 
-const ve = computed(() => ({
-  contact: attempted.value && !contact.value.trim(),
-  message: attempted.value && !message.value.trim(),
-  consent: attempted.value && !consent.value,
-}))
+type Status = { text: string; failed: boolean } | null
+const status = ref<Status>(null)
+const sending = ref(false)
 
-const localePath = useLocalePath()
+const fromField = ref<HTMLInputElement | null>(null)
+const messageField = ref<HTMLTextAreaElement | null>(null)
+const consentField = ref<HTMLInputElement | null>(null)
+
+/** An @handle, or something with an at-sign and a dotted domain — no more can
+ *  be guessed about a contact than that. */
+const looksLikeContact = (value: string) =>
+  /^@[\w\d_]{3,}$/.test(value) || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)
+
+/**
+ * Validates the form and focuses the first field that fails.
+ *
+ * @remarks
+ * The messages explain the reason rather than label the field: no "error", no
+ * "invalid". The contact format is checked loosely — "looks incomplete" —
+ * because every spelling of a handle or an address can't be anticipated.
+ */
+function validate(): boolean {
+  const value = from.value.trim()
+  errors.from = !value
+    ? t('contact.errors.from_empty')
+    : looksLikeContact(value) ? '' : t('contact.errors.from_malformed')
+  errors.message = message.value.trim() ? '' : t('contact.errors.message_empty')
+  errors.consent = consent.value ? '' : t('contact.errors.consent_empty')
+
+  const firstInvalid = (['from', 'message', 'consent'] as Field[]).find(field => errors[field])
+  if (!firstInvalid) return true
+
+  const control = { from: fromField, message: messageField, consent: consentField }[firstInvalid]
+  control.value?.focus()
+  return false
+}
 
 async function onSubmit() {
-  attempted.value = true
-  if (!contact.value.trim() || !message.value.trim() || !token.value || !consent.value) return
-  attempted.value = false
-  state.value = 'loading'
-  errMsg.value = ''
+  status.value = null
+  if (!validate()) return
+
+  sending.value = true
   try {
     await $fetch('/api/contact', {
       method: 'POST',
-      body: { token: token.value, contact: contact.value, message: message.value },
+      body: { token: token.value, contact: from.value, message: message.value },
     })
-    state.value = 'success'
-    contact.value = message.value = token.value = ''
+    status.value = { text: t('contact.sent'), failed: false }
+    from.value = message.value = ''
     consent.value = false
-  } catch (e: any) {
-    errMsg.value = e?.data?.message ?? t('contact.error')
-    state.value = 'error'
+  } catch (error: any) {
+    // a rejected token is worth its own line: the fix is a refresh, not a retype
+    const captcha = error?.statusCode === 400 && /captcha/i.test(error?.data?.message ?? '')
+    status.value = { text: captcha ? t('contact.captcha_failed') : t('contact.failed'), failed: true }
+  } finally {
+    sending.value = false
+    // a token is single-use: whatever the outcome, the next send needs a new one
     token.value = ''
   }
 }
 
-/* ── Glow card ── */
-const cardEl = ref<HTMLElement | null>(null)
-useGlowCard(cardEl)
+/* ── Analytics ────────────────────────────────────────────────────────────── */
 
-/* ── Scroll reveal ── */
-const { observe } = useReveal()
-onMounted(() => observe(cardEl.value))
-
-/* ── Analytics ── */
-const track = useTrack()
-let contactStarted = false
-function onContactStart() {
-  if (contactStarted) return
-  contactStarted = true
+let started = false
+function onFormStart() {
+  if (started) return
+  started = true
   track(EV.contactStart)
 }
 </script>
 
 <template>
-  <section id="contact" class="section-contact">
+  <section
+    id="contact"
+    class="layout-grid gap-y-grid-gap py-section-padding-y"
+    aria-labelledby="contact-title"
+  >
     <div
-      class="contact-card glass-card reveal rv-d1"
-      ref="cardEl"
+      class="col-span-4 md:col-span-8 lg:col-span-3 xl:col-span-5 2xl:col-span-7 gap-6 flex flex-col pt-contact-intro-padding-y"
     >
-      <!-- Left: heading + CTA + channels -->
-      <div class="contact-left">
-        <h2 class="contact-heading">
-          {{ t('contact.heading_before_acc') }}<span class="contact-acc">{{ t('contact.heading_acc') }}</span>
-        </h2>
-        <p class="contact-lead">{{ t('contact.lead') }}</p>
+      <h2 id="contact-title" class="type-display-2xl text-text-primary">{{ t('contact.title') }}</h2>
 
+      <p class="type-body-lg text-text-primary">
+        <template v-for="(line, i) in lead" :key="i">
+          <br v-if="i">{{ line }}
+        </template>
+      </p>
+
+      <div class="flex flex-row gap-3 pt-4">
         <a
+          v-if="telegramUrl"
           :href="telegramUrl"
-          class="contact-cta"
           target="_blank"
           rel="noopener noreferrer"
+          class="py-4 px-9 inline-flex items-center justify-center bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-default gap-1.5 type-cta text-text-inverse rounded-full"
           @click="track(EV.ctaClick)"
         >
-          {{ t('contact.cta') }} <span class="cta-arrow">→</span>
+          <span class="h-5 w-5 flex items-center justify-center">
+            <svg class="w-4 h-3.5" viewBox="0 0 16 14" fill="currentColor" aria-hidden="true">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M1.09992 6.02691C5.39488 4.05119 8.25885 2.74867 9.69185 2.11936C13.7834 0.322542 14.6335 0.0104165 15.1877 0.000109891C15.3095 -0.00215693 15.5821 0.0297341 15.7586 0.180964C15.9076 0.30866 15.9486 0.481158 15.9683 0.602228C15.9879 0.723297 16.0123 0.999097 15.9929 1.2146C15.7712 3.6743 14.8118 9.64335 14.3237 12.3983C14.1172 13.564 13.7105 13.9548 13.3169 13.9931C12.4613 14.0762 11.8116 13.3961 10.9829 12.8225C9.68624 11.9251 8.9537 11.3664 7.69503 10.4907C6.24043 9.47859 7.18338 8.92233 8.01236 8.01324C8.22931 7.77533 11.999 4.15509 12.0719 3.82668C12.0811 3.7856 12.0895 3.6325 12.0034 3.55166C11.9172 3.47081 11.7901 3.49846 11.6983 3.52045C11.5683 3.55161 9.4968 4.99723 5.48389 7.8573C4.89591 8.2836 4.36333 8.49131 3.88616 8.48042C3.36012 8.46842 2.34822 8.16638 1.59598 7.90821C0.673328 7.59154 -0.0599784 7.42412 0.00387615 6.88633C0.0371355 6.60621 0.402482 6.31974 1.09992 6.02691Z"
+              />
+            </svg>
+          </span>
+          <span>{{ t('contact.telegram') }}</span>
         </a>
 
-        <div class="contact-channels">
-          <a
-            :href="githubUrl"
-            class="channel-link"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span>{{ t('contact.github') }}</span>
-            <span class="channel-handle mono">/{{ githubHandle }}</span>
-          </a>
+        <div class="flex flex-row items-center gap-1">
           <a
             v-if="cvUrl"
             :href="cvUrl"
-            class="channel-link"
-            target="_blank"
-            rel="noopener noreferrer"
             download
+            class="pill-button text-text-primary hover:bg-surface-hover active:bg-fill-strong active:text-text-inverse"
           >
+            <span class="h-4 w-4 flex items-center justify-center">
+              <svg class="h-2.75 w-2.5" viewBox="0 0 10 11" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M9.456 9.91a.544.544 0 0 1 0 1.09H.544a.544.544 0 0 1 0-1.09zm-5-9.365a.544.544 0 1 1 1.088 0V7.06l2.919-2.524a.545.545 0 0 1 .712.825l-3.82 3.304a.544.544 0 0 1-.71 0L.824 5.362a.545.545 0 0 1 .712-.825l2.919 2.524z"
+                />
+              </svg>
+            </span>
             <span>{{ t('contact.cv') }}</span>
-            <span class="channel-handle mono">{{ t('contact.cv_note') }}</span>
+          </a>
+
+          <a
+            v-if="githubUrl"
+            :href="githubUrl"
+            rel="me noopener"
+            target="_blank"
+            class="pill-button text-text-primary hover:bg-surface-hover active:bg-fill-strong active:text-text-inverse"
+          >
+            <span class="h-4 w-4 flex items-center justify-center">
+              <svg class="size-2.75" viewBox="0 0 11 11" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M4.65136 8.0403C3.23339 7.86286 2.23438 6.8093 2.23438 5.44522C2.23438 4.89072 2.42773 4.29186 2.75 3.89262C2.61035 3.52664 2.63183 2.75033 2.79297 2.42873C3.22266 2.37327 3.80273 2.60617 4.14648 2.92778C4.55469 2.79469 4.98438 2.72815 5.51074 2.72815C6.03711 2.72815 6.4668 2.79469 6.85352 2.91669C7.18652 2.60617 7.77734 2.37327 8.20703 2.42873C8.35742 2.72815 8.37891 3.50446 8.23925 3.88152C8.583 4.30294 8.76562 4.86854 8.76562 5.44522C8.76562 6.8093 7.7666 7.84068 6.32714 8.0292C6.69238 8.27318 6.93945 8.80551 6.93945 9.41547V10.5689C6.93945 10.9015 7.208 11.0901 7.53027 10.957C9.47461 10.1917 11 8.18446 11 5.70029C11 2.56181 8.5293 0 5.48925 0C2.44922 0 0 2.5618 0 5.70029C0 8.16228 1.51464 10.2029 3.55566 10.9681C3.8457 11.0789 4.125 10.8794 4.125 10.58V9.69271C3.97461 9.75925 3.78125 9.80361 3.60938 9.80361C2.90039 9.80361 2.48144 9.40437 2.18066 8.66134C2.0625 8.36191 1.93359 8.18446 1.68652 8.1512C1.55761 8.1401 1.51464 8.08466 1.51464 8.01812C1.51464 7.88504 1.72949 7.78522 1.94433 7.78522C2.25586 7.78522 2.52441 7.98484 2.80371 8.39518C3.01855 8.71679 3.24414 8.86096 3.51269 8.86096C3.78125 8.86096 3.95313 8.76115 4.20019 8.50608C4.38281 8.31754 4.52246 8.1512 4.65136 8.0403Z"
+                />
+              </svg>
+            </span>
+            <span>{{ t('contact.github') }}</span>
           </a>
         </div>
       </div>
+    </div>
 
-      <!-- Right: form -->
-      <div class="contact-form-wrap">
-        <div v-if="state === 'success'" class="form-success">
-          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          {{ t('contact.success') }}
-          <button class="form-again" @click="state = 'idle'">{{ t('contact.send_another') }}</button>
-        </div>
+    <!--
+      Validation is ours rather than the browser's: native tooltips can't be
+      styled, say "Please fill in this field", and vanish on their own.
+    -->
+    <form
+      class="col-span-4 md:col-span-8 lg:col-start-5 lg:col-span-4 xl:col-start-7 xl:col-span-6 2xl:col-start-8 2xl:col-span-5 gap-4 flex flex-col"
+      novalidate
+      @submit.prevent="onSubmit"
+      @focusin="onFormStart"
+    >
+      <p class="text-text-decorative type-ui">{{ t('contact.form_note') }}</p>
 
-        <form v-else class="contact-form" novalidate @submit.prevent="onSubmit" @focusin="onContactStart">
-          <span class="eyebrow form-label">{{ t('contact.form_label') }}</span>
-          <input
-            v-model="contact"
-            type="text"
-            :placeholder="t('contact.contact_placeholder')"
-            :class="{ 'is-error': ve.contact }"
-            autocomplete="off"
-          >
-          <p v-if="ve.contact" class="field-err" aria-live="polite">{{ t('form.required') }}</p>
-          <textarea
-            v-model="message"
-            rows="3"
-            :placeholder="t('contact.message_placeholder')"
-            :class="{ 'is-error': ve.message }"
-          ></textarea>
-          <p v-if="ve.message" class="field-err" aria-live="polite">{{ t('form.required') }}</p>
+      <div class="contact-field flex flex-col gap-2 pt-3" :data-invalid="errors.from || undefined">
+        <label for="contact-from" class="type-ui text-text-primary">{{ t('contact.from_label') }}</label>
+        <input
+          id="contact-from"
+          ref="fromField"
+          v-model="from"
+          name="from"
+          type="text"
+          :placeholder="t('contact.from_placeholder')"
+          :aria-invalid="Boolean(errors.from)"
+          aria-describedby="contact-from-error"
+          class="contact-input"
+          @input="errors.from = ''"
+        >
+        <p id="contact-from-error" class="contact-error">{{ errors.from }}</p>
+      </div>
+
+      <div class="contact-field flex flex-col gap-2 pt-3" :data-invalid="errors.message || undefined">
+        <label for="contact-message" class="type-ui text-text-primary">{{ t('contact.message_label') }}</label>
+        <textarea
+          id="contact-message"
+          ref="messageField"
+          v-model="message"
+          name="message"
+          rows="4"
+          :placeholder="t('contact.message_placeholder')"
+          :aria-invalid="Boolean(errors.message)"
+          aria-describedby="contact-message-error"
+          class="contact-input contact-input--message"
+          @input="errors.message = ''"
+        />
+        <p id="contact-message-error" class="contact-error">{{ errors.message }}</p>
+      </div>
+
+      <div class="pt-4 gap-4 flex flex-col">
+        <!-- the captcha's space is taken up front, so the form doesn't jump
+             when the widget resolves -->
+        <div class="contact-captcha">
           <NuxtTurnstile
             v-model="token"
             :site-key="turnstileContactSiteKey || undefined"
-            appearance="invisible"
+            :options="{ theme: 'light' }"
           />
-          <p v-if="state === 'error'" class="form-err" aria-live="polite">{{ errMsg }}</p>
-          <label class="consent-label" :class="{ 'consent-error': ve.consent }">
-            <input type="checkbox" v-model="consent" class="consent-check" />
-            <span v-if="locale === 'ru'">
-              Я даю согласие на обработку данных и трансграничную передачу —
-              <NuxtLink :to="localePath('/personal-data')" target="_blank" class="consent-link">согласие</NuxtLink>
-              и
-              <NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">политика</NuxtLink>
-            </span>
-            <span v-else>
-              {{ t('contact.consent_pre') }}<NuxtLink :to="localePath('/privacy')" target="_blank" class="consent-link">{{ t('contact.consent_link') }}</NuxtLink>
-            </span>
-          </label>
-          <p v-if="ve.consent" class="field-err consent-field-err" aria-live="polite">{{ t('form.required_consent') }}</p>
-          <button type="submit" :disabled="state === 'loading' || !token">
-            <span v-if="state === 'loading'" class="loading-dot"></span>
-            <span v-else>{{ t('contact.submit') }}</span>
-          </button>
-        </form>
+        </div>
+
+        <div class="contact-field flex flex-col gap-2" :data-invalid="errors.consent || undefined">
+          <div class="contact-consent">
+            <input
+              id="contact-consent"
+              ref="consentField"
+              v-model="consent"
+              name="consent"
+              type="checkbox"
+              :aria-invalid="Boolean(errors.consent)"
+              aria-describedby="contact-consent-error"
+              class="contact-consent__box"
+              @change="errors.consent = ''"
+            >
+            <label for="contact-consent" class="type-ui text-text-secondary">
+              <i18n-t keypath="contact.consent" tag="span" scope="global">
+                <template #consent>
+                  <NuxtLink :to="localePath('/personal-data')" target="_blank" class="contact-consent__link">
+                    {{ t('contact.consent_link') }}
+                  </NuxtLink>
+                </template>
+                <template #policy>
+                  <NuxtLink :to="localePath('/privacy')" target="_blank" class="contact-consent__link">
+                    {{ t('contact.policy_link') }}
+                  </NuxtLink>
+                </template>
+              </i18n-t>
+            </label>
+          </div>
+          <p id="contact-consent-error" class="contact-error">{{ errors.consent }}</p>
+        </div>
+
+        <button
+          type="submit"
+          class="contact-submit h-12 px-8 rounded-full bg-fill-strong hover:bg-accent-strong-hover active:bg-accent-default text-text-inverse type-cta text-nowrap w-fit"
+          :aria-disabled="sending"
+        >
+          {{ sending ? t('contact.sending') : t('contact.submit') }}
+        </button>
+
+        <!-- role="status": the text is announced where it appears, without
+             pulling focus out of the form -->
+        <p class="contact-status" :data-state="status?.failed ? 'error' : undefined" role="status" aria-live="polite">
+          {{ status?.text }}
+        </p>
       </div>
-    </div>
+    </form>
   </section>
 </template>
 
 <style scoped>
-.section-contact {
-  padding: clamp(4.375rem, 9vw, 8.75rem) 0;
-}
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  /*
+   * Real inputs behind the mock's styling: highlighted on :focus rather than
+   * :active, which on a field lasts only while the button is held.
+   */
+  .contact-input {
+    width: 100%;
+    padding-inline: var(--spacing-contact-field-padding-x);
+    padding-block: calc(var(--spacing) * 3);
+    border-radius: var(--radius-2xl);
+    outline: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-field);
+    color: var(--color-text-primary);
+    font-size: var(--text-text);
+    line-height: var(--text-text--line-height);
+    font-weight: var(--text-text--font-weight);
+    transition: outline-color var(--duration-hover) var(--ease-base);
 
-.contact-card {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: clamp(1.875rem, 4vw, 3.5rem);
-  align-items: start;
-  border-radius: var(--radius-contact);
-  padding: clamp(1.875rem, 4vw, 3.5rem);
-}
+    &::placeholder {
+      color: var(--color-text-secondary);
+    }
 
-/* ── Left column ────────────────────────────────────────────────────────────── */
-.contact-left {
-  position: relative;
-  z-index: 2;
-}
-
-.contact-heading {
-  font-family: 'Golos Text', 'Onest', sans-serif;
-  font-size: clamp(1.75rem, 1rem + 2vw, 3.125rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
-  margin-bottom: 1.125rem;
-}
-.contact-acc {
-  color: var(--ember);
-}
-
-.contact-lead {
-  color: var(--mist);
-  font-size: 0.9375rem;
-  max-width: 34ch;
-  margin-bottom: 1.625rem;
-  line-height: 1.55;
-}
-
-.contact-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.625rem;
-  background: var(--ember);
-  color: #1a120b;
-  font-weight: 600;
-  font-size: 0.9375rem;
-  padding: 0.875rem 1.375rem;
-  border-radius: 0.75rem;
-  text-decoration: none;
-  transition:
-    transform 0.2s var(--ease-out-expo),
-    box-shadow 0.25s var(--ease-silk),
-    background 0.2s var(--ease-silk);
-  box-shadow: 0 0.75rem 1.875rem -0.75rem rgba(214, 154, 106, 0.5);
-  box-shadow: 0 0.75rem 1.875rem -0.75rem oklch(72% 0.1 58 / 50%);
-}
-.contact-cta:hover {
-  transform: translateY(-0.125rem);
-  box-shadow: 0 1rem 2.25rem -0.75rem rgba(214, 154, 106, 0.65);
-  box-shadow: 0 1rem 2.25rem -0.75rem oklch(72% 0.1 58 / 65%);
-  background: #DDAA76;
-  background: oklch(76% 0.1 58);
-}
-.contact-cta:active {
-  transform: translateY(0.0625rem) scale(0.98);
-  box-shadow: 0 0.5rem 1.25rem -0.75rem rgba(214, 154, 106, 0.4);
-  box-shadow: 0 0.5rem 1.25rem -0.75rem oklch(72% 0.1 58 / 40%);
-}
-.cta-arrow {
-  display: inline-block;
-  vertical-align: middle;
-  transition: transform 0.25s var(--ease-out-expo);
-}
-.contact-cta:hover .cta-arrow { transform: translateX(0.25rem); }
-.contact-cta:active .cta-arrow { transform: translateX(0.125rem); }
-
-.contact-channels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.125rem;
-}
-.channel-link {
-  display: inline-flex;
-  gap: 0.4375rem;
-  align-items: center;
-  padding: 0.5rem 0.8125rem;
-  border: 1px solid var(--line-soft);
-  border-radius: 0.5rem;
-  text-decoration: none;
-  color: var(--mist);
-  font-size: 0.84375rem;
-  transition:
-    color       0.25s var(--ease-silk),
-    border-color 0.25s var(--ease-silk),
-    background   0.25s var(--ease-silk),
-    transform    0.2s  var(--ease-out-expo);
-}
-.channel-link:hover {
-  color: var(--ink);
-  border-color: var(--line);
-  background: rgba(255, 255, 255, 0.04);
-  background: oklch(100% 0 0 / 4%);
-  transform: translateY(-0.0625rem);
-}
-.channel-link:active {
-  transform: scale(0.97);
-  background: rgba(255, 255, 255, 0.06);
-  background: oklch(100% 0 0 / 6%);
-}
-.channel-handle {
-  color: var(--faint);
-  font-size: 0.6875rem;
-  transition: color 0.25s var(--ease-silk);
-  user-select: all;
-}
-.channel-link:hover .channel-handle {
-  color: var(--mist);
-}
-
-/* ── Form ───────────────────────────────────────────────────────────────────── */
-.contact-form-wrap {
-  position: relative;
-  z-index: 2;
-  border-left: 1px solid var(--line-soft);
-  padding-left: clamp(0px, 2.5vw, 2rem);
-}
-.contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.form-label {
-  display: block;
-  margin-bottom: 0.875rem;
-  color: var(--faint);
-}
-
-.contact-form input:not(.consent-check),
-.contact-form textarea {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  background: oklch(100% 0 0 / 3%);
-  border: 1px solid var(--line-soft);
-  border-radius: 0.75rem;
-  padding: 0.75rem 0.875rem;
-  color: var(--ink);
-  font-family: 'Onest', sans-serif;
-  font-size: 0.875rem;
-  transition: border-color 0.25s var(--ease-silk);
-  resize: vertical;
-  margin-bottom: 0.625rem;
-}
-.contact-form input::placeholder,
-.contact-form textarea::placeholder {
-  color: var(--faint);
-}
-.contact-form input:not(.consent-check):focus,
-.contact-form textarea:focus {
-  border-color: rgba(214, 154, 106, 0.45);
-  border-color: oklch(72% 0.1 58 / 45%);
-}
-.contact-form input:not(.consent-check):focus-visible,
-.contact-form textarea:focus-visible {
-  outline: 2px solid rgba(214, 154, 106, 0.6);
-  outline: 2px solid oklch(72% 0.1 58 / 60%);
-  outline-offset: -1px;
-}
-
-.contact-form button {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  background: oklch(100% 0 0 / 4%);
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
-  color: var(--ink);
-  font-family: 'Onest', sans-serif;
-  font-weight: 500;
-  font-size: 0.875rem;
-  padding: 0.75rem;
-  cursor: pointer;
-  transition:
-    border-color 0.25s var(--ease-silk),
-    background   0.25s var(--ease-silk),
-    color        0.25s var(--ease-silk),
-    transform    0.2s  var(--ease-out-expo);
-}
-.contact-form button:hover {
-  border-color: var(--ember-border);
-  background: var(--ember-bg);
-  color: var(--ember);
-}
-.contact-form button:active {
-  transform: scale(0.98);
-  background: rgba(255, 255, 255, 0.06);
-  background: oklch(100% 0 0 / 6%);
-  border-color: var(--line);
-  color: var(--ink);
-}
-
-.form-err {
-  font-size: 0.8125rem;
-  color: #7070CE;
-  color: oklch(65% 0.14 270);
-  margin: 0;
-}
-
-.field-err {
-  font-size: 0.75rem;
-  color: #7070CE;
-  color: oklch(65% 0.14 270);
-  margin: -0.375rem 0 0.375rem;
-}
-.consent-field-err { margin-top: 0; margin-bottom: 0.25rem; }
-.consent-error { color: var(--ink); }
-
-.contact-form input:not(.consent-check).is-error,
-.contact-form textarea.is-error {
-  border-color: rgba(112, 112, 206, 0.5);
-  border-color: oklch(65% 0.14 270 / 50%);
-}
-
-.contact-form button:disabled { opacity: 0.5; cursor: default; }
-
-.loading-dot {
-  display: inline-block;
-  width: 0.5rem; height: 0.5rem;
-  border-radius: 50%;
-  background: currentColor;
-  animation: blink 0.8s ease-in-out infinite alternate;
-}
-@keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
-
-.form-success {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.75rem;
-  color: #55B070;
-  color: oklch(72% 0.12 150);
-  font-size: 0.9375rem;
-  padding: 1rem 0;
-}
-.form-success svg { width: 1.5rem; height: 1.5rem; }
-
-.form-again {
-  color: var(--faint);
-  font-size: 0.8125rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-  font-family: inherit;
-}
-
-.consent-label {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--faint);
-  line-height: 1.5;
-  cursor: pointer;
-  margin-top: 0.25rem;
-  margin-bottom: 0.75rem;
-}
-.consent-check {
-  appearance: none;
-  -webkit-appearance: none;
-  flex-shrink: 0;
-  margin-top: 0.2rem;
-  width: 1rem;
-  height: 1rem;
-  border: 1px solid var(--line-soft);
-  border-radius: 0.25rem;
-  background: transparent;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  display: grid;
-  place-items: center;
-}
-.consent-check:hover { border-color: rgba(214, 154, 106, 0.45); border-color: oklch(72% 0.1 58 / 45%); }
-.consent-check::before {
-  content: '';
-  width: 0.3125rem;
-  height: 0.5rem;
-  border: 1.5px solid #1a120b;
-  border-top: none;
-  border-left: none;
-  transform: rotate(45deg) scale(0);
-  transition: transform 0.15s ease;
-  margin-top: -0.0625rem;
-}
-.consent-check:checked {
-  background: var(--ember);
-  border-color: var(--ember);
-}
-.consent-check:checked::before {
-  transform: rotate(45deg) scale(1);
-}
-.consent-check:focus-visible {
-  outline: 2px solid rgba(214, 154, 106, 0.4);
-  outline-offset: 2px;
-}
-.consent-link {
-  color: var(--ember);
-  text-decoration: underline;
-  text-decoration-color: rgba(214, 154, 106, 0.4);
-  text-underline-offset: 2px;
-  transition: text-decoration-color 0.2s;
-}
-.consent-link:hover { text-decoration-color: var(--ember); }
-
-/* ── Responsive ─────────────────────────────────────────────────────────────── */
-@media (max-width: 45em) {
-  .contact-card {
-    grid-template-columns: 1fr;
+    &:focus {
+      outline-color: var(--color-border-input);
+    }
   }
-  .contact-form-wrap {
-    border-left: none;
-    padding-left: 0;
-    border-top: 1px solid var(--line-soft);
-    padding-top: 1.625rem;
+
+  .contact-input--message {
+    min-height: calc(var(--spacing) * 40);
+    resize: vertical;
+  }
+
+  .contact-consent {
+    display: flex;
+    flex-direction: row;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .contact-consent__box {
+    flex: none;
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+    margin-top: 0.15em;
+    accent-color: var(--color-accent-strong);
+  }
+
+  .contact-consent__link {
+    color: var(--color-accent-strong);
+    transition: color var(--duration-hover) var(--ease-base);
+
+    &:hover { color: var(--color-accent-strong-hover); }
+    &:active {
+      color: var(--color-accent-default);
+      transition-duration: var(--duration-press);
+    }
+  }
+
+  .contact-captcha {
+    display: flex;
+    align-items: center;
+    width: calc(var(--spacing) * 75);
+    max-width: 100%;
+    min-height: calc(var(--spacing) * 16);
+  }
+
+  /*
+   * The palette has no dedicated error colour, so the hint and the field's
+   * outline both use the accent — the one signalling colour in the system.
+   */
+  .contact-error {
+    display: none;
+    color: var(--color-accent-strong);
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    font-weight: var(--text-ui--font-weight);
+  }
+
+  .contact-field[data-invalid] .contact-error {
+    display: block;
+  }
+
+  .contact-field[data-invalid] .contact-input {
+    outline-color: var(--color-accent-strong);
+  }
+
+  /* an empty outcome takes no space: no padding, no border, nothing */
+  .contact-status {
+    color: var(--color-text-primary);
+    font-size: var(--text-text);
+    line-height: var(--text-text--line-height);
+    font-weight: var(--text-text--font-weight);
+  }
+
+  .contact-status:empty {
+    display: none;
+  }
+
+  .contact-status[data-state='error'] {
+    color: var(--color-accent-strong);
+  }
+
+  /* while it's sending, pressing again would only queue a duplicate */
+  .contact-submit[aria-disabled='true'] {
+    pointer-events: none;
+    opacity: 0.7;
   }
 }
 </style>
