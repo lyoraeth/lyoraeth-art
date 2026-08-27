@@ -6,4 +6,5 @@ definePageMeta({ layout: 'redesign' })
   <HeroSection />
   <WorkSection />
   <ExperienceSection />
+  <WritingSection />
 </template>

@@ -107,6 +107,32 @@ test.describe('work', () => {
   })
 })
 
+test.describe('writing', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+  })
+
+  test('three cards, each linking to its post', async ({ page }) => {
+    const cards = page.locator('.post-card')
+    await expect(cards).toHaveCount(3)
+    await expect(cards.first().locator('a')).toHaveAttribute('href', /\/writing\//)
+  })
+
+  test('the action appears on hover without resizing the card', async ({ page }) => {
+    const card = page.locator('.post-card').first()
+    await card.scrollIntoViewIfNeeded()
+
+    const action = card.locator('.post-card__action')
+    await expect(action).toBeHidden()
+
+    const before = (await card.boundingBox())!.height
+    await card.hover()
+    await expect(action).toBeVisible()
+    expect((await card.boundingBox())!.height).toBe(before)
+  })
+})
+
 test.describe('phone menu', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 

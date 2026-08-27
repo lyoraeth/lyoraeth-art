@@ -1,342 +1,55 @@
 <script setup lang="ts">
 import type { PostItem } from '../../../server/api/posts.get'
 
-const { t }        = useI18n()
-const loc          = useLoc()
-const localePath   = useLocalePath()
+const { t } = useI18n()
+const localePath = useLocalePath()
+const plural = usePlural()
 
-const { data: posts } = await useFetch('/api/posts', { default: () => [] as PostItem[] })
-
-const featured  = computed(() => posts.value[0] ?? null)
-const secondary = computed(() => (posts.value ?? []).slice(1))
-
-const formatDate = useFormatDate()
-
-/* ── Template refs ── */
-const headRef = ref<HTMLElement | null>(null)
-const featRef = ref<HTMLElement | null>(null)
-const mini0   = ref<HTMLElement | null>(null)
-const mini1   = ref<HTMLElement | null>(null)
-
-const { observe } = useReveal()
-onMounted(() => {
-  observe(headRef.value)
-  observe(featRef.value)
-  observe(mini0.value)
-  observe(mini1.value)
+const { data: posts } = await useFetch<PostItem[]>('/api/posts', {
+  query: { limit: 0 },
+  key: 'posts-all',
+  default: () => [] as PostItem[],
 })
 
-useGlowCard(featRef)
-useGlowCard(mini0)
-useGlowCard(mini1)
+const CARDS = 3
+
+const shown = computed(() => posts.value.slice(0, CARDS))
+const total = computed(() => posts.value.length)
 </script>
 
 <template>
-  <section id="writing" class="section-writing">
-    <div class="sec-head reveal" ref="headRef">
-      <h2>{{ t('writing.title') }}</h2>
-    </div>
-
-    <div v-if="featured" class="writing-wrap">
-      <!-- Featured post -->
-      <a
-        :href="localePath(`/writing/${featured.slug}`)"
-        class="feat glass-card reveal rv-d1"
-        ref="featRef"
-        @click.prevent="navigateTo(localePath(`/writing/${featured.slug}`))"
+  <section
+    id="writing"
+    class="flex flex-col gap-y-section-header-gap py-section-padding-y"
+    aria-labelledby="writing-title"
+  >
+    <div class="section-header">
+      <h2 id="writing-title" class="section-header__title type-display-xl text-text-primary">
+        {{ t('writing.title') }}
+      </h2>
+      <span class="section-header__count type-ui text-text-secondary">
+        {{ t(`writing.count_${plural(total)}`, { n: total }) }}
+      </span>
+      <NuxtLink
+        :to="localePath('/writing')"
+        class="section-header__action h-10 w-40 inline-flex justify-center items-center rounded-full type-ui text-text-inverse bg-fill-strong hover:bg-accent-strong-hover active:bg-accent-default"
       >
-        <div class="feat-thumb">
-          <div class="feat-thumb-media">
-            <SanityPicture
-              :src="featured.coverUrl"
-              :alt="featured.coverAlt ?? loc(featured.title)"
-              class="feat-thumb-img"
-              loading="lazy"
-              draggable="false"
-              :width="600"
-            >
-              <template #placeholder>
-                <!-- FPO sheet — print-production placeholder, see lyoaeth-brand/placeholders -->
-                <img src="/placeholders/writing.svg" alt="" class="feat-thumb-img" aria-hidden="true" draggable="false" />
-              </template>
-            </SanityPicture>
-          </div>
-        </div>
-
-        <div class="feat-divider" aria-hidden="true"></div>
-
-        <div class="feat-body">
-          <div class="feat-meta">
-            <span class="mono feat-date">{{ formatDate(featured.publishedAt) }}</span>
-            <span class="feat-dot"></span>
-            <span class="mono">{{ t('writing.min', { n: featured.readingTime }) }}</span>
-          </div>
-          <h3 class="feat-title">{{ loc(featured.title) }}</h3>
-          <div class="feat-tags">
-            <span v-for="tag in featured.tags" :key="tag" class="tag">{{ tag }}</span>
-          </div>
-          <span class="feat-read">
-            {{ t('writing.read') }} <span class="feat-arrow">→</span>
-          </span>
-        </div>
-      </a>
-
-      <!-- Secondary posts -->
-      <div class="more-writing">
-        <a
-          v-for="(post, i) in secondary"
-          :key="post._id"
-          :href="localePath(`/writing/${post.slug}`)"
-          class="mini-card glass-card reveal rv-d2"
-          :ref="(el) => { if (i === 0) mini0 = el as HTMLElement | null; else mini1 = el as HTMLElement | null }"
-          @click.prevent="navigateTo(localePath(`/writing/${post.slug}`))"
-        >
-          <div class="mini-meta">
-            <span class="mono mini-date">{{ formatDate(post.publishedAt) }}</span>
-            <span class="mini-dot"></span>
-            <span class="mono">{{ t('writing.min', { n: post.readingTime }) }}</span>
-          </div>
-          <span class="mini-title">{{ loc(post.title) }}</span>
-          <span class="mini-read">
-            {{ t('writing.read') }} <span class="mini-arrow">→</span>
-          </span>
-        </a>
-      </div>
-      <div class="view-all-wrap">
-        <NuxtLink :to="localePath('/writing')" class="view-all">{{ t('writing.see_all') }} <span class="va-arrow">→</span></NuxtLink>
-      </div>
+        {{ t('writing.see_all') }}
+      </NuxtLink>
     </div>
 
-    <!-- Empty state while Sanity is not yet configured -->
-    <p v-else class="empty-state">{{ t('writing.not_found') }}</p>
+    <!--
+      Three cards, so the layout differs from work: two columns for a while,
+      with the third taking the bottom row whole, and all three in a row from
+      1280. Heights are levelled by auto-rows-fr, the floor lives in the card.
+    -->
+    <div class="layout-grid gap-grid-gap auto-rows-fr">
+      <PostCard
+        v-for="(post, i) in shown"
+        :key="post._id"
+        :item="post"
+        :class="i === CARDS - 1 ? 'col-span-4 md:col-span-8 xl:col-span-4' : 'col-span-4'"
+      />
+    </div>
   </section>
 </template>
-
-<style scoped>
-.section-writing {
-  padding: clamp(4.375rem, 9vw, 8.75rem) 0;
-}
-.writing-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.empty-state {
-  color: var(--faint);
-  font-size: 0.875rem;
-}
-.view-all-wrap {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
-.view-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--ember);
-  font-size: 0.9375rem;
-  text-decoration: none;
-}
-.va-arrow {
-  display: inline-block;
-  vertical-align: middle;
-  transition: transform 0.3s var(--ease-out-expo);
-}
-.view-all:hover .va-arrow { transform: translateX(0.25rem); }
-
-/* ── Featured post ─────────────────────────────────────────────────────────── */
-.feat {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  border-radius: var(--radius-card);
-  text-decoration: none;
-  color: inherit;
-}
-.feat-thumb {
-  position: relative;
-  min-height: 13.75rem;
-  background: linear-gradient(135deg, #0c1016, #0a0d12);
-  overflow: hidden;
-  z-index: 2;
-}
-/* Sunk on the 3 sides touching the card's own border (so it shows through
-   unbroken) — flush against the divider, which already separates it from the text.
-   Radius nudged in by the same 1px so the corner stays concentric with the card. */
-@media (min-width: 42.5em) {
-  .feat-thumb {
-    margin: 1px 0 1px 1px;
-    border-radius: calc(var(--radius-card) - 1px) 0 0 calc(var(--radius-card) - 1px);
-  }
-}
-.feat-thumb-media {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.feat-thumb-img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center;
-  display: block;
-}
-
-/* Divider — a single masked container (no native `border`) so the static line and
-   its hover glow share one clip and can't drift apart into a stepped double-edge.
-   Trimmed 1px top/bottom so it doesn't overlap the outer ring's horizontal runs. */
-.feat-divider {
-  position: absolute;
-  inset: 1px 0;
-  pointer-events: none;
-  z-index: 3;
-  background: var(--line-soft);
-  -webkit-mask: linear-gradient(to right, transparent calc(45% - 0.5px), #fff calc(45% - 0.5px), #fff calc(45% + 0.5px), transparent calc(45% + 0.5px));
-  mask: linear-gradient(to right, transparent calc(45% - 0.5px), #fff calc(45% - 0.5px), #fff calc(45% + 0.5px), transparent calc(45% + 0.5px));
-}
-/* Cursor-tracked glow, nested so it inherits the parent's mask/clip for free
-   (--gx/--gy from useGlowCard on featRef). */
-.feat-divider::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(16rem circle at var(--gx, 50%) var(--gy, 50%), oklch(72% 0.1 58 / 90%), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s var(--ease-silk);
-}
-.feat:hover .feat-divider::after {
-  opacity: 1;
-}
-@media (max-width: 42.5em) {
-  .feat-divider { display: none; }
-}
-
-.feat-body {
-  padding: clamp(1.5rem, 3vw, 2.375rem);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: relative;
-  z-index: 2;
-}
-.feat-meta {
-  display: flex;
-  gap: 0.875rem;
-  align-items: center;
-  margin-bottom: 1rem;
-  color: var(--faint);
-}
-.feat-date { font-size: 0.6875rem; }
-.feat-dot {
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: var(--faint);
-  flex-shrink: 0;
-}
-.feat-title {
-  font-size: clamp(1.25rem, 0.875rem + 1vw, 1.625rem);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.15;
-  margin-bottom: 0.875rem;
-}
-.feat-tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-.tag {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 0.6875rem;
-  color: var(--mist);
-  padding: 0.3125rem 0.625rem;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-tag);
-  background: rgba(255, 255, 255, 0.02);
-  background: oklch(100% 0 0 / 2%);
-}
-.feat-read {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1.375rem;
-  color: var(--ember);
-  font-size: 0.875rem;
-}
-.feat-arrow {
-  display: inline-block;
-  vertical-align: middle;
-  transition: transform 0.35s var(--ease-out-expo);
-}
-.feat:hover .feat-arrow { transform: translateX(0.3125rem); }
-
-/* ── Mini cards ────────────────────────────────────────────────────────────── */
-.more-writing {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-.mini-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1.5rem;
-  border-radius: var(--radius-card-sm);
-  text-decoration: none;
-  color: inherit;
-  transition:
-    opacity   var(--duration-reveal) var(--ease-out-expo),
-    transform 0.25s var(--ease-out-expo);
-}
-.mini-card:hover {
-  transform: translateY(-0.1875rem);
-}
-.mini-meta {
-  display: flex;
-  gap: 0.625rem;
-  align-items: center;
-  color: var(--faint);
-  position: relative;
-  z-index: 2;
-}
-.mini-date { font-size: 0.65625rem; }
-.mini-dot {
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: var(--faint);
-  flex-shrink: 0;
-}
-.mini-title {
-  font-weight: 500;
-  font-size: 1rem;
-  letter-spacing: -0.01em;
-  line-height: 1.25;
-  margin-top: auto;
-  position: relative;
-  z-index: 2;
-}
-.mini-read {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4375rem;
-  color: var(--ember);
-  font-size: 0.8125rem;
-  position: relative;
-  z-index: 2;
-}
-.mini-arrow {
-  display: inline-block;
-  vertical-align: middle;
-  transition: transform 0.3s var(--ease-out-expo);
-}
-.mini-card:hover .mini-arrow { transform: translateX(0.25rem); }
-
-@media (max-width: 42.5em) {
-  .feat { grid-template-columns: 1fr; }
-  .feat-thumb {
-    min-height: 9.375rem;
-    margin: 1px;
-  }
-  .more-writing { grid-template-columns: 1fr; }
-}
-</style>
