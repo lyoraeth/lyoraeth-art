@@ -16,6 +16,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'All fields are required' })
   }
 
+  // same caps as the WebMCP endpoint: nothing here needs more, and an
+  // unbounded body is a free way to fill a mailbox
+  if (contact.length > 200 || message.length > 5000) {
+    throw createError({ statusCode: 413, message: 'Message too long' })
+  }
+
   const { turnstileContactSecretKey, resendApiKey, mailerFrom, mailerTo } = useRuntimeConfig(event)
   const valid = await verifyTurnstileToken(token, event)
   if (!valid.success) throw createError({ statusCode: 400, message: 'Captcha failed — please try again' })
@@ -31,7 +37,8 @@ export default defineEventHandler(async (event) => {
     to:      mailerTo,
     subject: 'New message — lyoraeth.art',
     text:    `From: ${contact.trim()}\n\n${message.trim()}`,
-    html:    `<p><strong>From:</strong> ${contact.trim()}</p><pre style="font-family:inherit">${message.trim()}</pre>`,
+    // escaped: the body is attacker-controlled text landing in an HTML email
+    html:    `<p><strong>From:</strong> ${escapeHtml(contact.trim())}</p><pre style="font-family:inherit">${escapeHtml(message.trim())}</pre>`,
   })
 
   return { ok: true }
