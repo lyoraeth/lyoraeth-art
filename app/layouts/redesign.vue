@@ -26,6 +26,8 @@ const menuOpen = ref(false)
   >
     <slot />
   </main>
+
+  <PageFooter />
 </template>
 
 <style>
@@ -41,11 +43,6 @@ const menuOpen = ref(false)
   }
 
   html.shell-redesign body {
-    /* full-height column, so a short page still pins the footer to the bottom */
-    display: flex;
-    flex-direction: column;
-    min-height: 100dvh;
-
     background-color: var(--color-surface-page);
     color: var(--color-text-primary);
 
@@ -54,6 +51,15 @@ const menuOpen = ref(false)
     font-size: var(--text-text);
     line-height: var(--text-text--line-height);
     font-weight: var(--text-text--font-weight);
+  }
+
+  /* The column lives on Nuxt's root rather than on body: that is the closest
+     ancestor the shell shares, and a block element in between would stop
+     `flex: 1` from reaching the footer. */
+  html.shell-redesign #__nuxt {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
   }
 
   html.shell-redesign main {
