@@ -211,7 +211,43 @@
   "footer": {
     "copyright": "© 2026 Данил Климов",
     "privacy": "Конфиденциальность",
-    "hint": "листайте ещё ↓"
+    "hint": "листайте ещё ↓",
+    "tagline": "Страница кончилась, сайт остался. Шрифты, сборка, код и референсы.",
+    "credits": [
+      {
+        "label": "Шрифты",
+        "value": "PP Pangram Sans · PP Neue Montreal (Explore & Pitch Font Pack)"
+      },
+      {
+        "label": "Собрано",
+        "value": "Nuxt · Vue · TypeScript"
+      },
+      {
+        "label": "CMS",
+        "value": "Sanity"
+      },
+      {
+        "label": "Аналитика",
+        "value": "Umami"
+      },
+      {
+        "label": "Лицензия",
+        "value": "Source Reference License"
+      },
+      {
+        "label": "Референсы",
+        "value": "Pangram Pangram · Siteinspire · dstudio.agency · mostlyserious · ParaType · «Duwy» — Natasha Belova, Korsa"
+      },
+      {
+        "label": "Язык",
+        "value": "EN · RU"
+      }
+    ],
+    "feed_label": "Подписка",
+    "feed": "RSS",
+    "privacy_policy": "Политика конфиденциальности",
+    "personal_data": "Обработка персональных данных",
+    "top": "Наверх ↑"
   },
 
   "privacy": {

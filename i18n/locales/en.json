@@ -211,7 +211,43 @@
   "footer": {
     "copyright": "© 2026 Danil Klimov",
     "privacy": "Privacy",
-    "hint": "keep scrolling ↓"
+    "hint": "keep scrolling ↓",
+    "tagline": "The page ended, the site didn't. Fonts, build, code and references.",
+    "credits": [
+      {
+        "label": "Fonts",
+        "value": "PP Pangram Sans · PP Neue Montreal (Explore & Pitch Font Pack)"
+      },
+      {
+        "label": "Built with",
+        "value": "Nuxt · Vue · TypeScript"
+      },
+      {
+        "label": "CMS",
+        "value": "Sanity"
+      },
+      {
+        "label": "Analytics",
+        "value": "Umami"
+      },
+      {
+        "label": "License",
+        "value": "Source Reference License"
+      },
+      {
+        "label": "References",
+        "value": "Pangram Pangram · Siteinspire · dstudio.agency · mostlyserious · ParaType · «Duwy» — Natasha Belova, Korsa"
+      },
+      {
+        "label": "Language",
+        "value": "EN · RU"
+      }
+    ],
+    "feed_label": "Feed",
+    "feed": "RSS",
+    "privacy_policy": "Privacy policy",
+    "personal_data": "Personal data processing",
+    "top": "Back to top ↑"
   },
 
   "privacy": {
