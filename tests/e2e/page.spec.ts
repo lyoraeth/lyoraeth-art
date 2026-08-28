@@ -256,6 +256,33 @@ test.describe('contact form', () => {
   })
 })
 
+test.describe('footer', () => {
+  test('colophon, legal links and a feed for the active locale', async ({ page }) => {
+    await page.goto('/ru')
+    await page.waitForLoadState('load')
+
+    const footer = page.locator('footer')
+    await expect(footer.locator('.credits-row')).toHaveCount(8)
+    await expect(footer.locator('a[href$="rss.xml"]')).toHaveAttribute('href', '/ru/rss.xml')
+    await expect(footer.locator('a[href*="privacy"]')).toBeVisible()
+  })
+
+  test('sits at the bottom even when the page is short', async ({ page }) => {
+    await page.goto('/')
+    await page.waitForLoadState('load')
+
+    const gap = await page.evaluate(() => {
+      const main = document.querySelector('main')!
+      const kept = main.innerHTML
+      main.innerHTML = ''
+      const bottom = document.querySelector('footer')!.getBoundingClientRect().bottom
+      main.innerHTML = kept
+      return Math.round(window.innerHeight - bottom)
+    })
+    expect(gap).toBe(0)
+  })
+})
+
 test.describe('phone menu', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
