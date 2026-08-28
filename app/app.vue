@@ -51,13 +51,13 @@ useHead({
 </script>
 
 <template>
-  <div>
-    <a href="#main-content" class="skip-link">{{ t('a11y.skip') }}</a>
-    <NuxtRouteAnnouncer />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
+  <!-- No wrapper element: the shells lay themselves out as a column, and every
+       block in between would break that chain. -->
+  <a href="#main-content" class="skip-link">{{ t('a11y.skip') }}</a>
+  <NuxtRouteAnnouncer />
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>
 
 <style>
