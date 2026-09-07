@@ -34,7 +34,7 @@ function onPointerEnter(event: PointerEvent) {
 
     <div class="work-card__header">
       <div v-if="tags.length" class="work-card__tags type-ui">
-        <span v-for="tag in tags" :key="tag">{{ tag }}</span>
+        <span class="work-card__tags-text">{{ tags.join(' • ') }}</span>
       </div>
       <p v-if="item.year" class="work-card__date type-ui">{{ item.year }}</p>
     </div>
@@ -118,22 +118,30 @@ function onPointerEnter(event: PointerEvent) {
     width: 100%;
   }
 
+  /*
+   * Capped rather than left to grow with the tag count: a project with more
+   * tags than fit doesn't wrap to a second line or push the date over, it
+   * just truncates. Overflow lives on the text span, not the pill itself —
+   * a flex item needs min-width: 0 before overflow: hidden does anything,
+   * the pill's own default min-width would otherwise stretch to fit it.
+   */
   .work-card__tags {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: calc(var(--spacing) * 3.75);
+    max-width: 240px;
     padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2);
     border-radius: calc(infinity * 1px);
     outline: 1px solid var(--color-border-raised);
     color: var(--color-text-secondary);
     transition: color 500ms var(--ease-base), outline-color 500ms var(--ease-base);
+  }
 
-    /* separator drawn by a pseudo-element rather than typed into the text */
-    & span + span::before {
-      content: '•';
-      margin-right: calc(var(--spacing) * 3.75);
-    }
+  .work-card__tags-text {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .work-card__date {
