@@ -59,6 +59,12 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // GSC flagged /ru/rss.xml as a duplicate of /rss.xml — content actually
+    // differs (EN "writing" vs RU "блог"), a false positive, but a feed has
+    // nowhere useful to rank anyway; it doesn't need to be indexed to be
+    // subscribed to.
+    '/rss.xml':    { headers: { 'X-Robots-Tag': 'noindex' } },
+    '/ru/rss.xml': { headers: { 'X-Robots-Tag': 'noindex' } },
     '/llms-full.txt':  { headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' } },
     '/avatar.webp':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     // Portrait variants: cached long, but not immutable — the file names carry
