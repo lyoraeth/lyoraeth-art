@@ -1,4 +1,4 @@
-import { Marked } from 'marked'
+import { Marked, Renderer } from 'marked'
 
 /** Turns a heading's text into a stable anchor id — shared by the renderer
  *  (which stamps the id onto <h2>/<h3>) and the TOC (which links to it), so
@@ -7,9 +7,19 @@ export function slugifyHeading(text: string) {
   return text.toLowerCase().replace(/[^a-z0-9а-яёa-z\s-]/gi, '').trim().replace(/\s+/g, '-')
 }
 
+function escapeHtml(raw: string) {
+  return raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+// Delegated to for every fenced code block except ```mermaid — reproducing
+// marked's own default rather than hand-rolling <pre><code> again.
+const defaultRenderer = new Renderer()
+
 /** marked configured for post bodies: h2/h3 get anchor ids, images become
- *  captioned figures. Returns a `renderPost` that also opens external links in
- *  a new tab and prepends the intro anchor the TOC scrolls to. */
+ *  captioned figures, ```mermaid``` fences become diagram containers (mermaid
+ *  itself runs client-side against `.mermaid`, once the post page mounts).
+ *  Returns a `renderPost` that also opens external links in a new tab and
+ *  prepends the intro anchor the TOC scrolls to. */
 export function useMarkdown() {
   const md = new Marked({
     renderer: {
@@ -24,6 +34,12 @@ export function useMarkdown() {
       image({ href, title, text }) {
         const caption = title ? `<figcaption class="post-caption">${title}</figcaption>` : ''
         return `<figure class="post-figure"><img src="${href}" alt="${text ?? ''}" loading="lazy" class="post-img">${caption}</figure>`
+      },
+      code(token) {
+        if (token.lang === 'mermaid') {
+          return `<div class="mermaid">${escapeHtml(token.text)}</div>\n`
+        }
+        return defaultRenderer.code(token)
       },
     },
   })

@@ -1,11 +1,13 @@
 export interface TocEntry { id: string; text: string; level: 2 | 3 | 'intro' }
 
 /** Table of contents for a markdown article: builds the entry list from the
- *  raw source, tracks which heading is active, and positions the mobile panel
- *  / clamps the fixed desktop sidebar. Owns its own scroll + resize listeners.
+ *  raw source and tracks which heading is active while scrolling.
  *
- *  `content` is the rendered HTML — watched so the active id / clamp re-measure
- *  once the new body has hit the DOM (e.g. after a locale switch). */
+ *  `content` is the rendered HTML — watched so the active id re-measures once
+ *  the new body has hit the DOM (e.g. after a locale switch). Positioning the
+ *  sidebar is CSS's job now (`position: sticky` inside its own grid column),
+ *  not this composable's — the fixed/clamp dance it used to do only existed
+ *  because the dark shell's `overflow-x: hidden` broke sticky outright. */
 export function useToc(opts: {
   markdown:   () => string
   introLabel: () => string
@@ -27,35 +29,16 @@ export function useToc(opts: {
     return entries
   })
 
-  const activeId      = ref('')
-  const tocOpen       = ref(false)
-  const scrolled      = ref(false)
-  const tocBtnEl      = ref<HTMLElement | null>(null)
-  const tocAsideEl    = ref<HTMLElement | null>(null)
-  const tocPanelStyle = ref<Record<string, string>>({})
-
-  function updateTocPanelStyle() {
-    if (!tocBtnEl.value) return
-    const r = tocBtnEl.value.getBoundingClientRect()
-    const gap = scrolled.value ? 32 : 14
-    tocPanelStyle.value = {
-      right: `${document.documentElement.clientWidth - r.right}px`,
-      top:   `${r.bottom + gap}px`,
-    }
-  }
-
-  watch(tocOpen,  (open) => { if (open) nextTick().then(updateTocPanelStyle) })
-  watch(scrolled, ()     => { if (tocOpen.value) updateTocPanelStyle() })
+  const activeId = ref('')
 
   const router = useRouter()
-  function jumpTo(id: string, closePanel?: boolean) {
+  function jumpTo(id: string) {
     const el = document.getElementById(id)
     if (el) {
       const top = el.getBoundingClientRect().top + window.scrollY - Math.round(window.innerHeight / 3)
       window.scrollTo({ top, behavior: 'smooth' })
     }
     router.replace({ hash: `#${id}` })
-    if (closePanel) tocOpen.value = false
   }
 
   function updateActiveId() {
@@ -71,44 +54,18 @@ export function useToc(opts: {
     activeId.value = above.at(-1)!.id
   }
 
-  /* Fixed TOC follows the viewport center; near the article's end it would run
-     past the content, so the scroll handler pushes it up by exactly the amount
-     its bottom overshoots the comments block's bottom. */
-  function clampToc() {
-    const el = tocAsideEl.value
-    if (!el) return
-    if (!window.matchMedia('(min-width: 72rem)').matches) {
-      el.style.transform = ''
-      return
-    }
-    const comments = document.getElementById('post-comments')
-    if (!comments) return
-    const desiredBottom = window.innerHeight / 2 + el.offsetHeight / 2
-    const overshoot = Math.max(0, desiredBottom - comments.getBoundingClientRect().bottom)
-    el.style.transform = overshoot > 0 ? `translateY(calc(-50% - ${Math.round(overshoot)}px))` : ''
-  }
-
   onMounted(async () => {
-    const onScroll = () => {
-      scrolled.value = window.scrollY > 24
-      updateActiveId()
-      clampToc()
-    }
+    const onScroll = () => updateActiveId()
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', clampToc, { passive: true })
 
-    // Register cleanup + watcher synchronously (before the await) so they bind to
-    // the active component instance — after `await nextTick()` there is none.
-    onUnmounted(() => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', clampToc)
-    })
-    watch(opts.content, async () => { await nextTick(); updateActiveId(); clampToc() })
+    // Registered synchronously (before the await) so it binds to the active
+    // component instance — after `await nextTick()` there is none.
+    onUnmounted(() => window.removeEventListener('scroll', onScroll))
+    watch(opts.content, async () => { await nextTick(); updateActiveId() })
 
     await nextTick()
     updateActiveId()
-    clampToc()
   })
 
-  return { toc, activeId, tocOpen, tocBtnEl, tocAsideEl, tocPanelStyle, jumpTo }
+  return { toc, activeId, jumpTo }
 }

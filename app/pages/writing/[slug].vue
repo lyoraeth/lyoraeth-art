@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { PostDetail } from '../../../server/api/post/[slug].get'
 
+definePageMeta({ layout: 'redesign' })
+
 const { locale, t } = useI18n()
 const localePath    = useLocalePath()
 const loc   = useLoc()
@@ -83,8 +85,42 @@ const bodyHtml = computed(() => {
   return renderPost(raw)
 })
 
-/* ── TOC ── */
-const { toc, activeId, tocOpen, tocBtnEl, tocAsideEl, tocPanelStyle, jumpTo } = useToc({
+/* ── Mermaid ──
+   ```mermaid``` fences render server-side as inert text inside a plain
+   `.mermaid` div (see useMarkdown); this turns them into diagrams once the
+   div is actually in the DOM. Loaded on demand — most posts have no
+   diagrams, and the library is too heavy to sit in every page's bundle. */
+async function renderMermaid() {
+  await nextTick()
+  if (!document.querySelector('.post-body .mermaid')) return
+
+  const { default: mermaid } = await import('mermaid')
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    fontFamily: 'PP Neue Montreal, ui-sans-serif, system-ui, sans-serif',
+    themeVariables: {
+      primaryColor: '#EEF0F1',
+      primaryTextColor: '#1F2123',
+      primaryBorderColor: '#D3D6D9',
+      lineColor: '#8895A5',
+      secondaryColor: '#F3F5F6',
+      tertiaryColor: '#FFFFFF',
+      textColor: '#1F2123',
+    },
+  })
+  await mermaid.run({ querySelector: '.post-body .mermaid' })
+}
+
+onMounted(renderMermaid)
+watch(bodyHtml, renderMermaid)
+
+/* ── TOC ──
+   One data source, two renderings: a sticky sidebar at xl (its own grid
+   column) and a plain, always-visible list inline in the article below it
+   — not the same markup repositioned, only the sidebar needs to track
+   scroll position visually. */
+const { toc, activeId, jumpTo } = useToc({
   markdown:   () => (locale.value === 'ru' ? post.value?.body.ru : post.value?.body.en) ?? '',
   introLabel: () => t('writing.toc_intro'),
   content:    () => bodyHtml.value,
@@ -109,117 +145,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="post-outer" v-if="post">
-
-  <!-- Mobile TOC button (teleported into nav right slot) -->
-  <Teleport v-if="toc.length >= 2" to="#nav-toc-slot">
-    <button
-      ref="tocBtnEl"
-      class="toc-btn"
-      :class="{ 'toc-btn--open': tocOpen }"
-      :aria-label="t('writing.toc')"
-      :aria-expanded="tocOpen"
-      @click="tocOpen = !tocOpen"
-    >
-      <svg width="16" height="14" viewBox="0 0 16 14" fill="none" aria-hidden="true">
-        <line x1="0" y1="1"  x2="13" y2="1"  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="2" y1="5"  x2="11" y2="5"  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="0" y1="9"  x2="13" y2="9"  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="2" y1="13" x2="9"  y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-    </button>
-  </Teleport>
-
-  <!-- Mobile TOC panel + backdrop -->
-  <Teleport v-if="toc.length >= 2" to="body">
-    <Transition name="toc-panel">
-      <div v-if="tocOpen" class="toc-mob-panel" role="dialog" :aria-label="t('writing.toc')" :style="tocPanelStyle">
-        <span class="toc-label">{{ t('writing.toc') }}</span>
-        <ol class="toc-list">
-          <li
-            v-for="entry in toc"
-            :key="entry.id"
-            :class="['toc-item', entry.level !== 'intro' && `toc-item--h${entry.level}`]"
-          >
-            <a
-              :href="`#${entry.id}`"
-              class="toc-link"
-              :class="{ 'toc-link--active': activeId === entry.id }"
-              @click="tocOpen = false"
-            >{{ entry.text }}</a>
-          </li>
-          <li class="toc-divider-item" aria-hidden="true" />
-          <li
-            v-for="entry in tocMeta"
-            :key="entry.id"
-            class="toc-item toc-item--meta"
-          >
-            <a
-              :href="`#${entry.id}`"
-              class="toc-link"
-              :class="{ 'toc-link--active': activeId === entry.id }"
-              @click.prevent="jumpTo(entry.id, true)"
-            >{{ entry.label }}</a>
-          </li>
-        </ol>
-      </div>
-    </Transition>
-    <Transition name="toc-bd">
-      <div v-if="tocOpen" class="toc-backdrop" @click="tocOpen = false" />
-    </Transition>
-  </Teleport>
-
-  <!-- TOC sidebar (desktop, ≥2 headings). position: fixed — NOT sticky: the
-       global overflow-x: hidden on html/body turns body into a scroll
-       container and kills sticky (hard-won lesson). The stop-at-article-end
-       behavior comes from a small clamp in the scroll handler instead. -->
-  <aside v-if="toc.length >= 2" ref="tocAsideEl" class="toc-sidebar" aria-label="Table of contents">
-    <nav class="toc-nav">
-      <span class="toc-label">{{ t('writing.toc') }}</span>
-      <ol class="toc-list">
-        <li
-          v-for="entry in toc"
-          :key="entry.id"
-          :class="['toc-item', entry.level !== 'intro' && `toc-item--h${entry.level}`]"
-        >
-          <a
-            :href="`#${entry.id}`"
-            class="toc-link"
-            :class="{ 'toc-link--active': activeId === entry.id }"
-          >{{ entry.text }}</a>
-        </li>
-        <li class="toc-divider-item" aria-hidden="true" />
-        <li
-          v-for="entry in tocMeta"
-          :key="entry.id"
-          class="toc-item toc-item--meta"
-        >
-          <a
-            :href="`#${entry.id}`"
-            class="toc-link"
-            :class="{ 'toc-link--active': activeId === entry.id }"
-            @click.prevent="jumpTo(entry.id)"
-          >{{ entry.label }}</a>
-        </li>
-      </ol>
-    </nav>
-  </aside>
-
-  <article class="post-page">
+  <div v-if="post" class="flex flex-col gap-y-section-gap py-section-padding-y">
     <!-- Back + prev/next -->
-    <div class="post-topnav">
-      <NuxtLink :to="localePath('/writing')" class="back-link">
+    <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-2">
+      <NuxtLink :to="localePath('/writing')" class="post-nav-link">
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
         {{ t('writing.back') }}
       </NuxtLink>
 
-      <div v-if="post.prev || post.next" class="adjacent-nav">
+      <div v-if="post.prev || post.next" class="flex items-center gap-5">
         <NuxtLink
           v-if="post.prev"
           :to="localePath(`/writing/${post.prev.slug}`)"
-          class="back-link adjacent-link"
+          class="post-nav-link"
           :aria-label="`${t('writing.prev_post')}: ${loc(post.prev.title)}`"
           :title="loc(post.prev.title)"
         >
@@ -229,7 +169,7 @@ onMounted(() => {
         <NuxtLink
           v-if="post.next"
           :to="localePath(`/writing/${post.next.slug}`)"
-          class="back-link adjacent-link"
+          class="post-nav-link"
           :aria-label="`${t('writing.next_post')}: ${loc(post.next.title)}`"
           :title="loc(post.next.title)"
         >
@@ -239,488 +179,408 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Header -->
-    <header class="post-header">
-      <div class="post-meta">
-        <span class="mono meta-date">{{ formatDate(post.publishedAt, 'long') }}</span>
-        <span class="meta-dot"></span>
-        <span class="mono">{{ t('writing.min_read', { n: post.readingTime }) }}</span>
-      </div>
-      <h1 class="post-title">{{ title }}</h1>
-      <div class="post-tags">
-        <span v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</span>
-      </div>
-    </header>
+    <!-- Article — centred rather than flush left: two empty columns, a gap,
+         six of text, another gap, the TOC in the last two. -->
+    <div class="layout-grid gap-grid-gap">
+      <article class="col-span-4 md:col-span-8 xl:col-start-4 xl:col-span-6 min-w-0">
+        <header class="post-column flex flex-col gap-6 mb-10">
+          <div class="flex items-center gap-2.5 type-ui text-text-secondary">
+            <span>{{ formatDate(post.publishedAt, 'long') }}</span>
+            <span aria-hidden="true">·</span>
+            <span>{{ t('writing.min_read', { n: post.readingTime }) }}</span>
+          </div>
+          <h1 class="type-display-2xl text-text-primary">{{ title }}</h1>
+          <div v-if="post.tags.length" class="flex flex-wrap gap-2">
+            <span v-for="tag in post.tags" :key="tag" class="tag-pill">{{ tag }}</span>
+          </div>
+        </header>
 
-    <!-- Cover -->
-    <div v-if="post.coverUrl" class="post-cover">
-      <SanityPicture
-        :src="post.coverUrl"
-        :alt="post.coverAlt ?? title"
-        loading="eager"
-        fetchpriority="high"
-        :width="900"
-        :height="post.coverWidth && post.coverHeight ? Math.round(900 * post.coverHeight / post.coverWidth) : undefined"
-      />
+        <div v-if="post.coverUrl" class="post-cover">
+          <SanityPicture
+            :src="post.coverUrl"
+            :alt="post.coverAlt ?? title"
+            loading="eager"
+            fetchpriority="high"
+            :width="900"
+            :height="post.coverWidth && post.coverHeight ? Math.round(900 * post.coverHeight / post.coverWidth) : undefined"
+          />
+        </div>
+
+        <!-- Below xl — always visible, no border or toggle, otherwise the
+             same list as the sidebar; that one takes over from xl. -->
+        <nav v-if="toc.length >= 2" class="post-column toc-plain xl:hidden mb-10" aria-label="Table of contents">
+          <span class="toc-label type-ui text-text-secondary">{{ t('writing.toc') }}</span>
+          <ol class="toc-list">
+            <li
+              v-for="entry in toc"
+              :key="entry.id"
+              :class="['toc-item', entry.level !== 'intro' && `toc-item--h${entry.level}`]"
+            >
+              <a
+                :href="`#${entry.id}`"
+                class="toc-link"
+                :class="{ active: activeId === entry.id }"
+              >{{ entry.text }}</a>
+            </li>
+            <li class="toc-divider" aria-hidden="true" />
+            <li v-for="entry in tocMeta" :key="entry.id" class="toc-item">
+              <a
+                href="#"
+                class="toc-link"
+                :class="{ active: activeId === entry.id }"
+                @click.prevent="jumpTo(entry.id)"
+              >{{ entry.label }}</a>
+            </li>
+          </ol>
+        </nav>
+
+        <div class="post-body post-column" v-html="bodyHtml" />
+
+        <footer v-if="post.references?.length" id="post-references" class="post-column post-references">
+          <span class="post-references__label type-ui text-text-secondary">{{ t('writing.toc_references') }}</span>
+          <ol class="post-references__list">
+            <li v-for="ref in post.references" :key="ref.href">
+              <a :href="ref.href" target="_blank" rel="noopener noreferrer" @click="track(EV.referenceClick, { slug, href: ref.href })">{{ ref.title }}</a>
+            </li>
+          </ol>
+        </footer>
+
+        <div class="post-divider" />
+
+        <section class="post-column">
+          <PostRating :slug="slug" />
+        </section>
+
+        <div class="post-divider" />
+
+        <section id="post-comments" class="post-column">
+          <PostComments :slug="slug" :post-title="post.title.en" />
+        </section>
+      </article>
+
+      <!-- TOC sidebar — last two of twelve columns at xl only; sticky
+           inside the article's own row, so it naturally stops scrolling
+           with the page once the row (and the comments inside it) ends,
+           rather than needing a scroll-handler clamp against the viewport. -->
+      <aside v-if="toc.length >= 2" class="hidden xl:block xl:col-start-11 xl:col-span-2">
+        <nav class="toc-sidebar">
+          <span class="toc-label type-ui text-text-secondary">{{ t('writing.toc') }}</span>
+          <ol class="toc-list">
+            <li
+              v-for="entry in toc"
+              :key="entry.id"
+              :class="['toc-item', entry.level !== 'intro' && `toc-item--h${entry.level}`]"
+            >
+              <a
+                :href="`#${entry.id}`"
+                class="toc-link"
+                :class="{ active: activeId === entry.id }"
+              >{{ entry.text }}</a>
+            </li>
+            <li class="toc-divider" aria-hidden="true" />
+            <li v-for="entry in tocMeta" :key="entry.id" class="toc-item">
+              <a
+                href="#"
+                class="toc-link"
+                :class="{ active: activeId === entry.id }"
+                @click.prevent="jumpTo(entry.id)"
+              >{{ entry.label }}</a>
+            </li>
+          </ol>
+        </nav>
+      </aside>
     </div>
-
-    <!-- Body -->
-    <div class="post-body" v-html="bodyHtml" />
-
-    <!-- References -->
-    <footer v-if="post.references?.length" id="post-references" class="post-references">
-      <span class="references-label">{{ t('writing.toc_references') }}</span>
-      <ol class="references-list">
-        <li v-for="ref in post.references" :key="ref.href">
-          <a :href="ref.href" target="_blank" rel="noopener noreferrer" @click="track(EV.referenceClick, { slug, href: ref.href })">{{ ref.title }}</a>
-        </li>
-      </ol>
-    </footer>
-
-    <!-- Divider -->
-    <hr class="post-divider" />
-
-    <!-- Rating -->
-    <section class="post-aside">
-      <PostRating :slug="slug" />
-    </section>
-
-    <!-- Comments -->
-    <hr class="post-divider" />
-
-    <section id="post-comments" class="post-comments">
-      <PostComments :slug="slug" :post-title="post.title.en" />
-    </section>
-  </article>
   </div>
 </template>
 
 <style scoped>
-/* ── Mobile TOC button ── */
-.toc-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: none;
-  background: none;
-  color: var(--faint);
-  cursor: pointer;
-  border-radius: 0.5rem;
-  transition: color 0.2s, background 0.2s;
-}
-.toc-btn:hover,
-.toc-btn--open { color: var(--ink); background: oklch(100% 0 0 / 5%); }
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    height: calc(var(--spacing) * 7);
+    padding-inline: calc(var(--spacing) * 3);
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-secondary);
+    font-size: var(--text-ui);
+  }
 
-/* ── TOC dropdown (mobile + tablet) ── */
-.toc-mob-panel {
-  position: fixed;
-  z-index: 49;
-  min-width: 13rem;
-  max-width: min(18rem, calc(100vw - 2rem));
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 0.625rem;
-  border-radius: var(--radius-card-sm, 1rem);
-  background: oklch(10% 0.008 235 / 85%);
-  backdrop-filter: blur(24px) saturate(1.6) brightness(1.05);
-  -webkit-backdrop-filter: blur(24px) saturate(1.6) brightness(1.05);
-  border: 1px solid oklch(100% 0 0 / 10%);
-  box-shadow:
-    inset 0 1px 0 oklch(100% 0 0 / 12%),
-    0 1rem 2rem -0.5rem oklch(0% 0 0 / 60%);
-}
+  .post-cover {
+    margin-bottom: calc(var(--spacing) * 10);
+    border-radius: var(--radius-3xl);
+    overflow: hidden;
+    outline: 1px solid var(--color-border-default);
+  }
 
-.toc-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 48;
-}
-
-.toc-panel-enter-active,
-.toc-panel-leave-active {
-  transition: opacity 0.18s var(--ease-silk), transform 0.18s var(--ease-out-expo);
-}
-.toc-panel-enter-from,
-.toc-panel-leave-to { opacity: 0; transform: translateY(-6px); }
-
-.toc-bd-enter-active,
-.toc-bd-leave-active { transition: opacity 0.18s; }
-.toc-bd-enter-from,
-.toc-bd-leave-to { opacity: 0; }
-
-/* ── Desktop TOC sidebar ── */
-.toc-sidebar { display: none; }
-
-@media (min-width: 72rem) {
-  .toc-sidebar {
+  .post-cover :deep(img) {
     display: block;
-    position: fixed;
-    left: calc(75% + 5.5rem);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 11rem;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ── TOC — shared between the sidebar and the mobile disclosure ── */
+  .toc-label {
+    display: block;
+    margin-bottom: calc(var(--spacing) * 2);
+  }
+
+  .toc-list {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 0.5);
+    list-style: none;
+  }
+
+  .toc-item--h3 {
+    padding-left: calc(var(--spacing) * 3);
+  }
+
+  .toc-divider {
+    height: 1px;
+    margin: calc(var(--spacing) * 2) 0;
+    background-color: var(--color-border-default);
+  }
+
+  .toc-link {
+    display: block;
+    padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2);
+    border-radius: var(--radius-2xl);
+    font-size: var(--text-ui);
+    color: var(--color-text-secondary);
+    transition: color var(--duration-hover) var(--ease-base),
+                background-color var(--duration-hover) var(--ease-base);
+  }
+
+  .toc-link:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-hover);
+  }
+
+  /* Ambient — it moves on its own as the page scrolls, not something the
+     reader picked, so it stays on the same weight as hover rather than the
+     fill-strong the site otherwise uses for a deliberate selection. */
+  .toc-link.active {
+    color: var(--color-accent-strong);
+    background-color: var(--color-surface-hover);
+  }
+
+  .toc-sidebar {
+    position: sticky;
+    top: calc(var(--spacing-header-height) + var(--spacing) * 6);
+  }
+
+  /*
+   * Below xl the list sits in the flow, read once at the top of the article
+   * and then either skipped or clicked — there's nothing to track scroll
+   * position against here, so the pill chrome and the active state that
+   * exist to support that (sidebar only) both come off; these just read as
+   * plain links.
+   */
+  .toc-plain .toc-list {
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .toc-plain .toc-link {
+    padding: 0;
+    border-radius: 0;
+    color: var(--color-accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .toc-plain .toc-link:hover,
+  .toc-plain .toc-link.active {
+    color: var(--color-accent-strong-hover);
+    background-color: transparent;
+  }
+
+  /* ── References ── */
+  .post-references {
+    margin-top: calc(var(--spacing) * 10);
+    margin-bottom: calc(var(--spacing) * 10);
+  }
+
+  .post-references__label {
+    display: block;
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+
+  .post-references__list {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 1.5);
+    counter-reset: ref;
+    list-style: none;
+  }
+
+  .post-references__list li {
+    counter-increment: ref;
+    display: flex;
+    gap: calc(var(--spacing) * 2.5);
+    font-size: var(--text-text);
+    line-height: 1.4;
+  }
+
+  .post-references__list li::before {
+    content: counter(ref) '.';
+    flex-shrink: 0;
+    min-width: 1.25rem;
+    color: var(--color-text-decorative);
+    font-size: var(--text-ui);
+  }
+
+  .post-references__list a {
+    color: var(--color-accent-strong);
+    transition: color var(--duration-hover) var(--ease-base);
+  }
+
+  .post-references__list a:hover {
+    color: var(--color-accent-strong-hover);
+  }
+
+  .post-divider {
+    height: 1px;
+    margin-block: calc(var(--spacing) * 10);
+    background-color: var(--color-border-default);
   }
 }
 
-.post-page {
-  max-width: 44rem;
-  margin: 0 auto;
-  padding: clamp(5rem, 10vw, 8rem) var(--page-px, 1.5rem) clamp(4rem, 8vw, 8rem);
-}
-
-/* ── TOC shared ── */
-.toc-nav { display: flex; flex-direction: column; gap: 0.5rem; }
-
-.toc-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.5625rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--faint);
-  display: block;
-}
-
-.toc-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.toc-item--h3 { padding-left: 0.75rem; }
-
-.toc-divider-item {
-  height: 1px;
-  background: var(--line-soft);
-  margin: 0.375rem 0.5rem;
-  list-style: none;
-}
-
-/* meta items (sources, comments) — faint by default */
-.toc-mob-panel .toc-item--meta .toc-link { color: var(--faint); }
-.toc-mob-panel .toc-item--meta .toc-link:hover { color: var(--mist); }
-.toc-mob-panel .toc-item--meta .toc-link--active { color: var(--ember); background: var(--ember-bg); }
-
-.toc-sidebar .toc-item--meta .toc-link { color: var(--faint); opacity: 0.7; }
-.toc-sidebar .toc-item--meta .toc-link:hover { opacity: 1; color: var(--mist); }
-.toc-sidebar .toc-item--meta .toc-link--active { opacity: 1; color: var(--ember); border-left-color: var(--ember); background: var(--ember-bg); }
-
-/* dropdown (mobile + tablet) — matches nav drop-item style */
-.toc-mob-panel .toc-label {
-  padding: 0.25rem 0.5rem 0.375rem;
-}
-
-.toc-mob-panel .toc-link {
-  display: block;
-  font-size: 0.8125rem;
-  line-height: 1.3;
-  color: var(--ink);
-  text-decoration: none;
-  padding: 0.375rem 0.5rem;
-  border-radius: 0.375rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: background 0.15s, color 0.15s;
-}
-.toc-mob-panel .toc-link:hover { background: oklch(100% 0 0 / 4%); }
-.toc-mob-panel .toc-link--active {
-  color: var(--ember);
-  background: var(--ember-bg);
-}
-
-/* sidebar (desktop ≥72rem) */
-.toc-sidebar .toc-label { margin-bottom: 0.25rem; }
-
-.toc-sidebar .toc-link {
-  display: block;
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: var(--faint);
-  text-decoration: none;
-  padding: 0.25rem 0.375rem;
-  border-radius: 0.375rem;
-  border-left: 2px solid transparent;
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
-}
-.toc-sidebar .toc-link:hover { color: var(--mist); background: oklch(100% 0 0 / 3%); }
-.toc-sidebar .toc-link--active {
-  color: var(--ember);
-  border-left-color: var(--ember);
-  background: var(--ember-bg);
-}
-
-/* ── Back + prev/next row ── */
-.post-topnav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: var(--faint);
-  text-decoration: none;
-  font-size: 0.875rem;
-  transition: color 0.2s;
-}
-.back-link:hover { color: var(--snow); }
-.back-link svg { width: 1rem; height: 1rem; }
-
-.adjacent-nav {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-/* ── Header ── */
-.post-header { margin-bottom: 2rem; }
-
-.post-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  color: var(--faint);
-  margin-bottom: 1rem;
-}
-.meta-date { font-size: 0.75rem; }
-.meta-dot {
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: var(--faint);
-}
-
-.post-title {
-  font-size: clamp(1.75rem, 1.25rem + 2.5vw, 2.75rem);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
-  margin-bottom: 1.25rem;
-}
-
-.post-tags {
-  display: flex;
-  gap: 0.375rem;
-  flex-wrap: wrap;
-}
-.tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.625rem;
-  color: var(--mist);
-  padding: 0.25rem 0.5rem;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-tag);
-  background: rgba(255, 255, 255, 0.02);
-  background: oklch(100% 0 0 / 2%);
-}
-
-/* ── Cover ── */
-.post-cover {
-  margin: 0 0 2.5rem;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  border: 1px solid var(--line-soft);
-}
-.post-cover img {
-  width: 100%;
-  height: auto;
-  display: block;
-  aspect-ratio: auto 16/9;
-}
-
-/* ── Prose (body) ── */
+/*
+ * ── Prose (body) ──
+ * Width and centring come from .post-column (design-system.css), applied
+ * throughout this article to everything that isn't meant to run the full
+ * width — header, TOC below xl, this body, references, rating, comments.
+ */
 .post-body {
-  color: var(--ink);
-  font-size: 1.0625rem;
-  line-height: 1.9;
-  margin-bottom: 3rem;
+  color: var(--color-text-primary);
+  line-height: 1.5;
   hyphens: auto;
   font-kerning: normal;
   font-feature-settings: 'kern' 1, 'liga' 1;
 }
 
-/* Lead paragraph */
-:deep(.post-body > p:first-child) {
-  font-size: 1.125rem;
-  color: var(--snow);
-  line-height: 1.8;
-  margin-bottom: 1.75rem;
-}
-:deep(.post-body > p:first-child::first-letter) {
-  font-size: 1.2em;
-  font-weight: 700;
-  color: var(--ember);
-}
-
-/* Paragraphs */
-:deep(.post-body p)       { margin: 0 0 1.25rem; }
+/* Every paragraph indents, lead included — no exceptions. */
+:deep(.post-body p) { margin: 0 0 1.25rem; text-indent: 1.5em; }
 :deep(.post-body p:last-child) { margin-bottom: 0; }
-:deep(.post-body p + p)   { text-indent: 1.5em; }
 
-/* Headings */
 :deep(.post-body h2),
 :deep(.post-body h3) {
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.025em;
-  color: var(--snow);
   margin: 2.5rem 0 0.75rem;
 }
-:deep(.post-body h2) { font-size: 1.375rem; line-height: 1.2; }
-:deep(.post-body h3) { font-size: 1.125rem; line-height: 1.25; }
+:deep(.post-body h2) {
+  font-size: var(--text-display-xl);
+  line-height: var(--text-display-xl--line-height);
+  letter-spacing: var(--text-display-xl--letter-spacing);
+}
+:deep(.post-body h3) {
+  font-size: var(--text-display-lg);
+  line-height: var(--text-display-lg--line-height);
+  letter-spacing: var(--text-display-lg--letter-spacing);
+}
 
-/* Divider from --- */
 :deep(.post-body hr) {
   border: none;
-  border-top: 1px solid var(--line-soft);
+  border-top: 1px solid var(--color-border-default);
   margin: 2rem 0;
 }
 
-/* Strong / em */
-:deep(.post-body strong) { color: var(--snow); font-weight: 600; }
-:deep(.post-body em)     { color: var(--mist); }
+:deep(.post-body strong) { color: var(--color-text-primary); font-weight: 600; }
+:deep(.post-body em) { font-style: italic; }
 
-/* Blockquote */
 :deep(.post-body blockquote) {
-  border-left: 2px solid var(--ember);
+  border-left: 2px solid var(--color-accent-strong);
   margin: 1.75rem 0;
   padding: 0.125rem 0 0.125rem 1.25rem;
-  color: var(--mist);
+  color: var(--color-text-secondary);
   font-style: italic;
 }
 
-/* Code inline */
 :deep(.post-body code) {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.875em;
-  background: oklch(100% 0 0 / 6%);
-  border: 1px solid var(--line-soft);
+  background-color: var(--color-surface-hover);
   border-radius: 0.25rem;
   padding: 0.1em 0.4em;
-  color: var(--ember);
+  color: var(--color-accent-strong);
 }
 
-/* Code block */
 :deep(.post-body pre) {
-  background: oklch(100% 0 0 / 3%);
-  border: 1px solid var(--line-soft);
-  border-radius: 0.5rem;
+  background-color: var(--color-surface-panel);
+  border-radius: var(--radius-2xl);
   padding: 1rem 1.25rem;
   overflow-x: auto;
   margin: 1.5rem 0;
 }
 :deep(.post-body pre code) {
   background: none;
-  border: none;
   padding: 0;
   font-size: 0.875rem;
-  color: var(--mist);
+  color: var(--color-text-primary);
 }
 
-/* Links */
+/* Renders as inert text until mermaid.run() replaces it with an <svg> —
+   see renderMermaid() in the page script. */
+:deep(.post-body .mermaid) {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
 :deep(.post-body a) {
-  color: var(--ember);
+  color: var(--color-accent-strong);
   text-decoration: underline;
-  text-decoration-color: oklch(72% 0.1 58 / 40%);
   text-underline-offset: 2px;
-  transition: text-decoration-color 0.2s;
+  transition: color var(--duration-hover) var(--ease-base);
 }
-:deep(.post-body a:hover) { text-decoration-color: var(--ember); }
+:deep(.post-body a:hover) { color: var(--color-accent-strong-hover); }
 
-/* Images */
 :deep(.post-body .post-figure) { margin: 2rem 0; }
 :deep(.post-body .post-img) {
   width: 100%;
   height: auto;
-  border-radius: 0.5rem;
-  border: 1px solid var(--line-soft);
   display: block;
+  border-radius: var(--radius-2xl);
+  outline: 1px solid var(--color-border-default);
 }
 :deep(.post-body .post-caption) {
   font-size: 0.8125rem;
-  color: var(--faint);
+  color: var(--color-text-secondary);
   text-align: center;
   margin-top: 0.5rem;
   font-style: italic;
 }
 
-/* Lists */
+/* list-style: revert — Preflight zeroes it globally, which left every
+   marker invisible even though the items themselves rendered fine. */
 :deep(.post-body ul),
-:deep(.post-body ol) { margin: 0 0 1.25rem 1.5rem; }
+:deep(.post-body ol) {
+  list-style: revert;
+  margin: 0 0 1.25rem 1.5rem;
+}
 :deep(.post-body li) { margin-bottom: 0.375rem; }
 
-/* ── Dividers / sections ── */
-.post-divider {
-  border: none;
-  border-top: 1px solid var(--line-soft);
-  margin: 2.5rem 0;
+:deep(.post-body table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: var(--text-ui);
 }
-
-.post-aside {
-  display: flex;
-  justify-content: center;
+:deep(.post-body th),
+:deep(.post-body td) {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--color-border-default);
+  text-align: left;
+  vertical-align: top;
 }
-
-.post-comments { padding-bottom: 2rem; }
-
-/* ── References ── */
-.post-references {
-  margin-bottom: 2.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--line-soft);
+:deep(.post-body th) {
+  color: var(--color-text-primary);
+  font-weight: 600;
 }
-
-.references-label {
-  display: block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-  color: var(--faint);
-  margin-bottom: 0.75rem;
-}
-
-.references-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  counter-reset: ref;
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.references-list li {
-  counter-increment: ref;
-  display: flex;
-  gap: 0.625rem;
-  font-size: 0.8125rem;
-  line-height: 1.4;
-}
-
-.references-list li::before {
-  content: counter(ref) '.';
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6875rem;
-  color: var(--faint);
-  min-width: 1.25rem;
-  padding-top: 0.05em;
-  flex-shrink: 0;
-}
-
-.references-list a {
-  color: var(--mist);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.references-list a:hover { color: var(--snow); }
+:deep(.post-body td) { color: var(--color-text-secondary); }
 </style>

@@ -72,51 +72,51 @@ async function submit() {
 
     <!-- Existing comments -->
     <div v-if="comments?.length" class="comment-list">
-      <h3 class="comments-title">{{ t(`post.comments.count_${plural(comments.length)}`, { n: comments.length }) }}</h3>
+      <h3 class="comments-title type-display-md text-text-primary">{{ t(`post.comments.count_${plural(comments.length)}`, { n: comments.length }) }}</h3>
       <div v-for="c in comments" :key="c._id" class="comment-item">
         <div class="comment-header">
-          <div class="comment-avatar" :aria-label="c.nick">
+          <div class="comment-avatar type-ui">
             {{ (c.nick[0] ?? '?').toUpperCase() }}
           </div>
-          <span class="comment-nick">@{{ c.nick }}</span>
-          <span class="comment-date">{{ formatDate(c.publishedAt) }}</span>
+          <span class="comment-nick type-ui text-text-secondary">@{{ c.nick }}</span>
+          <span class="comment-date type-ui text-text-decorative">{{ formatDate(c.publishedAt) }}</span>
         </div>
-        <p class="comment-body">{{ c.message }}</p>
+        <p class="comment-body type-text text-text-primary">{{ c.message }}</p>
       </div>
     </div>
 
     <!-- Form -->
     <div class="comment-form-wrap">
-      <h3 class="comments-title">{{ comments?.length ? t('post.comments.reply') : t('post.comments.first') }}</h3>
+      <h3 class="comments-title type-display-md text-text-primary">{{ comments?.length ? t('post.comments.reply') : t('post.comments.first') }}</h3>
 
-      <div v-if="state === 'success'" class="success-msg" aria-live="polite">
+      <div v-if="state === 'success'" class="success-msg type-text" aria-live="polite">
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 10l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         {{ t('post.comments.success') }}
-        <button class="another-btn" @click="state = 'idle'">{{ t('post.comments.another') }}</button>
+        <button type="button" class="another-btn type-ui text-text-secondary" @click="state = 'idle'">{{ t('post.comments.another') }}</button>
       </div>
 
       <form v-else class="comment-form" novalidate @submit.prevent="submit" @focusin="onCommentStart">
         <div class="field">
-          <label class="field-label" for="c-nick">{{ t('post.comments.nick') }}</label>
+          <label class="type-ui text-text-primary" for="c-nick">{{ t('post.comments.nick') }}</label>
           <input id="c-nick" v-model="nick" class="field-input" type="text"
             :class="{ 'is-error': ve.nick }"
             autocomplete="nickname" :placeholder="t('post.comments.nick_placeholder')" />
-          <p v-if="ve.nick" class="field-err" aria-live="polite">{{ t('form.required') }}</p>
+          <p v-if="ve.nick" class="type-ui text-text-critical" aria-live="polite">{{ t('form.required') }}</p>
         </div>
 
         <div class="field">
-          <label class="field-label" for="c-msg">{{ t('post.comments.message') }}</label>
+          <label class="type-ui text-text-primary" for="c-msg">{{ t('post.comments.message') }}</label>
           <textarea id="c-msg" v-model="message" class="field-input field-textarea"
             :class="{ 'is-error': ve.message }"
             rows="4" :placeholder="t('post.comments.message_placeholder')" />
-          <p v-if="ve.message" class="field-err" aria-live="polite">{{ t('form.required') }}</p>
+          <p v-if="ve.message" class="type-ui text-text-critical" aria-live="polite">{{ t('form.required') }}</p>
         </div>
 
         <NuxtTurnstile v-model="token" appearance="invisible" />
 
-        <p v-if="state === 'error'" class="err-msg">{{ errMsg }}</p>
+        <p v-if="state === 'error'" class="type-text text-text-critical">{{ errMsg }}</p>
 
-        <label class="consent-label" :class="{ 'consent-error': ve.consent }">
+        <label class="consent-label type-ui" :class="ve.consent ? 'text-text-critical' : 'text-text-secondary'">
           <input type="checkbox" v-model="consent" class="consent-check" />
           <i18n-t keypath="post.comments.consent" tag="span" scope="global">
             <template #consent>
@@ -127,9 +127,9 @@ async function submit() {
             </template>
           </i18n-t>
         </label>
-        <p v-if="ve.consent" class="field-err" aria-live="polite">{{ t('form.required_consent') }}</p>
+        <p v-if="ve.consent" class="type-ui text-text-critical" aria-live="polite">{{ t('form.required_consent') }}</p>
 
-        <button type="submit" class="submit-btn" :disabled="state === 'loading' || !token">
+        <button type="submit" class="submit-btn type-ui" :disabled="state === 'loading' || !token">
           <span v-if="state === 'loading'" class="loading-dot"></span>
           <span v-else>{{ t('post.comments.submit') }}</span>
         </button>
@@ -140,213 +140,162 @@ async function submit() {
 </template>
 
 <style scoped>
-.comments { display: flex; flex-direction: column; gap: 2rem; }
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  .comments { display: flex; flex-direction: column; gap: calc(var(--spacing) * 8); }
 
-.comments-title {
-  font-size: 1.0625rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin-bottom: 1.25rem;
-}
+  .comments-title {
+    margin-bottom: calc(var(--spacing) * 5);
+  }
 
-/* ── Existing comments ── */
-.comment-list { display: flex; flex-direction: column; gap: 0; }
+  /* ── Existing comments ── */
+  .comment-list { display: flex; flex-direction: column; gap: 0; }
 
-.comment-item {
-  padding: 1.25rem 0;
-  border-bottom: 1px solid var(--line-soft);
-}
-.comment-item:first-of-type { border-top: 1px solid var(--line-soft); }
+  .comment-item {
+    padding: calc(var(--spacing) * 5) 0;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  .comment-item:first-of-type { border-top: 1px solid var(--color-border-default); }
 
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-.comment-avatar {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: var(--ember-bg);
-  border: 1px solid var(--ember-border);
-  color: var(--ember);
-  font-size: 0.875rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.comment-nick {
-  font-size: 0.875rem;
-  color: var(--mist);
-  font-family: 'JetBrains Mono', monospace;
-  flex: 1;
-}
-.comment-date {
-  font-size: 0.6875rem;
-  color: var(--faint);
-  flex-shrink: 0;
-  font-family: 'JetBrains Mono', monospace;
-}
-.comment-body {
-  font-size: 0.9375rem;
-  color: var(--ink);
-  line-height: 1.65;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+  .comment-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: calc(var(--spacing) * 8);
+    height: calc(var(--spacing) * 8);
+    border-radius: 50%;
+    background-color: var(--color-surface-hover);
+    color: var(--color-accent-strong);
+    font-weight: 600;
+  }
+  .comment-nick { flex: 1; }
+  .comment-date { flex-shrink: 0; }
+  .comment-body {
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 
-/* ── Form ── */
-.comment-form-wrap { }
-.comment-form { display: flex; flex-direction: column; gap: 1rem; }
+  /* ── Form ── */
+  .comment-form { display: flex; flex-direction: column; gap: calc(var(--spacing) * 4); }
 
-.field { display: flex; flex-direction: column; gap: 0.375rem; }
-.field-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.625rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-.field-hint {
-  text-transform: none;
-  letter-spacing: 0;
-  font-family: inherit;
-  font-size: 0.6875rem;
-  color: var(--faint);
-  opacity: 0.7;
-}
-.field-input {
-  background: rgba(255, 255, 255, 0.03);
-  background: oklch(100% 0 0 / 3%);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-tag);
-  padding: 0.5625rem 0.75rem;
-  font-family: inherit;
-  font-size: 0.9375rem;
-  color: var(--snow);
-  transition: border-color 0.2s;
-  resize: none;
-}
-.field-input::placeholder { color: var(--faint); }
-.field-input:focus { border-color: rgba(214, 154, 106, 0.4); border-color: oklch(72% 0.1 58 / 40%); }
-.field-input:focus-visible { outline: 2px solid rgba(214, 154, 106, 0.6); outline: 2px solid oklch(72% 0.1 58 / 60%); outline-offset: -1px; }
-.field-input.is-error { border-color: rgba(112, 112, 206, 0.5); border-color: oklch(65% 0.14 270 / 50%); }
-.field-textarea { min-height: 7rem; line-height: 1.6; }
+  .field { display: flex; flex-direction: column; gap: calc(var(--spacing) * 1.5); }
+  .field-input {
+    padding: calc(var(--spacing) * 2.25) calc(var(--spacing) * 3);
+    border-radius: var(--radius-2xl);
+    outline: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-field);
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: var(--text-text);
+    transition: outline-color var(--duration-hover) var(--ease-base);
+    resize: none;
+  }
+  .field-input::placeholder { color: var(--color-text-secondary); }
+  .field-input:focus { outline-color: var(--color-border-input); }
+  .field-input.is-error { outline-color: var(--color-text-critical); }
+  .field-textarea { min-height: 7rem; line-height: 1.6; }
 
-.field-err {
-  font-size: 0.6875rem;
-  color: #7070CE;
-  color: oklch(65% 0.14 270);
-  margin: 0.25rem 0 0;
-  font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.02em;
-}
-.consent-error { color: var(--ink); }
+  p[aria-live='polite'] { margin: calc(var(--spacing) * 1) 0 0; }
 
-.submit-btn {
-  margin-top: 0.5rem;
-  align-self: flex-start;
-  padding: 0.5625rem 1.5rem;
-  background: var(--ember-bg);
-  border: 1px solid var(--ember-border);
-  border-radius: var(--radius-tag);
-  color: var(--ember);
-  font-size: 0.9375rem;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.consent-label {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--faint);
-  line-height: 1.5;
-  cursor: pointer;
-}
-.consent-check {
-  appearance: none;
-  -webkit-appearance: none;
-  flex-shrink: 0;
-  margin-top: 0.2rem;
-  width: 1rem;
-  height: 1rem;
-  border: 1px solid var(--line-soft);
-  border-radius: 0.25rem;
-  background: transparent;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  display: grid;
-  place-items: center;
-}
-.consent-check:hover { border-color: rgba(214, 154, 106, 0.45); border-color: oklch(72% 0.1 58 / 45%); }
-.consent-check::before {
-  content: '';
-  width: 0.3125rem;
-  height: 0.5rem;
-  border: 1.5px solid #1a120b;
-  border-top: none;
-  border-left: none;
-  transform: rotate(45deg) scale(0);
-  transition: transform 0.15s ease;
-  margin-top: -0.0625rem;
-}
-.consent-check:checked {
-  background: var(--ember);
-  border-color: var(--ember);
-}
-.consent-check:checked::before {
-  transform: rotate(45deg) scale(1);
-}
-.consent-check:focus-visible {
-  outline: 2px solid rgba(214, 154, 106, 0.4);
-  outline-offset: 2px;
-}
-.consent-link {
-  color: var(--ember);
-  text-decoration: underline;
-  text-decoration-color: rgba(214, 154, 106, 0.4);
-  text-underline-offset: 2px;
-  transition: text-decoration-color 0.2s;
-}
-.consent-link:hover { text-decoration-color: var(--ember); }
+  .submit-btn {
+    align-self: flex-start;
+    margin-top: calc(var(--spacing) * 1);
+    height: calc(var(--spacing) * 10);
+    padding-inline: calc(var(--spacing) * 6);
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-fill-strong);
+    color: var(--color-text-inverse);
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color var(--duration-hover) var(--ease-base);
+  }
+  .submit-btn:hover:not(:disabled) { background-color: var(--color-accent-strong-hover); }
+  .submit-btn:active:not(:disabled) { background-color: var(--color-accent-default); }
+  .submit-btn:disabled { opacity: 0.5; cursor: default; }
 
-.submit-btn:hover:not(:disabled) { background: rgba(214, 154, 106, 0.15); background: oklch(72% 0.1 58 / 15%); }
-.submit-btn:disabled { opacity: 0.5; cursor: default; }
+  .consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(var(--spacing) * 2);
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .consent-check {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    outline: 1px solid var(--color-border-input);
+    background-color: var(--color-surface-field);
+    cursor: pointer;
+    appearance: none;
+    transition: outline-color var(--duration-hover) var(--ease-base),
+                background-color var(--duration-hover) var(--ease-base);
+  }
+  .consent-check:hover { outline-color: var(--color-accent-strong); }
+  .consent-check::before {
+    content: '';
+    width: 0.3125rem;
+    height: 0.5rem;
+    margin-top: -0.0625rem;
+    border: 1.5px solid var(--color-text-inverse);
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.15s ease;
+  }
+  .consent-check:checked {
+    background-color: var(--color-fill-strong);
+    outline-color: var(--color-fill-strong);
+  }
+  .consent-check:checked::before { transform: rotate(45deg) scale(1); }
+  .consent-check:focus-visible {
+    outline: 2px solid var(--color-accent-default);
+    outline-offset: 2px;
+  }
+  .consent-link {
+    color: var(--color-accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color var(--duration-hover) var(--ease-base);
+  }
+  .consent-link:hover { color: var(--color-accent-strong-hover); }
 
-.err-msg { font-size: 0.8125rem; color: #7070CE; color: oklch(65% 0.14 270); }
+  .success-msg {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2.5);
+    flex-wrap: wrap;
+    color: oklch(60% 0.14 150);
+  }
+  .success-msg svg { width: calc(var(--spacing) * 5); height: calc(var(--spacing) * 5); flex-shrink: 0; }
+  .another-btn {
+    padding: 0;
+    border: none;
+    background: none;
+    text-decoration: underline;
+    cursor: pointer;
+  }
 
-.success-msg {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  color: #55B070;
-  color: oklch(72% 0.12 150);
-  font-size: 0.9375rem;
-  flex-wrap: wrap;
+  .loading-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--color-text-inverse);
+    animation: blink 0.8s ease-in-out infinite alternate;
+  }
+  @keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
 }
-.success-msg svg { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
-.another-btn {
-  color: var(--faint);
-  font-size: 0.8125rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-}
-
-.loading-dot {
-  display: inline-block;
-  width: 0.5rem; height: 0.5rem;
-  border-radius: 50%;
-  background: var(--ember);
-  animation: blink 0.8s ease-in-out infinite alternate;
-}
-@keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
-
 </style>

@@ -13,8 +13,6 @@ onMounted(() => {
 const up   = computed(() => rating.value?.up   ?? 0)
 const down = computed(() => rating.value?.down ?? 0)
 const total = computed(() => up.value - down.value)
-const totalVotes = computed(() => up.value + down.value)
-const upRatio = computed(() => totalVotes.value > 0 ? up.value / totalVotes.value : 0.5)
 
 const totalClass = computed(() => {
   if (total.value > 0) return 'positive'
@@ -48,8 +46,9 @@ async function vote(dir: 'up' | 'down') {
   <div class="rating">
     <div class="rating-row">
       <button
+        type="button"
         class="vote-btn vote-up"
-        :class="{ active: voted === 'up', disabled: !!voted }"
+        :class="{ chosen: voted === 'up' }"
         :disabled="!!voted"
         :aria-label="t('post.rating.upvote')"
         :aria-pressed="voted === 'up'"
@@ -58,7 +57,6 @@ async function vote(dir: 'up' | 'down') {
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M8 3l5 6H3l5-6z" fill="currentColor"/>
         </svg>
-        <span>{{ up }}</span>
       </button>
 
       <span class="rating-total" :class="totalClass">
@@ -66,8 +64,9 @@ async function vote(dir: 'up' | 'down') {
       </span>
 
       <button
+        type="button"
         class="vote-btn vote-down"
-        :class="{ active: voted === 'down', disabled: !!voted }"
+        :class="{ chosen: voted === 'down' }"
         :disabled="!!voted"
         :aria-label="t('post.rating.downvote')"
         :aria-pressed="voted === 'down'"
@@ -76,20 +75,7 @@ async function vote(dir: 'up' | 'down') {
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M8 13L3 7h10l-5 6z" fill="currentColor"/>
         </svg>
-        <span>{{ down }}</span>
       </button>
-    </div>
-
-    <div
-      class="rating-bar"
-      role="meter"
-      :aria-valuenow="Math.round(upRatio * 100)"
-      aria-valuemin="0"
-      aria-valuemax="100"
-      :aria-label="t('post.rating.meter', { pct: Math.round(upRatio * 100) })"
-      :title="`${up} up · ${down} down`"
-    >
-      <div class="bar-fill" :style="{ width: `${upRatio * 100}%` }"></div>
     </div>
 
     <p v-if="voted" class="rated-note">{{ t('post.rating.voted') }}</p>
@@ -98,80 +84,90 @@ async function vote(dir: 'up' | 'down') {
 </template>
 
 <style scoped>
-.rating {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1.5rem;
-}
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  .rating {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--spacing) * 3);
+    padding: calc(var(--spacing) * 6) 0;
+  }
 
-.rating-row {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-}
+  .rating-row {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 3.5);
+  }
 
-.vote-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  padding: 0.375rem 0.625rem;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-tag);
-  background: rgba(255, 255, 255, 0.03);
-  background: oklch(100% 0 0 / 3%);
-  color: var(--mist);
-  font-size: 0.6875rem;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
-}
-.vote-btn svg {
-  width: 0.625rem;
-  height: 0.625rem;
-}
-.vote-btn:not(.disabled):hover {
-  color: var(--snow);
-  border-color: var(--line);
-  background: rgba(255, 255, 255, 0.06);
-  background: oklch(100% 0 0 / 6%);
-}
-.vote-btn.disabled { cursor: default; opacity: 0.5; }
-.vote-up.active  { color: var(--ember); border-color: var(--ember-border); background: var(--ember-bg); opacity: 1; }
-.vote-down.active { color: #7070CE; color: oklch(65% 0.14 270); border-color: rgba(112, 112, 206, 0.3); border-color: oklch(65% 0.14 270 / 30%); background: rgba(112, 112, 206, 0.08); background: oklch(65% 0.14 270 / 8%); opacity: 1; }
+  /* Same shape as the header's icon-button: round, outlined, a hover fill —
+     the vertical icon-over-count pill it replaced didn't match anything
+     else the site draws a vote-style control with. */
+  .vote-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: calc(var(--spacing) * 9);
+    height: calc(var(--spacing) * 9);
+    border-radius: calc(infinity * 1px);
+    outline: 1px solid var(--color-border-default);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: color var(--duration-hover) var(--ease-base),
+                outline-color var(--duration-hover) var(--ease-base),
+                background-color var(--duration-hover) var(--ease-base);
+  }
 
-.rating-total {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  min-width: 3ch;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  transition: color 0.3s;
-}
-.rating-total.positive { color: var(--ember); }
-.rating-total.negative { color: #7070CE; color: oklch(65% 0.14 270); }
-.rating-total.neutral  { color: var(--faint); }
+  .vote-btn svg {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+  }
 
-.rating-bar {
-  width: 8rem;
-  height: 3px;
-  background: rgba(112, 112, 206, 0.25);
-  background: oklch(65% 0.14 270 / 25%);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  background: var(--ember);
-  border-radius: 2px;
-  transition: width 0.5s var(--ease-out-expo);
-}
+  .vote-btn:not(:disabled):hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-hover);
+  }
 
-.rate-prompt, .rated-note {
-  font-size: 0.75rem;
-  color: var(--faint);
-  margin: 0;
+  .vote-btn:disabled { cursor: default; opacity: 0.4; }
+
+  /* The chosen side stays on the same strong fill the rest of the site uses
+     for a deliberate, settled choice — the disabled sibling just dims. No
+     outline here: one drawn in the same color as the fill it borders still
+     rasterizes as a separate stroke, which left a hairline sliver of the
+     page showing through between the two on a circle this small. */
+  .vote-up.chosen {
+    color: var(--color-text-inverse);
+    outline: none;
+    background-color: var(--color-accent-strong);
+    opacity: 1;
+  }
+
+  .vote-down.chosen {
+    color: var(--color-text-inverse);
+    outline: none;
+    background-color: oklch(58% 0.15 270);
+    opacity: 1;
+  }
+
+  .rating-total {
+    min-width: 3ch;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    transition: color var(--duration-hover) var(--ease-base);
+  }
+  .rating-total.positive { color: var(--color-accent-strong); }
+  .rating-total.negative { color: oklch(58% 0.15 270); }
+  .rating-total.neutral  { color: var(--color-text-decorative); }
+
+  .rate-prompt, .rated-note {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--text-ui);
+  }
 }
 </style>
