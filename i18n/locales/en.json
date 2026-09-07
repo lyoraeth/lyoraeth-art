@@ -197,10 +197,10 @@
   },
 
   "error": {
-    "404_title": "Nothing here",
     "404_message": "This page doesn't exist or has moved.",
-    "5xx_title": "Something broke",
+    "404_cat_alt": "A cat squinting at a question mark, as confused as you are",
     "5xx_message": "The tech cats are already fixing it. Refresh the page or try again shortly.",
+    "5xx_cat_alt": "A cat smirking at the server outage",
     "go_home": "Back home"
   },
 
