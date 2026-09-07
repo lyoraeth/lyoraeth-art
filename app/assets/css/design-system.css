@@ -399,6 +399,21 @@
   line-height: var(--text-ui--line-height);
 }
 
+/*
+ * Shared reading measure for long-form text: the blog post, the case-study
+ * text column, the legal pages. font-size sets what 66ch actually resolves
+ * to in pixels — ch is relative to the element's own font, and most of the
+ * things this lands on (a header, a nav, a comments section) otherwise sit
+ * at the page default rather than the prose size, which would make the
+ * same 66ch a different width on each. Third repeat of the exact same
+ * three declarations was the point this stopped being page-local.
+ */
+@utility post-column {
+  max-width: 66ch;
+  margin-inline: auto;
+  font-size: var(--text-body-lg);
+}
+
 /* ═══════════════════════ Elements ═══════════════════════ */
 
 /*
@@ -435,6 +450,25 @@
     background-color: var(--color-fill-strong);
     color: var(--color-text-inverse);
     transition-duration: var(--duration-press);
+  }
+}
+
+/* Back / prev / next link atop an article — the blog post, the case study,
+   a legal page. Quieter than nav-link: it's a way out of the page, not a
+   destination worth a pill of its own. */
+@utility post-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 1.5);
+  color: var(--color-text-secondary);
+  font-size: var(--text-ui);
+  transition: color var(--duration-hover) var(--ease-base);
+
+  &:hover { color: var(--color-text-primary); }
+
+  & svg {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
   }
 }
 
