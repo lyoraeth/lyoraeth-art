@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { PostItem } from '../../../server/api/posts.get'
 
+definePageMeta({ layout: 'redesign' })
+
 const { t, locale } = useI18n()
-const localePath = useLocalePath()
 const plural = usePlural()
 const loc    = useLoc()
 
@@ -35,6 +36,16 @@ const { data: allPosts } = await useFetch('/api/posts', {
 type SortKey = 'date-desc' | 'date-asc' | 'alpha' | 'popular'
 const search = ref('')
 const sortBy = ref<SortKey>('date-desc')
+const topicFilter = ref<string | null>(null)
+
+// Small and fixed enough to browse in a dropdown rather than search for.
+const topics = computed(() => {
+  const seen = new Set<string>()
+  for (const p of allPosts.value ?? []) {
+    if (p.topic) seen.add(loc(p.topic))
+  }
+  return [...seen].sort((a, b) => a.localeCompare(b))
+})
 
 const filtered = computed<PostItem[]>(() => {
   let posts = [...(allPosts.value ?? [])]
@@ -46,6 +57,10 @@ const filtered = computed<PostItem[]>(() => {
       (p.title.ru ?? '').toLowerCase().includes(q) ||
       p.tags.some(tag => tag.toLowerCase().includes(q)),
     )
+  }
+
+  if (topicFilter.value) {
+    posts = posts.filter(p => p.topic && loc(p.topic) === topicFilter.value)
   }
 
   switch (sortBy.value) {
@@ -60,7 +75,67 @@ const filtered = computed<PostItem[]>(() => {
   }
 })
 
-const sortOpen = ref(false)
+/* ── Scroll reveal ──
+   First appearance is scroll-triggered, same observer as the dark shell
+   used. Re-filtering doesn't wait on scroll, though — the grid is already
+   on screen when a filter is touched, so that pass drops every current
+   card's `in` and re-adds it a frame later, replaying the same fade for
+   whatever the new filter left standing rather than reshuffling the old
+   cards into new positions.
+
+   The ref below has to stay a single stable function: an inline arrow in
+   the v-for is a new closure every render, and Vue treats a changed ref
+   identity as the element being unset and reset on every patch — including
+   ones that didn't actually mount or unmount anything. That churn made only
+   the cards that DID actually enter or leave end up observed correctly, and
+   left every card that simply survived a filter change without a working
+   ref. The id travels as a data attribute instead of a closure. */
+const { observe } = useReveal()
+const cardEls = new Map<string, HTMLElement>()
+
+function setCardRef(instance: unknown) {
+  const el = instance && typeof instance === 'object' && '$el' in instance
+    ? (instance as { $el: unknown }).$el
+    : instance
+
+  if (el instanceof HTMLElement && el.dataset.postId) {
+    cardEls.set(el.dataset.postId, el)
+    observe(el)
+  }
+}
+
+watch(filtered, (posts) => {
+  const stillFiltered = new Set(posts.map(p => p._id))
+  for (const id of cardEls.keys()) {
+    if (!stillFiltered.has(id)) cardEls.delete(id)
+  }
+
+  // A card that's already visible has its transition running toward opacity
+  // 1 — just removing `in` starts it reversing back toward 0, and re-adding
+  // `in` a moment later reverses it again before it's gone anywhere. Net
+  // motion: none, which is exactly the bug this caused. Turning the
+  // transition off for the drop snaps it to hidden instantly instead of
+  // reversing an animation in flight, so the reveal that follows always
+  // starts from a real, settled 0 rather than wherever the reverse got to.
+  cardEls.forEach(el => {
+    el.style.transition = 'none'
+    el.classList.remove('in')
+    void el.offsetHeight
+    el.style.transition = ''
+  })
+
+  nextTick(() => {
+    // A card that survived the switch already went through the drop above
+    // and just needs `in` back. A card mounting fresh this round (e.g.
+    // switching between two topics with no overlap at all) never went
+    // through it — its very first style is `.reveal-card`'s hidden state,
+    // and a transition can't be observed starting from a style that was
+    // never itself committed to a render. The reflow forces that commit for
+    // both cases alike before `in` goes on.
+    cardEls.forEach(el => { void el.offsetHeight })
+    cardEls.forEach(el => el.classList.add('in'))
+  })
+})
 
 const sorts = computed(() => [
   { key: 'date-desc' as SortKey, label: t('writing.sort_date_desc') },
@@ -68,226 +143,362 @@ const sorts = computed(() => [
   { key: 'alpha'     as SortKey, label: t('writing.sort_alpha')      },
   { key: 'popular'   as SortKey, label: t('writing.sort_popular')    },
 ])
+
+/* ── Topic dropdown — a custom listbox rather than a native select, to
+   carry the panel's own border and shadow instead of the browser's. ── */
+const topicOpen = ref(false)
+const topicRoot = ref<HTMLElement | null>(null)
+
+function selectTopic(value: string | null) {
+  topicFilter.value = value
+  topicOpen.value = false
+}
+
+function onDocumentClick(event: MouseEvent) {
+  if (!topicOpen.value) return
+  if (!topicRoot.value?.contains(event.target as Node)) topicOpen.value = false
+}
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.key !== 'Escape' || !topicOpen.value) return
+  topicOpen.value = false
+  topicRoot.value?.querySelector('button')?.focus()
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  document.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', onDocumentClick)
+  document.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <template>
-  <div class="writing-page">
-    <header class="page-head">
-      <h1>{{ t('writing.title') }}</h1>
-      <span class="eyebrow">{{ t(`writing.count_${plural(filtered.length)}`, { n: filtered.length }) }}</span>
+  <div class="flex flex-col gap-y-section-gap py-section-padding-y">
+    <header class="flex items-baseline gap-5">
+      <h1 class="type-display-2xl text-text-primary">{{ t('writing.title') }}</h1>
+      <span class="type-ui text-text-secondary">
+        {{ t(`writing.count_${plural(filtered.length)}`, { n: filtered.length }) }}
+      </span>
     </header>
 
-    <div class="writing-layout">
-      <!-- Sidebar — an interface panel (search/sort controls), not a content card,
-           so it borrows the nav/dock's frosted-chrome look instead of .glass-card. -->
-      <aside class="sidebar">
-        <div class="sb-section">
-          <label class="sb-label" for="search">{{ t('writing.search') }}</label>
-          <div class="search-wrap">
-            <svg class="search-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.25"/>
-              <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+    <div class="layout-grid gap-grid-gap">
+      <!-- Filters — three of twelve columns on desktop, the fourth left empty
+           for extra breathing room before the posts; full width and above the
+           posts everywhere narrower (default source order already puts it
+           first; the grid classes only change the width it claims). -->
+      <aside class="col-span-4 md:col-span-8 xl:col-span-3 flex flex-col gap-8">
+        <div class="flex flex-col gap-3">
+          <label for="writing-search" class="type-ui text-text-secondary">{{ t('writing.search') }}</label>
+          <div class="filter-search">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.25" />
+              <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" />
             </svg>
             <input
-              id="search"
+              id="writing-search"
               v-model="search"
-              class="search-input"
               type="search"
               :placeholder="t('writing.search_placeholder')"
               autocomplete="off"
-            />
+            >
           </div>
         </div>
 
-        <div class="sb-section">
-          <button class="sb-label sort-toggle" :class="{ open: sortOpen }" @click="sortOpen = !sortOpen" :aria-expanded="sortOpen">
-            {{ t('writing.sort_by') }}
-            <svg class="sort-chevron" viewBox="0 0 10 6" fill="none" aria-hidden="true">
-              <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="sort-collapse" :class="{ open: sortOpen }">
-            <div class="sort-collapse-inner">
-              <div class="sort-list">
+        <div v-if="topics.length" class="flex flex-col gap-3">
+          <span id="writing-topic-label" class="type-ui text-text-secondary">{{ t('writing.topic') }}</span>
+          <div ref="topicRoot" class="filter-dropdown">
+            <button
+              type="button"
+              class="filter-dropdown__trigger"
+              aria-haspopup="listbox"
+              :aria-expanded="topicOpen"
+              aria-labelledby="writing-topic-label"
+              @click="topicOpen = !topicOpen"
+            >
+              <span>{{ topicFilter ?? t('writing.all_topics') }}</span>
+              <svg class="filter-dropdown__chevron" :class="{ open: topicOpen }" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <ul v-if="topicOpen" class="filter-dropdown__panel" role="listbox">
+              <li role="option" :aria-selected="topicFilter === null">
                 <button
-                  v-for="s in sorts"
-                  :key="s.key"
-                  class="sort-btn"
-                  :class="{ active: sortBy === s.key }"
-                  @click="sortBy = s.key"
+                  type="button"
+                  class="filter-dropdown__option"
+                  :class="{ active: topicFilter === null }"
+                  @click="selectTopic(null)"
                 >
-                  {{ s.label }}
+                  {{ t('writing.all_topics') }}
                 </button>
-              </div>
-            </div>
+              </li>
+              <li v-for="topicLabel in topics" :key="topicLabel" role="option" :aria-selected="topicFilter === topicLabel">
+                <button
+                  type="button"
+                  class="filter-dropdown__option"
+                  :class="{ active: topicFilter === topicLabel }"
+                  @click="selectTopic(topicLabel)"
+                >
+                  {{ topicLabel }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <span class="type-ui text-text-secondary">{{ t('writing.sort_by') }}</span>
+          <div class="flex flex-col gap-1">
+            <button
+              v-for="s in sorts"
+              :key="s.key"
+              type="button"
+              class="filter-sort-btn"
+              :class="{ active: sortBy === s.key }"
+              @click="sortBy = s.key"
+            >
+              <svg v-if="s.key === 'date-desc'" class="filter-sort-btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 2.5v9M8 11.5l3-3M8 11.5l-3-3" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <svg v-else-if="s.key === 'date-asc'" class="filter-sort-btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 13.5v-9M8 4.5l3 3M8 4.5l-3 3" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <svg v-else-if="s.key === 'alpha'" class="filter-sort-btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 12.5 7.4 3.5a.6.6 0 0 1 1.2 0l3.4 9M5.6 8.5h4.8" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <svg v-else class="filter-sort-btn__icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 2.5l1.53 3.32 3.55.4-2.65 2.5.7 3.58L8 10.6l-3.13 1.7.7-3.58-2.65-2.5 3.55-.4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" />
+              </svg>
+              {{ s.label }}
+            </button>
           </div>
         </div>
       </aside>
 
-      <!-- Post list -->
-      <main class="post-list">
-        <TransitionGroup name="post" tag="div" class="post-list-inner">
-          <PostRow
+      <!-- Posts — last eight columns on desktop (column 4 sits empty between
+           the two regions); two-up follows from that width directly, the same
+           card the homepage uses at col-span-4 of the full twelve. -->
+      <div class="col-span-4 md:col-span-8 xl:col-start-5 xl:col-span-8 min-w-0">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-grid-gap auto-rows-fr">
+          <PostCard
             v-for="post in filtered"
             :key="post._id"
-            :post="post"
-            :href="localePath(`/writing/${post.slug}`)"
+            :ref="setCardRef"
+            :item="post"
+            :data-post-id="post._id"
+            class="reveal-card"
           />
-        </TransitionGroup>
+        </div>
 
-        <p v-if="filtered.length === 0" class="empty">{{ t('writing.not_found') }}</p>
-      </main>
+        <p v-if="filtered.length === 0" class="type-text text-text-secondary py-8">{{ t('writing.not_found') }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.writing-page {
-  max-width: var(--content-width, 72rem);
-  margin: 0 auto;
-  padding: clamp(5rem, 10vw, 9rem) var(--page-px, 1.5rem) clamp(4rem, 8vw, 8rem);
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  .filter-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .filter-search svg {
+    position: absolute;
+    left: calc(var(--spacing) * 3);
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+    color: var(--color-icon-default);
+    pointer-events: none;
+  }
+
+  .filter-search input {
+    width: 100%;
+    height: calc(var(--spacing) * 10);
+    padding-inline: calc(var(--spacing) * 10) calc(var(--spacing) * 4);
+    border-radius: calc(infinity * 1px);
+    outline: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-field);
+    color: var(--color-text-primary);
+    font-size: var(--text-ui);
+    transition: outline-color var(--duration-hover) var(--ease-base);
+  }
+
+  .filter-search input::placeholder {
+    color: var(--color-text-secondary);
+  }
+
+  .filter-search input:focus {
+    outline-color: var(--color-border-input);
+  }
+
+  /* Custom listbox rather than a native select: the panel carries its own
+     border and shadow instead of the browser's, and sits a small gap below
+     the trigger rather than flush against it. */
+  .filter-dropdown {
+    position: relative;
+  }
+
+  .filter-dropdown__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 2);
+    width: 100%;
+    height: calc(var(--spacing) * 10);
+    padding-inline: calc(var(--spacing) * 4);
+    border-radius: calc(infinity * 1px);
+    outline: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-field);
+    color: var(--color-text-primary);
+    font-size: var(--text-ui);
+    font-family: inherit;
+    cursor: pointer;
+    transition: outline-color var(--duration-hover) var(--ease-base);
+  }
+
+  .filter-dropdown__trigger:hover,
+  .filter-dropdown__trigger[aria-expanded='true'] {
+    outline-color: var(--color-border-input);
+  }
+
+  .filter-dropdown__chevron {
+    width: calc(var(--spacing) * 2.5);
+    height: calc(var(--spacing) * 2.5);
+    flex-shrink: 0;
+    color: var(--color-icon-default);
+    transition: transform var(--duration-hover) var(--ease-base);
+  }
+
+  .filter-dropdown__chevron.open {
+    transform: rotate(180deg);
+  }
+
+  /*
+   * padding-block is the air around the list; --panel-pad-y holds the same
+   * value so the first and last row can cancel it out below.
+   */
+  .filter-dropdown__panel {
+    --panel-pad-y: calc(var(--spacing) * 1.5);
+    position: absolute;
+    top: calc(100% + calc(var(--spacing) * 2));
+    left: 0;
+    right: 0;
+    z-index: 20;
+    overflow: hidden;
+    padding-block: var(--panel-pad-y);
+    border-radius: var(--radius-2xl);
+    outline: 1px solid var(--color-border-default);
+    background-color: var(--color-surface-field);
+    box-shadow: var(--shadow-panel);
+    list-style: none;
+  }
+
+  .filter-dropdown__option {
+    position: relative;
+    isolation: isolate;
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+    font-size: var(--text-ui);
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: transparent;
+    cursor: pointer;
+    transition: color var(--duration-hover) var(--ease-base);
+  }
+
+  /*
+   * The fill lives on a pseudo rather than the row's own background: a fill
+   * inset from the panel's edges reads as a mistake in this system, so the
+   * first and last row stretch theirs into the panel's own padding below —
+   * flush with the panel edge, clipped to its rounded corner by overflow:
+   * hidden — without moving the row's box or its text.
+   */
+  .filter-dropdown__option::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background-color: transparent;
+    transition: background-color var(--duration-hover) var(--ease-base);
+  }
+
+  .filter-dropdown__panel > li:first-child .filter-dropdown__option::before {
+    top: calc(var(--panel-pad-y) * -1);
+  }
+
+  .filter-dropdown__panel > li:last-child .filter-dropdown__option::before {
+    bottom: calc(var(--panel-pad-y) * -1);
+  }
+
+  .filter-dropdown__option:hover::before {
+    background-color: var(--color-surface-hover);
+  }
+
+  .filter-dropdown__option.active::before {
+    background-color: var(--color-fill-strong);
+  }
+
+  .filter-dropdown__option.active {
+    color: var(--color-text-inverse);
+  }
+
+  /* Same pill vocabulary as nav-link: hover fills light, the selected one
+     stays on the strong fill rather than only flashing it on press. */
+  .filter-sort-btn {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2.5);
+    height: calc(var(--spacing) * 10);
+    padding-inline: calc(var(--spacing) * 3);
+    border-radius: calc(infinity * 1px);
+    font-size: var(--text-ui);
+    color: var(--color-text-primary);
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color var(--duration-hover) var(--ease-base),
+                color var(--duration-hover) var(--ease-base);
+  }
+
+  .filter-sort-btn__icon {
+    flex-shrink: 0;
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+
+  .filter-sort-btn:hover {
+    background-color: var(--color-surface-hover);
+  }
+
+  .filter-sort-btn.active {
+    background-color: var(--color-fill-strong);
+    color: var(--color-text-inverse);
+  }
 }
 
-/* ── Header ── */
-.page-head {
-  display: flex;
-  align-items: baseline;
-  gap: 1.25rem;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
-}
-.page-head h1 {
-  font-size: clamp(2rem, 2rem + 2vw, 3.5rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-.page-head .eyebrow {
-  color: var(--faint);
+/*
+ * One transition drives every appearance — first scroll into view, and every
+ * re-filter, which just drops `in` from what's on screen and lets this same
+ * rule fade it back in. No reshuffle: a card that survives a filter change
+ * disappears and reappears at its new grid cell rather than sliding there.
+ */
+.reveal-card {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity var(--duration-reveal) var(--ease-out),
+              transform var(--duration-reveal) var(--ease-out);
 }
 
-/* ── Layout ── */
-.writing-layout {
-  display: grid;
-  grid-template-columns: 14rem 1fr;
-  gap: 1.5rem;
-  align-items: start;
-}
-
-/* ── Sidebar — frosted chrome panel (matches nav/dock), distinct from the flat
-   outline-only content cards used for the post list ── */
-.sidebar {
-  position: sticky;
-  top: 5.5rem;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  border-radius: var(--radius-card-sm);
-  background: oklch(13% 0.009 235 / 55%);
-  backdrop-filter: blur(14px) saturate(1.4) brightness(1.03);
-  -webkit-backdrop-filter: blur(14px) saturate(1.4) brightness(1.03);
-  border: 1px solid var(--line-soft);
-}
-.sb-section { display: flex; flex-direction: column; gap: 0.625rem; }
-.sb-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.625rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-
-/* Search */
-.search-wrap {
-  position: relative;
-}
-.search-icon {
-  position: absolute;
-  left: 0.625rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0.875rem;
-  height: 0.875rem;
-  color: var(--faint);
-  pointer-events: none;
-}
-.search-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  background: oklch(100% 0 0 / 3%);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-tag);
-  padding: 0.4375rem 0.625rem 0.4375rem 2rem;
-  font-family: inherit;
-  font-size: 0.8125rem;
-  color: var(--snow);
-  outline: none;
-  transition: border-color 0.2s;
-}
-.search-input::placeholder { color: var(--faint); }
-.search-input:focus { border-color: rgba(214, 154, 106, 0.4); border-color: oklch(72% 0.1 58 / 40%); }
-.search-input::-webkit-search-cancel-button { display: none; }
-
-/* Sort toggle */
-.sort-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: var(--faint);
-  transition: color 0.2s;
-}
-.sort-toggle:hover { color: var(--mist); }
-.sort-chevron {
-  width: 0.625rem;
-  height: 0.375rem;
-  flex-shrink: 0;
-  transition: transform 0.25s var(--ease-out-expo);
-}
-.sort-toggle.open .sort-chevron { transform: rotate(180deg); }
-
-/* Collapse */
-.sort-collapse {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.25s var(--ease-out-expo);
-}
-.sort-collapse.open { grid-template-rows: 1fr; }
-.sort-collapse-inner { overflow: hidden; }
-.sort-list { display: flex; flex-direction: column; gap: 0.125rem; padding-top: 0.375rem; }
-
-/* Sort */
-.sort-btn {
-  text-align: left;
-  padding: 0.4375rem 0.625rem;
-  border-radius: var(--radius-tag);
-  font-size: 0.875rem;
-  color: var(--mist);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
-}
-.sort-btn:hover  { color: var(--snow); background: rgba(255, 255, 255, 0.04); background: oklch(100% 0 0 / 4%); }
-.sort-btn.active { color: var(--ember); background: var(--ember-bg); }
-
-/* ── Post list ── */
-.post-list { min-width: 0; }
-.post-list-inner { display: flex; flex-direction: column; gap: 0.625rem; }
-
-/* Transition */
-.post-enter-active, .post-leave-active { transition: opacity 0.2s, transform 0.2s; }
-.post-enter-from, .post-leave-to { opacity: 0; transform: translateY(0.5rem); }
-
-.empty { color: var(--faint); font-size: 0.875rem; padding: 2rem 0; }
-
-/* ── Responsive ── */
-@media (max-width: 52rem) {
-  .writing-layout { grid-template-columns: 1fr; }
-  .sidebar { position: static; }
+.reveal-card.in {
+  opacity: 1;
+  transform: none;
 }
 </style>
