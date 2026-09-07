@@ -21,7 +21,7 @@ const feedUrl = computed(() => (locale.value === 'ru' ? '/ru/rss.xml' : '/rss.xm
 </script>
 
 <template>
-  <footer class="footer border-t border-t-border-default bg-surface-header">
+  <footer class="footer mt-footer-padding-top border-t border-t-border-default bg-surface-header">
     <div class="wrapper flex flex-col items-center gap-2.5">
       <div class="layout-grid gap-x-grid-gap gap-y-10 py-section-padding-y px-page-padding-x">
         <div class="flex flex-col justify-center col-span-4 md:col-span-3 xl:col-span-5">
