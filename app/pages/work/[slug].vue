@@ -132,7 +132,9 @@ onMounted(() => {
 
     <!-- Image left, text right — five of twelve columns for the cover, the
          sixth left empty, the text taking the last six. Below xl the cover
-         moves above the text instead of sharing a row with it. -->
+         moves above the text instead of sharing a row with it. Without a
+         cover there's nothing to sit beside, so the text falls back to the
+         same centred column as the blog post and the legal pages. -->
     <div class="layout-grid gap-grid-gap">
       <button
         v-if="item.coverUrl"
@@ -150,8 +152,11 @@ onMounted(() => {
         />
       </button>
 
-      <article class="col-span-4 md:col-span-8 xl:col-start-7 xl:col-span-6 min-w-0">
-        <div class="post-column work-text">
+      <article
+        class="col-span-4 md:col-span-8 min-w-0"
+        :class="item.coverUrl ? 'xl:col-start-7 xl:col-span-6' : 'xl:col-start-4 xl:col-span-6'"
+      >
+        <div class="post-column work-text" :class="{ 'work-text--flush': item.coverUrl }">
           <header class="flex flex-col gap-6 mb-10">
             <div class="flex items-center gap-2.5 type-ui text-text-secondary">
               <span>{{ loc(item.teaser) }}</span>
@@ -434,15 +439,14 @@ onMounted(() => {
 }
 
 /*
- * .post-column (design-system.css) covers the cap and the centring; this
- * only removes the centring at xl, flush against the column's own start
- * edge instead — this grid is asymmetric by design (image, then text)
- * rather than built around one centred column, unlike the blog post's, so
- * centring only makes sense below xl, once the text is standing on its own
- * with no image beside it to read flush against.
+ * .post-column (design-system.css) covers the cap and the centring; a case
+ * with a cover only removes the centring at xl, flush against the column's
+ * own start edge instead — that grid is asymmetric by design (image, then
+ * text). Without a cover there's no image to read flush against, so the
+ * text stays on .post-column's own centred column, same as the blog post.
  */
 @media (width >= 80rem) {
-  .work-text {
+  .work-text--flush {
     margin-inline: 0;
   }
 }
