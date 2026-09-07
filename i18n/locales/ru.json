@@ -131,7 +131,9 @@
     "count_few": "{n} работы",
     "count_many": "{n} работ",
     "view_project": "Открыть проект",
-    "back": "Работы"
+    "back": "Работы",
+    "prev_project": "Предыдущий",
+    "next_project": "Следующий"
   },
 
   "post": {

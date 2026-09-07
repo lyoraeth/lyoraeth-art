@@ -131,7 +131,9 @@
     "count_few": "{n} projects",
     "count_many": "{n} projects",
     "view_project": "Open project",
-    "back": "Work"
+    "back": "Work",
+    "prev_project": "Previous",
+    "next_project": "Next"
   },
 
   "post": {

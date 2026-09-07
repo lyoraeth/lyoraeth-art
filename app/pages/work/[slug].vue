@@ -98,12 +98,37 @@ onMounted(() => {
 
 <template>
   <div v-if="item" class="flex flex-col gap-y-section-gap py-section-padding-y">
-    <NuxtLink :to="localePath('/work')" class="post-nav-link">
-      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      {{ t('work.title') }}
-    </NuxtLink>
+    <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-2">
+      <NuxtLink :to="localePath('/work')" class="post-nav-link">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        {{ t('work.title') }}
+      </NuxtLink>
+
+      <div v-if="item.prev || item.next" class="flex items-center gap-5">
+        <NuxtLink
+          v-if="item.prev"
+          :to="localePath(`/work/${item.prev.slug}`)"
+          class="post-nav-link"
+          :aria-label="`${t('work.prev_project')}: ${loc(item.prev.title)}`"
+          :title="loc(item.prev.title)"
+        >
+          <span aria-hidden="true">←</span>
+          <span>{{ t('work.prev_project') }}</span>
+        </NuxtLink>
+        <NuxtLink
+          v-if="item.next"
+          :to="localePath(`/work/${item.next.slug}`)"
+          class="post-nav-link"
+          :aria-label="`${t('work.next_project')}: ${loc(item.next.title)}`"
+          :title="loc(item.next.title)"
+        >
+          <span>{{ t('work.next_project') }}</span>
+          <span aria-hidden="true">→</span>
+        </NuxtLink>
+      </div>
+    </div>
 
     <!-- Image left, text right — five of twelve columns for the cover, the
          sixth left empty, the text taking the last six. Below xl the cover
