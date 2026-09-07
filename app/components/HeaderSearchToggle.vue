@@ -12,9 +12,10 @@ const root = ref<HTMLElement | null>(null)
 const input = ref<HTMLInputElement | null>(null)
 const query = ref('')
 
-const { ensureLoaded, search, ready: searchReady } = useSiteSearch()
+const { ensureLoaded, search, ready: searchReady, minQueryLength } = useSiteSearch()
 const groups = computed(() => search(query.value))
-const showResults = computed(() => open.value && searchReady.value && query.value.trim().length > 0)
+const showResults = computed(() =>
+  open.value && searchReady.value && query.value.trim().length >= minQueryLength)
 
 function onButtonClick() {
   if (!open.value) {

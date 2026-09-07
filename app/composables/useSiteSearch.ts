@@ -5,6 +5,18 @@ import type { WorkItem } from '../../server/api/work.get'
  *  whole catalog fits in two requests, fetched once and filtered client-side. */
 const RESULT_LIMIT = 5
 
+/** Below this, a query is almost always a stray keystroke rather than intent. */
+const MIN_QUERY_LENGTH = 2
+
+/** The only two pages here, in both languages — @nuxtjs/i18n compiles the
+ *  locale files into its own message format, not plain JSON, so importing
+ *  en.json/ru.json directly and indexing into them doesn't yield strings.
+ *  Two short titles are cheaper to duplicate here than to fight that. */
+const LEGAL_PAGE_TITLES = {
+  privacy:        { en: 'Privacy Policy', ru: 'Политика конфиденциальности' },
+  'personal-data': { en: 'Personal Data Processing', ru: 'Согласие на обработку персональных данных' },
+} as const satisfies Record<string, { en: string; ru: string }>
+
 export interface SearchResult {
   key:   string
   href:  string
@@ -52,19 +64,27 @@ export function useSiteSearch() {
     }
   }
 
-  // Only two of these exist — matched by title alone, there's nothing else
-  // on them worth indexing.
-  const pages = computed((): SearchResult[] => [
-    { key: 'privacy', href: localePath('/privacy'), title: t('privacy.title'), meta: null },
-    { key: 'personal-data', href: localePath('/personal-data'), title: t('personal_data.title'), meta: null },
+  const pages = computed(() => [
+    { key: 'privacy', href: localePath('/privacy'), title: t('privacy.title'), ...LEGAL_PAGE_TITLES.privacy },
+    { key: 'personal-data', href: localePath('/personal-data'), title: t('personal_data.title'), ...LEGAL_PAGE_TITLES['personal-data'] },
   ])
+
+  /** Both locale variants of a `{ en, ru }` field, lowercased — search matches
+   *  either regardless of which one is on screen right now. */
+  function bothLoc(field: { en: string; ru?: string | null } | null | undefined): string[] {
+    if (!field) return []
+    return [field.en.toLowerCase(), field.ru?.toLowerCase()].filter((s): s is string => !!s)
+  }
 
   function search(query: string): SearchGroups {
     const q = query.trim().toLowerCase()
-    if (!q) return { work: [], writing: [], pages: [] }
+    if (q.length < MIN_QUERY_LENGTH) return { work: [], writing: [], pages: [] }
 
     const matchedWork = work.value
-      .filter(w => loc(w.title).toLowerCase().includes(q) || w.tags.some(tag => tag.toLowerCase().includes(q)))
+      .filter(w =>
+        bothLoc(w.title).some(s => s.includes(q)) ||
+        w.tags.some(tag => tag.toLowerCase().includes(q)),
+      )
       .slice(0, RESULT_LIMIT)
       .map((w): SearchResult => ({
         key:   w._id,
@@ -75,8 +95,8 @@ export function useSiteSearch() {
 
     const matchedPosts = posts.value
       .filter(p =>
-        loc(p.title).toLowerCase().includes(q) ||
-        loc(p.topic).toLowerCase().includes(q) ||
+        bothLoc(p.title).some(s => s.includes(q)) ||
+        bothLoc(p.topic).some(s => s.includes(q)) ||
         p.tags.some(tag => tag.toLowerCase().includes(q)),
       )
       .slice(0, RESULT_LIMIT)
@@ -87,10 +107,12 @@ export function useSiteSearch() {
         meta:  loc(p.topic) || null,
       }))
 
-    const matchedPages = pages.value.filter(p => p.title.toLowerCase().includes(q))
+    const matchedPages = pages.value
+      .filter(p => p.en.toLowerCase().includes(q) || p.ru.toLowerCase().includes(q))
+      .map((p): SearchResult => ({ key: p.key, href: p.href, title: p.title, meta: null }))
 
     return { work: matchedWork, writing: matchedPosts, pages: matchedPages }
   }
 
-  return { ensureLoaded, search, ready: loaded }
+  return { ensureLoaded, search, ready: loaded, minQueryLength: MIN_QUERY_LENGTH }
 }

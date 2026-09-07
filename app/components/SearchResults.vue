@@ -32,11 +32,11 @@ const { t } = useI18n()
           v-for="r in groups.writing"
           :key="r.key"
           :to="r.href"
-          class="search-panel__option"
+          class="search-panel__option search-panel__option--stacked"
           @click="emit('select')"
         >
           <span>{{ r.title }}</span>
-          <span v-if="r.meta" class="search-panel__meta">{{ r.meta }}</span>
+          <span v-if="r.meta" class="search-panel__meta type-ui">{{ r.meta }}</span>
         </NuxtLink>
       </div>
 
@@ -92,10 +92,6 @@ const { t } = useI18n()
     color: var(--color-text-secondary);
   }
 
-  .search-panel__group:last-child .search-panel__option:last-child {
-    padding-bottom: calc(var(--spacing) * 3);
-  }
-
   /*
    * No inset fill on hover — the row runs the panel's full width, so the fill
    * meets the panel's own edge instead of sitting inside it as a pill.
@@ -105,10 +101,18 @@ const { t } = useI18n()
     align-items: center;
     justify-content: space-between;
     gap: calc(var(--spacing) * 3);
-    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
     color: var(--color-text-primary);
     text-decoration: none;
     transition: background-color var(--duration-hover) var(--ease-base);
+  }
+
+  /* Blog rows: the topic drops under the title instead of racing it on the
+     same line, and reads at the smaller ui scale — a tag, not a second title. */
+  .search-panel__option--stacked {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--spacing) * 1);
   }
 
   .search-panel__option:hover {

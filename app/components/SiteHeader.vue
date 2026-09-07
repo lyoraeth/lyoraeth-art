@@ -12,13 +12,14 @@ const searchOpen = ref(false)
 const burger = ref<HTMLButtonElement | null>(null)
 const query = ref('')
 
-const { ensureLoaded, search, ready: searchReady } = useSiteSearch()
+const { ensureLoaded, search, ready: searchReady, minQueryLength } = useSiteSearch()
 const searchRoot = ref<HTMLElement | null>(null)
 const resultsOpen = ref(false)
 const searchGroups = computed(() => search(query.value))
 // gated on searchReady too — otherwise a keystroke right after focus can flash
 // "nothing found" for the instant before the catalog fetch resolves
-const showResults = computed(() => resultsOpen.value && searchReady.value && query.value.trim().length > 0)
+const showResults = computed(() =>
+  resultsOpen.value && searchReady.value && query.value.trim().length >= minQueryLength)
 
 function onSearchFocus() {
   resultsOpen.value = true
