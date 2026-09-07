@@ -12,9 +12,14 @@ const root = ref<HTMLElement | null>(null)
 const input = ref<HTMLInputElement | null>(null)
 const query = ref('')
 
+const { ensureLoaded, search, ready: searchReady } = useSiteSearch()
+const groups = computed(() => search(query.value))
+const showResults = computed(() => open.value && searchReady.value && query.value.trim().length > 0)
+
 function onButtonClick() {
   if (!open.value) {
     open.value = true
+    ensureLoaded()
     nextTick(() => input.value?.focus())
     return
   }
@@ -23,7 +28,9 @@ function onButtonClick() {
 }
 
 function submit() {
-  // Search results are a stage of their own; the field is markup for now.
+  const g = groups.value
+  const first = g.work[0] ?? g.writing[0] ?? g.pages[0]
+  if (first) navigateTo(first.href)
 }
 
 // a click outside collapses it, but never discards typed text
@@ -43,45 +50,55 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick))
 </script>
 
 <template>
-  <form
-    ref="root"
-    role="search"
-    class="search-toggle lg:hidden"
-    :data-open="open || undefined"
-    @submit.prevent="submit"
-  >
-    <button
-      type="button"
-      :aria-label="t('search.toggle')"
-      :aria-expanded="open"
-      aria-controls="mobile-search-input"
-      @click="onButtonClick"
+  <div ref="root" class="search-toggle-wrap lg:hidden">
+    <form
+      role="search"
+      class="search-toggle"
+      :data-open="open || undefined"
+      @submit.prevent="submit"
     >
-      <svg class="size-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path
-          d="M12.19 7.238a4.952 4.952 0 0 0-8.48-3.546A4.95 4.95 0 0 0 2.285 7.24a4.953 4.953 0 0 0 9.906-.002m2.287 0a7.2 7.2 0 0 1-1.379 4.244l2.567 2.567a1.144 1.144 0 1 1-1.616 1.616l-2.567-2.567a7.2 7.2 0 0 1-4.244 1.379 7.239 7.239 0 1 1 7.239-7.239"
-        />
-      </svg>
-    </button>
+      <button
+        type="button"
+        :aria-label="t('search.toggle')"
+        :aria-expanded="open"
+        aria-controls="mobile-search-input"
+        @click="onButtonClick"
+      >
+        <svg class="size-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path
+            d="M12.19 7.238a4.952 4.952 0 0 0-8.48-3.546A4.95 4.95 0 0 0 2.285 7.24a4.953 4.953 0 0 0 9.906-.002m2.287 0a7.2 7.2 0 0 1-1.379 4.244l2.567 2.567a1.144 1.144 0 1 1-1.616 1.616l-2.567-2.567a7.2 7.2 0 0 1-4.244 1.379 7.239 7.239 0 1 1 7.239-7.239"
+          />
+        </svg>
+      </button>
 
-    <label for="mobile-search-input" class="sr-only">{{ t('search.label') }}</label>
-    <input
-      id="mobile-search-input"
-      ref="input"
-      v-model="query"
-      name="q"
-      type="search"
-      :placeholder="t('search.placeholder')"
-      :tabindex="open ? 0 : -1"
-      class="w-full bg-transparent pr-3 text-ui placeholder:text-text-secondary focus:outline-none"
-      @keydown="onKeydown"
-    >
-  </form>
+      <label for="mobile-search-input" class="sr-only">{{ t('search.label') }}</label>
+      <input
+        id="mobile-search-input"
+        ref="input"
+        v-model="query"
+        name="q"
+        type="search"
+        :placeholder="t('search.placeholder')"
+        :tabindex="open ? 0 : -1"
+        autocomplete="off"
+        class="w-full bg-transparent pr-3 text-ui placeholder:text-text-secondary focus:outline-none"
+        @keydown="onKeydown"
+      >
+    </form>
+
+    <SearchResults v-if="showResults" class="search-panel--end" :groups="groups" @select="open = false" />
+  </div>
 </template>
 
 <style scoped>
 /* In the components layer, so utility classes in the markup still win. */
 @layer components {
+  /* Positions the results panel — the form itself can't carry this, its own
+     overflow: hidden (needed for the unroll animation) would clip the panel. */
+  .search-toggle-wrap {
+    position: relative;
+  }
+
   /*
    * Unrolling is animated with flex-grow alone rather than width plus flex: on
    * collapse, flex-shrink drops to zero instantly, so the element expands to its

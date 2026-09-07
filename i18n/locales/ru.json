@@ -29,7 +29,9 @@
     "placeholder": "Поиск",
     "label": "Поиск по сайту",
     "submit": "Найти",
-    "toggle": "Поиск"
+    "toggle": "Поиск",
+    "pages": "Страницы",
+    "no_results": "Ничего не найдено"
   },
 
   "hero": {

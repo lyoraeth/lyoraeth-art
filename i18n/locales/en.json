@@ -29,7 +29,9 @@
     "placeholder": "Search",
     "label": "Search the site",
     "submit": "Find",
-    "toggle": "Search"
+    "toggle": "Search",
+    "pages": "Pages",
+    "no_results": "No results"
   },
 
   "hero": {

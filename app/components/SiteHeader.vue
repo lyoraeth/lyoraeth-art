@@ -12,6 +12,23 @@ const searchOpen = ref(false)
 const burger = ref<HTMLButtonElement | null>(null)
 const query = ref('')
 
+const { ensureLoaded, search, ready: searchReady } = useSiteSearch()
+const searchRoot = ref<HTMLElement | null>(null)
+const resultsOpen = ref(false)
+const searchGroups = computed(() => search(query.value))
+// gated on searchReady too — otherwise a keystroke right after focus can flash
+// "nothing found" for the instant before the catalog fetch resolves
+const showResults = computed(() => resultsOpen.value && searchReady.value && query.value.trim().length > 0)
+
+function onSearchFocus() {
+  resultsOpen.value = true
+  ensureLoaded()
+}
+
+function closeResults() {
+  resultsOpen.value = false
+}
+
 const isHome = computed(() => {
   const home = localePath('/')
   return route.path === home || route.path === home.replace(/\/$/, '')
@@ -32,7 +49,10 @@ const links = computed(() => [
 ])
 
 function submitSearch() {
-  // Search results are a stage of their own; the field is markup for now.
+  const g = searchGroups.value
+  const first = g.work[0] ?? g.writing[0] ?? g.pages[0]
+  if (first) navigateTo(first.href)
+  closeResults()
 }
 
 function toggleMenu() {
@@ -43,9 +63,19 @@ function toggleMenu() {
 
 // Escape closes from anywhere, and focus returns to the burger
 function onKeydown(event: KeyboardEvent) {
-  if (event.key !== 'Escape' || !menuOpen.value) return
+  if (event.key !== 'Escape') return
+  if (resultsOpen.value) {
+    closeResults()
+    return
+  }
+  if (!menuOpen.value) return
   menuOpen.value = false
   burger.value?.focus()
+}
+
+function onDocumentClick(event: MouseEvent) {
+  if (!resultsOpen.value) return
+  if (!searchRoot.value?.contains(event.target as Node)) closeResults()
 }
 
 let desktop: MediaQueryList | undefined
@@ -56,12 +86,14 @@ const onDesktopChange = (event: MediaQueryListEvent) => {
 
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)
+  document.addEventListener('click', onDocumentClick)
   desktop = matchMedia('(width >= 64rem)')
   desktop.addEventListener('change', onDesktopChange)
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
+  document.removeEventListener('click', onDocumentClick)
   desktop?.removeEventListener('change', onDesktopChange)
 })
 </script>
@@ -92,8 +124,9 @@ onUnmounted(() => {
           grid is what gives it width.
         -->
         <form
+          ref="searchRoot"
           role="search"
-          class="interactive flex h-10 w-full items-center gap-2.5 rounded-full px-3 hover:bg-surface-hover-strong focus-within:bg-surface-hover-strong focus-within:outline-1 focus-within:outline-border-input"
+          class="interactive relative flex h-10 w-full items-center gap-2.5 rounded-full px-3 hover:bg-surface-hover-strong focus-within:bg-surface-hover-strong focus-within:outline-1 focus-within:outline-border-input"
           @submit.prevent="submitSearch"
         >
           <!-- the 44x44 tap target is drawn by a pseudo-element, so it doesn't
@@ -117,8 +150,15 @@ onUnmounted(() => {
             name="q"
             type="search"
             :placeholder="t('search.placeholder')"
+            autocomplete="off"
+            aria-haspopup="listbox"
+            :aria-expanded="showResults"
             class="w-full bg-transparent text-ui placeholder:text-text-secondary focus:outline-none"
+            @focus="onSearchFocus"
+            @input="resultsOpen = true"
           >
+
+          <SearchResults v-if="showResults" :groups="searchGroups" @select="closeResults" />
         </form>
       </nav>
 
