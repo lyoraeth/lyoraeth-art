@@ -1,6 +1,7 @@
 {
   "a11y": {
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "close": "Close"
   },
 
   "nav": {

@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import type { WorkItem } from '../../../server/api/work.get'
+import type { WorkDetail } from '../../../server/api/work/[slug].get'
+
+definePageMeta({ layout: 'redesign' })
 
 const { t }      = useI18n()
 const loc        = useLoc()
 const localePath = useLocalePath()
-const route  = useRoute()
-const slug   = route.params.slug as string
+const route      = useRoute()
+const slug       = route.params.slug as string
 
-const { data: item } = await useFetch<WorkItem | null>(`/api/work/${slug}`)
+const { data: item } = await useFetch<WorkDetail | null>(`/api/work/${slug}`)
 
 if (!item.value) {
   throw createError({ statusCode: 404, statusMessage: 'Work item not found' })
@@ -66,181 +68,380 @@ useHead({
 /* ── Analytics: case-study funnel ── */
 const track = useTrack()
 const { depthEl, endEl } = useCaseStudyFunnel(slug)
+
+/* ── Cover lightbox ──
+   Below xl the cover is cropped to 4/3 to line up with the text column;
+   the lightbox is how the actual, uncropped image — whatever shape it
+   really is — stays reachable at every width, not just at xl where the
+   grid already shows it uncropped.
+
+   Opens fit-to-screen; clicking the image widens it to the screen's own
+   width (see .work-lightbox__img--zoomed) rather than its full resolution
+   — past that, pinch-zoom (touch) or the trackpad (desktop) already cover
+   it, and a custom zoom wider than the screen has nowhere to pan without a
+   scrollable backdrop, which reads as broken rather than as a feature.
+   Resets on every open, so a previous zoom never carries over. */
+const lightboxOpen = ref(false)
+const imageZoomed  = ref(false)
+watch(lightboxOpen, (open) => { if (!open) imageZoomed.value = false })
+
+function onLightboxKeydown(event: KeyboardEvent) {
+  if (event.key !== 'Escape' || !lightboxOpen.value) return
+  lightboxOpen.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', onLightboxKeydown)
+  onUnmounted(() => document.removeEventListener('keydown', onLightboxKeydown))
+})
 </script>
 
 <template>
-  <article class="work-page" v-if="item">
-    <NuxtLink :to="localePath('/work')" class="back-link">
+  <div v-if="item" class="flex flex-col gap-y-section-gap py-section-padding-y">
+    <NuxtLink :to="localePath('/work')" class="post-nav-link">
       <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       {{ t('work.title') }}
     </NuxtLink>
 
-    <header class="work-header">
-      <div class="work-meta">
-        <span class="eyebrow">{{ loc(item.teaser) }}</span>
-        <span v-if="item.year" class="eyebrow meta-dot-sep">{{ item.year }}</span>
-      </div>
+    <!-- Image left, text right — five of twelve columns for the cover, the
+         sixth left empty, the text taking the last six. Below xl the cover
+         moves above the text instead of sharing a row with it. -->
+    <div class="layout-grid gap-grid-gap">
+      <button
+        v-if="item.coverUrl"
+        type="button"
+        class="col-span-4 md:col-span-8 xl:col-span-5 xl:self-start post-column work-cover"
+        :aria-label="item.coverAlt ?? title"
+        @click="lightboxOpen = true"
+      >
+        <SanityPicture
+          :src="item.coverUrl"
+          :alt="item.coverAlt ?? title"
+          loading="eager"
+          fetchpriority="high"
+          :width="900"
+        />
+      </button>
 
-      <h1 class="work-title">{{ title }}</h1>
+      <article class="col-span-4 md:col-span-8 xl:col-start-7 xl:col-span-6 min-w-0">
+        <div class="post-column work-text">
+          <header class="flex flex-col gap-6 mb-10">
+            <div class="flex items-center gap-2.5 type-ui text-text-secondary">
+              <span>{{ loc(item.teaser) }}</span>
+              <template v-if="item.year">
+                <span aria-hidden="true">·</span>
+                <span>{{ item.year }}</span>
+              </template>
+            </div>
+            <h1 class="type-display-2xl text-text-primary">{{ title }}</h1>
+            <div v-if="item.tags?.length" class="flex flex-wrap gap-2">
+              <span v-for="tag in item.tags" :key="tag" class="tag-pill">{{ tag }}</span>
+            </div>
+          </header>
 
-      <div class="work-tags">
-        <span v-for="tag in item.tags" :key="tag" class="tag">{{ tag }}</span>
-      </div>
-    </header>
+          <div class="post-body">
+            <span ref="depthEl" aria-hidden="true" />
+            <p v-for="(para, i) in bodyParagraphs" :key="i">{{ para }}</p>
+            <span ref="endEl" aria-hidden="true" />
+          </div>
 
-    <div v-if="item.coverUrl" class="work-cover">
-      <SanityPicture
-        :src="item.coverUrl"
-        :alt="item.coverAlt ?? title"
-        loading="eager"
-        fetchpriority="high"
-        :width="1100"
-        :height="item.coverWidth && item.coverHeight ? Math.round(1100 * item.coverHeight / item.coverWidth) : undefined"
-      />
+          <a
+            v-if="item.showLink && item.url"
+            :href="item.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="work-external-link type-ui"
+            @click="track(EV.workLink, { slug })"
+          >
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 13L13 3M13 3H7M13 3v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {{ t('work.view_project') }}
+          </a>
+        </div>
+      </article>
     </div>
 
-    <span ref="depthEl" aria-hidden="true" />
-    <p v-for="(para, i) in bodyParagraphs" :key="i" class="work-desc">{{ para }}</p>
-    <span ref="endEl" aria-hidden="true" />
+    <!-- Full view of the cover — reachable at every width, not only where
+         the grid already shows it uncropped. Always the real aspect ratio,
+         letterboxed rather than filled, since the point is to see the whole
+         image rather than fill the screen with it. -->
+    <Teleport v-if="item.coverUrl" to="body">
+      <Transition name="lightbox">
+        <div
+          v-if="lightboxOpen"
+          class="work-lightbox"
+          :class="{ 'work-lightbox--zoomed': imageZoomed }"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="item.coverAlt ?? title"
+          @click.self="lightboxOpen = false"
+        >
+          <button
+            type="button"
+            class="work-lightbox__close"
+            :aria-label="t('a11y.close')"
+            @click="lightboxOpen = false"
+          >
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </button>
 
-    <a
-      v-if="item.showLink && item.url"
-      :href="item.url"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="work-link"
-      @click="track(EV.workLink, { slug })"
-    >
-      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M3 13L13 3M13 3H7M13 3v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      {{ t('work.view_project') }}
-    </a>
-  </article>
+          <figure class="work-lightbox__figure">
+            <SanityPicture
+              :src="item.coverUrl"
+              :alt="item.coverAlt ?? title"
+              :width="2400"
+              class="work-lightbox__img"
+              :class="{ 'work-lightbox__img--zoomed': imageZoomed }"
+              @click="imageZoomed = !imageZoomed"
+            />
+            <figcaption v-if="item.coverAlt" class="work-lightbox__caption type-ui">
+              {{ item.coverAlt }}
+            </figcaption>
+          </figure>
+        </div>
+      </Transition>
+    </Teleport>
+  </div>
 </template>
 
 <style scoped>
-.work-page {
-  max-width: 52rem;
-  margin: 0 auto;
-  padding: clamp(5rem, 10vw, 8rem) var(--page-px, 1.5rem) clamp(4rem, 8vw, 8rem);
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    height: calc(var(--spacing) * 7);
+    padding-inline: calc(var(--spacing) * 3);
+    border-radius: calc(infinity * 1px);
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-secondary);
+    font-size: var(--text-ui);
+  }
+
+  /*
+   * Width and centring are .post-column (design-system.css) — below xl,
+   * cropped to 4/3 on top of that so it lines up with the text as a stack;
+   * at xl both the crop and .post-column's own cap come off (see the
+   * override below) — full column width, real aspect ratio, tall or wide,
+   * whatever the image actually is. It's a <button>, not a <div>: the whole
+   * point below is that clicking it opens the uncropped original, so plain
+   * button chrome is reset rather than styled. font: inherit resets a
+   * button's own default font wholesale, so .post-column's font-size has to
+   * be repeated after it — that shorthand would otherwise win it back.
+   */
+  .work-cover {
+    display: block;
+    font: inherit;
+    font-size: var(--text-body-lg);
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-3xl);
+    outline: 1px solid var(--color-border-default);
+    background: none;
+    overflow: hidden;
+    cursor: zoom-in;
+  }
+
+  .work-cover :deep(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    /* top rather than centre — whatever the crop cuts, it cuts from the
+       bottom, not evenly off both ends */
+    object-position: center top;
+  }
+
+  @media (width >= 80rem) {
+    .work-cover {
+      max-width: none;
+      margin-inline: 0;
+    }
+
+    .work-cover :deep(img) {
+      aspect-ratio: auto;
+      height: auto;
+    }
+  }
+
+  .work-external-link {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 1.5);
+    margin-top: calc(var(--spacing) * 2);
+    color: var(--color-text-secondary);
+    transition: color var(--duration-hover) var(--ease-base);
+  }
+
+  .work-external-link:hover {
+    color: var(--color-accent-strong);
+  }
+
+  .work-external-link svg {
+    width: calc(var(--spacing) * 3.5);
+    height: calc(var(--spacing) * 3.5);
+    flex-shrink: 0;
+  }
+
+  /* ── Cover lightbox ── */
+  .work-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing) * 4);
+    padding: calc(var(--spacing) * 6);
+    background-color: oklch(15% 0.01 250 / 88%);
+    overflow: auto;
+  }
+
+  /*
+   * Zoomed never grows past the lightbox's own width (see .work-lightbox__
+   * img--zoomed), so the cross axis never overflows — only vertical can,
+   * for a tall image at full width. justify-content still switches to
+   * flex-start for that axis: centred flex alignment clips whatever
+   * overflows before the start edge (a browser quirk, not a choice), which
+   * left the top of a tall zoomed image unreachable by scrolling.
+   */
+  .work-lightbox--zoomed {
+    justify-content: flex-start;
+    padding-inline: calc(var(--spacing) * 2);
+  }
+
+  .work-lightbox__close {
+    position: fixed;
+    top: calc(var(--spacing) * 6);
+    right: calc(var(--spacing) * 6);
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--spacing) * 10);
+    height: calc(var(--spacing) * 10);
+    border-radius: calc(infinity * 1px);
+    outline: 1px solid oklch(100% 0 0 / 20%);
+    background-color: oklch(100% 0 0 / 8%);
+    color: var(--color-text-inverse);
+    cursor: pointer;
+    transition: background-color var(--duration-hover) var(--ease-base);
+  }
+
+  .work-lightbox__close:hover {
+    background-color: oklch(100% 0 0 / 16%);
+  }
+
+  /* Zoomed, the image runs full-width right behind this button and the
+     translucent-on-dark-backdrop tint above has nothing dark left to show
+     through — a light photo behind it reads as no button at all. Solid
+     instead, so it stays visible regardless of what's behind it. */
+  .work-lightbox--zoomed .work-lightbox__close {
+    outline: none;
+    background-color: var(--color-fill-strong);
+  }
+
+  .work-lightbox__close svg {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+
+  .work-lightbox__figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--spacing) * 3);
+    /* width, not just max-width — a percentage width on the zoomed image
+       needs a definite width to resolve against, and .work-lightbox (the
+       viewport-pinned parent) is the one definite box in this chain. */
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .work-lightbox__figure :deep(.work-lightbox__img) {
+    display: block;
+    max-width: 100%;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+    border-radius: var(--radius-2xl);
+    cursor: zoom-in;
+  }
+
+  /*
+   * Widens to fill the lightbox rather than to the image's full resolution
+   * — a zoom that can run wider than the screen has nowhere for the extra
+   * width to go, and panning it via a scrollable backdrop reads as broken
+   * rather than as a feature. Screen width is the ceiling; a reader after
+   * more than that already has pinch-zoom (touch) or the trackpad (desktop)
+   * for it. height: auto past that width is exactly why justify-content
+   * flips to flex-start above — the whole point is the extra height becomes
+   * reachable by an ordinary scroll, not fit back down to compensate.
+   */
+  .work-lightbox__figure :deep(.work-lightbox__img--zoomed) {
+    max-width: 100%;
+    max-height: none;
+    width: 100%;
+    cursor: zoom-out;
+  }
+
+  .work-lightbox__caption {
+    color: oklch(100% 0 0 / 70%);
+    text-align: center;
+  }
+
+  .lightbox-enter-active,
+  .lightbox-leave-active {
+    transition: opacity var(--duration-hover) var(--ease-base);
+  }
+
+  .lightbox-enter-from,
+  .lightbox-leave-to {
+    opacity: 0;
+  }
 }
 
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: var(--faint);
-  text-decoration: none;
-  font-size: 0.875rem;
-  margin-bottom: 2.5rem;
-  transition: color 0.2s;
-}
-.back-link:hover { color: var(--snow); }
-.back-link svg { width: 1rem; height: 1rem; }
-
-.work-header { margin-bottom: 2rem; }
-
-.work-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  color: var(--faint);
-}
-.meta-dot-sep::before {
-  content: '·';
-  margin-right: 0.75rem;
+/*
+ * .post-column (design-system.css) covers the cap and the centring; this
+ * only removes the centring at xl, flush against the column's own start
+ * edge instead — this grid is asymmetric by design (image, then text)
+ * rather than built around one centred column, unlike the blog post's, so
+ * centring only makes sense below xl, once the text is standing on its own
+ * with no image beside it to read flush against.
+ */
+@media (width >= 80rem) {
+  .work-text {
+    margin-inline: 0;
+  }
 }
 
-.work-title {
-  font-size: clamp(1.75rem, 1.25rem + 2.5vw, 2.75rem);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
-  margin-bottom: 1.25rem;
-}
-
-.work-tags {
-  display: flex;
-  gap: 0.375rem;
-  flex-wrap: wrap;
-}
-.tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.625rem;
-  color: var(--mist);
-  padding: 0.25rem 0.5rem;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-tag);
-  background: rgba(255, 255, 255, 0.02);
-  background: oklch(100% 0 0 / 2%);
-}
-.tag--warm {
-  color: var(--ember);
-  border-color: var(--ember-border);
-  background: var(--ember-bg);
-}
-
-.work-cover {
-  margin: 0 0 2.5rem;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  border: 1px solid var(--line-soft);
-}
-.work-cover img {
-  width: 100%;
-  height: auto;
-  display: block;
-  aspect-ratio: auto 16/9;
-}
-
-.work-desc {
-  font-size: 1.0625rem;
-  color: var(--ink);
-  line-height: 1.9;
-  margin-bottom: 1.25rem;
+/* ── Prose (body) — same rules as the blog post's .post-body. ── */
+.post-body {
+  color: var(--color-text-primary);
+  line-height: 1.5;
   hyphens: auto;
   font-kerning: normal;
   font-feature-settings: 'kern' 1, 'liga' 1;
 }
-.work-desc:last-of-type {
-  margin-bottom: 2.5rem;
-}
 
-/* lead paragraph — brighter, slightly larger, sets the tone */
-.work-desc:first-of-type {
-  font-size: 1.125rem;
-  color: var(--snow);
-  line-height: 1.8;
-  margin-bottom: 1.75rem;
-}
+/* Every paragraph indents, lead included — no exceptions. */
+:deep(.post-body p) { margin: 0 0 1.25rem; text-indent: 1.5em; }
+:deep(.post-body p:last-child) { margin-bottom: 0; }
+</style>
 
-/* ember accent on the opening letter — inline, same baseline */
-.work-desc:first-of-type::first-letter {
-  font-size: 1.2em;
-  font-weight: 700;
-  color: var(--ember);
+<style>
+/* In the components layer, so utility classes in the markup still win. */
+@layer components {
+  /* Global on purpose: the page behind an open lightbox must not scroll. */
+  html:has(.work-lightbox) {
+    overflow: hidden;
+  }
 }
-
-/* indent subsequent paragraphs — classic typographic rhythm */
-.work-desc + .work-desc {
-  text-indent: 1.5em;
-}
-
-.work-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: var(--faint);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8125rem;
-  text-decoration: none;
-  transition: color 0.2s;
-  margin-top: 0.5rem;
-}
-.work-link svg { width: 0.75rem; height: 0.75rem; flex-shrink: 0; }
-.work-link:hover { color: var(--ember); }
 </style>
