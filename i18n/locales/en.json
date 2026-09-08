@@ -258,11 +258,13 @@
   },
 
   "privacy": {
-    "title": "Privacy Policy"
+    "title": "Privacy Policy",
+    "description": "What data lyoraeth.art collects and how it's used."
   },
 
   "personal_data": {
-    "title": "Personal Data Processing"
+    "title": "Personal Data Processing",
+    "description": "Consent for processing personal data submitted through comments and the contact form on lyoraeth.art."
   },
 
   "curtain": {

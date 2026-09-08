@@ -15,7 +15,12 @@ watch(locale, (lang) => {
   if (lang !== 'ru') navigateTo(localePath('/privacy'))
 })
 
-useSeoMeta({ title: computed(() => `${t('personal_data.title')} — lyoraeth`) })
+useSeoMeta({
+  title:         computed(() => `${t('personal_data.title')} — lyoraeth`),
+  description:   computed(() => t('personal_data.description')),
+  ogTitle:       computed(() => t('personal_data.title')),
+  ogDescription: computed(() => t('personal_data.description')),
+})
 
 const html = computed(() => marked(ruMd) as string)
 </script>
