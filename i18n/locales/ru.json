@@ -7,22 +7,16 @@
   "nav": {
     "home": "Главная",
     "work": "Работы",
-    "stack": "Стек",
     "writing": "Блог",
     "contact": "Контакты",
     "cv": "CV",
-    "lang_toggle": "Язык",
     "site_nav": "Навигация по сайту",
     "experience": "Опыт",
     "brand": "lyoraeth, на главную",
     "lang_switch": "Сменить язык, сейчас русский",
     "menu_open": "Открыть меню",
     "menu_close": "Закрыть меню",
-    "mobile_nav": "Мобильная навигация",
-    "drop_work_label": "избранное",
-    "drop_writing_label": "последние",
-    "drop_all_work": "Все работы",
-    "drop_all_posts": "Все посты"
+    "mobile_nav": "Мобильная навигация"
   },
 
   "search": {
@@ -98,7 +92,6 @@
     "seo_description": "Статьи о сайтах и интерфейсах: почему знакомый дизайн вызывает доверие, что посетитель считывает раньше текста, сколько миллисекунд нужно анимации.",
     "see_all": "Все статьи →",
     "read": "Читать статью",
-    "min": "{n} мин",
     "min_read": "{n} мин чтения",
     "count_one": "{n} запись",
     "count_few": "{n} записи",
@@ -131,7 +124,6 @@
     "count_few": "{n} работы",
     "count_many": "{n} работ",
     "view_project": "Открыть проект",
-    "back": "Работы",
     "prev_project": "Предыдущий",
     "next_project": "Следующий"
   },
@@ -141,8 +133,7 @@
       "prompt": "Было полезно?",
       "voted": "Голос учтён · спасибо",
       "upvote": "За",
-      "downvote": "Против",
-      "meter": "Рейтинг поста: {pct}% положительных"
+      "downvote": "Против"
     },
     "comments": {
       "count_one": "{n} комментарий",
@@ -236,8 +227,6 @@
 
   "footer": {
     "copyright": "© 2026 Данил Климов",
-    "privacy": "Конфиденциальность",
-    "hint": "листайте ещё ↓",
     "tagline": "Страница кончилась, сайт остался. Шрифты, сборка, код и референсы.",
     "credits": [
       {
@@ -284,22 +273,5 @@
   "personal_data": {
     "title": "Согласие на обработку персональных данных",
     "description": "Согласие на обработку персональных данных для комментариев и формы обратной связи на lyoraeth.art."
-  },
-
-  "curtain": {
-    "closing": "Раз вы здесь — давайте {acc}",
-    "closing_acc": "знакомиться.",
-    "type_label": "Шрифты",
-    "type_value": "Golos Text · Onest · JetBrains Mono",
-    "built_label": "Собрано",
-    "built_value": "Nuxt · Vue · TypeScript",
-    "cms_label": "CMS",
-    "cms_value": "Sanity",
-    "trackers_label": "Аналитика",
-    "trackers_value": "Umami — без куков",
-    "lang_label": "Язык",
-    "lang_value": "EN · RU",
-    "feed_label": "Фид",
-    "feed_hint": "Подписаться в RSS-читалке"
   }
 }
