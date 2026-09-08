@@ -28,12 +28,12 @@ export default defineEventHandler(async (event) => {
 
   const lines: string[] = []
 
-  lines.push('# lyoraeth.art — Full content index')
+  lines.push('# lyoraeth.art — full content index')
   lines.push('')
-  lines.push('> Personal portfolio of Danil Klimov — Frontend Developer specializing in Vue, TypeScript, and animation.')
-  lines.push('> Available for remote projects from July 2026.')
+  lines.push('> Personal site of Danil Klimov. Frontend developer and writer on how websites work. Interfaces, animation, legacy. Vue, TypeScript, Nuxt. Saint Petersburg, on-site or remote.')
+  lines.push('> Everything below is the English version; the site also runs in Russian under /ru/.')
   lines.push('')
-  lines.push(`> Site: ${BASE}  |  Contact: ${BASE}/#contact  |  Telegram: @lyoraeth`)
+  lines.push(`> Site: ${BASE}  |  Contact: ${BASE}/#contact  |  Telegram: @lyoraeth_art`)
   lines.push('')
 
   // ── Work ──────────────────────────────────────────────────────────────────
@@ -68,6 +68,7 @@ export default defineEventHandler(async (event) => {
       lines.push(`### ${post.title?.en ?? 'Untitled'}`)
       if (post.publishedAt) lines.push(`Published: ${new Date(post.publishedAt).toISOString().slice(0, 10)}`)
       if (post.readingTime) lines.push(`Reading time: ${post.readingTime} min`)
+      if (post.topic?.en) lines.push(`Topic: ${post.topic.en}`)
       if (post.tags?.length) lines.push(`Tags: ${post.tags.join(', ')}`)
       lines.push(`URL: ${BASE}/writing/${post.slug}`)
       lines.push('')

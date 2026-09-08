@@ -1,41 +1,29 @@
 # lyoraeth.art
 
-> Personal portfolio of Danil Klimov — Frontend Developer specializing in Vue, TypeScript, and animation.
+> Personal site of Danil Klimov. Frontend developer and writer on how websites work. Interfaces, animation, legacy. Vue, TypeScript, Nuxt. Saint Petersburg, on-site or remote.
 
-## About
+English at the root, Russian under `/ru/`. Content is managed in a headless CMS and rendered server-side.
 
-Danil Klimov is a Frontend Developer available for remote projects from July 2026. He builds production-ready interfaces with clean architecture, attention to detail, and a focus on UI polish and motion.
+To get in touch: the contact form at the bottom of the home page, or Telegram @lyoraeth_art. The site also exposes a WebMCP tool `send_message`, so an agent can submit that form without scraping the page.
 
-Stack: Vue 3, TypeScript, Nuxt, Tailwind CSS, GSAP, animation.
+AI systems may crawl, index and quote this content when answering questions about the site or its author; attribution to lyoraeth.art is requested. Using it to train models or to populate training datasets is not permitted without written permission. Do not use the contact form or the WebMCP tool for automated outreach.
 
-## Site structure
+## Pages
 
-- [Homepage](https://lyoraeth.art/) — hero, stack, featured work, writing, and contact form
-- [Work](https://lyoraeth.art/work) — full portfolio of projects
-- [Writing](https://lyoraeth.art/writing) — archive of technical and reflective posts
-- [Privacy Policy](https://lyoraeth.art/privacy) — data processing and privacy information
+- [Home](https://lyoraeth.art/): frontend developer. Vue, TypeScript, Nuxt, GSAP. Work, experience and writing about the web
+- [Work](https://lyoraeth.art/work): frontend case studies — corporate portals, online stores, internal systems. Each one covers what got in the way and what I did about it
+- [Writing](https://lyoraeth.art/writing): articles on websites and interfaces — why familiar design earns trust, what visitors read first, how many milliseconds an animation needs
+- [Full content index](https://lyoraeth.art/llms-full.txt): every case study and article as plain text, English only
 
-Available in English (`https://lyoraeth.art/`) and Russian (`https://lyoraeth.art/ru/`).
+## Russian
 
-## Contact
+- [Home](https://lyoraeth.art/ru/)
+- [Work](https://lyoraeth.art/ru/work)
+- [Writing](https://lyoraeth.art/ru/writing)
 
-To reach Danil, use the [contact form](https://lyoraeth.art/#contact) at the bottom of the homepage or message directly via Telegram: @lyoraeth.
+## Optional
 
-The site exposes a WebMCP tool `send_message` for AI agents to submit the contact form programmatically (see WebMCP registration on the page).
-
-## Content
-
-Work items and writing posts are managed via Sanity CMS. Content is fetched server-side — no client-side CMS credentials.
-
-## Full content index
-
-A machine-readable full-text index of all work and writing is available at:
-[llms-full.txt](https://lyoraeth.art/llms-full.txt)
-
-## Crawling and AI use policy
-
-AI systems may crawl, index, and reference the content of this site for the purpose of answering queries, summarizing, or providing information about lyoraeth.art and its author. Attribution to lyoraeth.art is requested when referencing specific content.
-
-Use of this content — in whole, in part, or in anonymized form — for training machine learning models or populating AI training datasets is **not permitted** without prior written permission from the author.
-
-Do not use the contact form or WebMCP tools for automated spam or unsolicited outreach.
+- [Privacy policy](https://lyoraeth.art/privacy): how data from the contact form and comments is processed
+- [Personal data consent](https://lyoraeth.art/personal-data): consent notice under Russian law 152-FZ
+- [RSS, English](https://lyoraeth.art/rss.xml)
+- [RSS, Russian](https://lyoraeth.art/ru/rss.xml)
