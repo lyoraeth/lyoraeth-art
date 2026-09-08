@@ -16,7 +16,8 @@ export function useArticleSeo(opts: {
 
   /* Cover, if present, gets a bounded jpeg. With no cover we fall back to a
      branded 1200×630 image generated on the fly (server/routes/og), localized
-     via ?l — so link previews are always on-brand, never the bare og-image.png. */
+     via ?l — so link previews are always on-brand, never the generic homepage
+     card (/og/home). */
   const generated = computed(() => !opts.coverUrl())
   const ogImage = computed(() =>
     opts.coverUrl()

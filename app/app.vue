@@ -12,9 +12,9 @@ useSeoMeta({
   ogTitle: () => t('seo.og_title'),
   ogDescription: () => t('seo.og_description'),
   ogType: 'website',
-  ogImage: 'https://lyoraeth.art/og-image.png',
+  ogImage: 'https://lyoraeth.art/og/home',
   twitterCard: 'summary_large_image',
-  twitterImage: 'https://lyoraeth.art/og-image.png',
+  twitterImage: 'https://lyoraeth.art/og/home',
 })
 
 useHead({
@@ -37,7 +37,7 @@ useHead({
         url: 'https://lyoraeth.art',
         jobTitle: 'Frontend Developer',
         description: 'Frontend Developer specializing in Vue, TypeScript, and animation. Remote.',
-        image: 'https://lyoraeth.art/og-image.png',
+        image: 'https://lyoraeth.art/og/home',
         email: 'lyoraeth@gmail.com',
         sameAs: [
           'https://github.com/lyoraeth',
