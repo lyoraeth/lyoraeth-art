@@ -50,16 +50,10 @@ useHead({
       ...(post.value?.coverUrl && { image: ogImage.value }),
       url: pageUrl.value,
       mainEntityOfPage: pageUrl.value,
-      author: {
-        '@type': 'Person',
-        name: 'Danil Klimov',
-        url: 'https://lyoraeth.art',
-      },
-      publisher: {
-        '@type': 'Person',
-        name: 'Danil Klimov',
-        url: 'https://lyoraeth.art',
-      },
+      // Both reference the one Person node app.vue defines, rather than
+      // repeating a copy of it here.
+      author:    { '@id': 'https://lyoraeth.art/#person' },
+      publisher: { '@id': 'https://lyoraeth.art/#person' },
     })),
   }, {
     type: 'application/ld+json',

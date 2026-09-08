@@ -45,11 +45,9 @@ useHead({
       description: metaDescription.value,
       url: pageUrl.value,
       ...(item.value?.coverUrl && { image: ogImage.value }),
-      author: {
-        '@type': 'Person',
-        name: 'Danil Klimov',
-        url: 'https://lyoraeth.art',
-      },
+      // References the one Person node app.vue defines, rather than
+      // repeating a copy of it here.
+      author: { '@id': 'https://lyoraeth.art/#person' },
     })),
   }, {
     type: 'application/ld+json',

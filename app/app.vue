@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { t } = useI18n()
+const { t, tm, rt } = useI18n()
 
 // lang/dir on <html>, canonical, hreflang alternates (+ x-default),
 // og:url and og:locale (+ alternates) — all derived from the i18n routing
@@ -29,22 +29,34 @@ useHead({
   script: [
     {
       type: 'application/ld+json',
-      innerHTML: JSON.stringify({
+      // The one Person node for the whole site — every page's own JSON-LD
+      // (BlogPosting/CreativeWork author, publisher) references it by @id
+      // instead of repeating a copy, so this is the only place the fields
+      // that vary by locale (name/jobTitle/description/language names) are
+      // written out.
+      innerHTML: computed(() => JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Person',
-        name: 'Danil Klimov',
+        '@id': 'https://lyoraeth.art/#person',
+        name: t('schema.name'),
         alternateName: 'lyoraeth',
-        url: 'https://lyoraeth.art',
-        jobTitle: 'Frontend Developer',
-        description: 'Frontend Developer specializing in Vue, TypeScript, and animation. Remote.',
-        image: 'https://lyoraeth.art/og/home',
-        email: 'lyoraeth@gmail.com',
+        url: 'https://lyoraeth.art/',
+        jobTitle: t('schema.job_title'),
+        description: t('schema.description'),
+        image: 'https://lyoraeth.art/face/face-1200.jpg',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: t('schema.address_locality'),
+          addressCountry: 'RU',
+        },
+        knowsLanguage: (tm('schema.knows_language') as unknown[])
+          .map((name: any) => ({ '@type': 'Language', name: rt(name) })),
         sameAs: [
           'https://github.com/lyoraeth',
-          'https://t.me/lyoraeth',
+          'https://t.me/lyoraeth_art',
         ],
-        knowsAbout: ['Vue', 'TypeScript', 'Nuxt', 'Frontend Development', 'Web Animation', 'UI Development'],
-      }),
+        knowsAbout: (tm('schema.knows_about') as unknown[]).map((item: any) => rt(item)),
+      })),
     },
   ],
 })

@@ -22,7 +22,7 @@ useHead({
       '@type': 'Blog',
       name: `${t('writing.title')} — lyoraeth`,
       url: `https://lyoraeth.art${locale.value === 'ru' ? '/ru' : ''}/writing`,
-      inLanguage: locale.value,
+      inLanguage: locale.value === 'ru' ? 'ru-RU' : 'en-US',
     })),
   }],
 })

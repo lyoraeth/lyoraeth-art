@@ -95,7 +95,7 @@
 
   "writing": {
     "title": "Writing",
-    "seo_description": "Notes on frontend, design systems and shipping real products — by Danil Klimov.",
+    "seo_description": "Articles on websites and interfaces: why familiar design earns trust, what visitors read first, how many milliseconds an animation needs.",
     "see_all": "All posts →",
     "read": "Read the post",
     "min": "{n} min",
@@ -124,7 +124,7 @@
 
   "work": {
     "title": "Work",
-    "seo_description": "Selected frontend projects by Danil Klimov — Vue, TypeScript, animation.",
+    "seo_description": "Frontend case studies: corporate portals, online stores, internal systems. Each one covers what got in the way and what I did about it.",
     "see_all": "All work →",
     "view_case": "Open the case",
     "count_one": "{n} project",
@@ -209,10 +209,29 @@
   },
 
   "seo": {
-    "title": "Danil Klimov — Frontend",
-    "description": "Frontend Developer. I take a task and get it done. Vue, TypeScript, animation. Remote.",
-    "og_title": "Danil Klimov — Frontend",
-    "og_description": "I take a task and get it done. Vue · TypeScript · animation."
+    "title": "Danil Klimov — Frontend Developer",
+    "description": "Frontend developer. Vue, TypeScript, Nuxt, GSAP. Work, experience and writing about the web. Saint Petersburg, on-site or remote.",
+    "og_title": "Danil Klimov — Frontend Developer",
+    "og_description": "Frontend developer. Work, experience and writing about the web."
+  },
+
+  "schema": {
+    "name": "Danil Klimov",
+    "job_title": "Frontend Developer",
+    "description": "Frontend developer and writer on how websites work. Interfaces, animation, legacy. Vue, TypeScript, Nuxt.",
+    "address_locality": "Saint Petersburg",
+    "knows_about": [
+      "GSAP",
+      "Web animation",
+      "Frontend performance",
+      "Design systems",
+      "Legacy refactoring",
+      "Server-side rendering"
+    ],
+    "knows_language": [
+      "Russian — native",
+      "English — B2"
+    ]
   },
 
   "footer": {
