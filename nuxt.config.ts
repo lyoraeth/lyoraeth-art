@@ -31,6 +31,14 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'en' },
       link: [
+        // SVG favicons, picked by the browser chrome's own colour scheme —
+        // not the site's (it has none, it's light-only). A dark-ink mark on
+        // a dark tab strip, or the reverse, disappears. Browsers without
+        // media-query favicon support fall through to the static ones below,
+        // which stay on the dark-ink mark — the safer default against the
+        // still-common light browser chrome.
+        { rel: "icon", type: "image/svg+xml", href: "/favicon-light.svg", media: "(prefers-color-scheme: light)" },
+        { rel: "icon", type: "image/svg+xml", href: "/favicon-dark.svg", media: "(prefers-color-scheme: dark)" },
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
         { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
         { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16.png" },
@@ -70,7 +78,9 @@ export default defineNuxtConfig({
     // Portrait variants: cached long, but not immutable — the file names carry
     // no hash, so a new photo has to be able to replace them.
     '/face/**':        { headers: { 'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' } },
-    '/logo.svg':       { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/logo.svg':         { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/favicon-light.svg': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
+    '/favicon-dark.svg':  { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon.ico':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon-32.png': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon-16.png': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
