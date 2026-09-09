@@ -4,11 +4,11 @@ import { ogDecorPng } from './ogDecor'
 
 /**
  * Shared satori template for the light-theme OG cards — used by the dynamic
- * `/og/[type]/[slug]` route (post/case cards) and by the one-off script that
- * bakes the static homepage card (`scripts/generate-og-home.mjs`).
+ * `/og/[type]/[slug]` route (post/case cards) and by `/og/home` (the fixed
+ * homepage card).
  *
  * One font (PP Pangram Sans Semibold, the only weight the cards use) covers
- * both scripts — no separate Latin/Cyrillic subsets needed here, unlike the
+ * both routes — no separate Latin/Cyrillic subsets needed here, unlike the
  * old dark template's Onest setup.
  */
 export const OG_FONTS = [

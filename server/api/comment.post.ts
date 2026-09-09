@@ -18,6 +18,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'All fields are required' })
   }
 
+  // Same reasoning as /api/contact and /api/mcp/send: nothing legitimate
+  // needs more, and an unbounded body is a free way to fill Sanity and the
+  // notification mailbox both — this endpoint had no cap at all before.
+  if (nick.length > 50 || message.length > 3000) {
+    throw createError({ statusCode: 413, message: 'Comment too long' })
+  }
+
   // ── Verify Turnstile ───────────────────────────────────────────────────────
   const valid = await verifyTurnstileToken(token, event)
   if (!valid.success) throw createError({ statusCode: 400, message: 'Captcha failed — please try again' })

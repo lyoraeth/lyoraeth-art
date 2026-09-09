@@ -66,5 +66,8 @@ export default defineEventHandler(async (event) => {
   ].join('\n')
 
   setHeader(event, 'Content-Type', 'application/xml')
+  // Same duration as rss.xml/llms-full.txt — crawler traffic, not user-
+  // facing, and this was hitting Sanity fresh on every single request.
+  setHeader(event, 'Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
   return xml
 })

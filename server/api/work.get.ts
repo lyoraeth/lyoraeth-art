@@ -25,7 +25,7 @@ export default defineCachedEventHandler(async (event) => {
       "coverAlt": cover.alt
     }
   `)
-}, { maxAge: 60 * 5, name: 'work-list', getKey: (event) => getQuery(event).limit ?? '3' })
+}, { maxAge: 60 * 5, name: 'work-list', getKey: (event) => String(getQuery(event).limit ?? '3') })
 
 export interface WorkItem {
   _id:         string
@@ -41,6 +41,10 @@ export interface WorkItem {
   year?:       number
   coverUrl:    string | null
   coverAlt:    string | null
-  coverWidth:  number | null
-  coverHeight: number | null
+  // Not selected by this endpoint's own GROQ projection (the listing has no
+  // use for them) — only work/[slug].get.ts's WorkDetail actually populates
+  // these; optional here so the type doesn't promise what the list query
+  // doesn't deliver.
+  coverWidth?:  number | null
+  coverHeight?: number | null
 }

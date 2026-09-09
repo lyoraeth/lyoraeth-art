@@ -18,7 +18,15 @@ useSeoMeta({
 })
 
 useHead({
-  htmlAttrs: () => i18nHead.value.htmlAttrs,
+  // @nuxtjs/i18n types htmlAttrs as a plain Record<string, string>
+  // (MetaAttrs), missing several of the templated index signatures
+  // (data-*, xmlns:*, ...) unhead's own HtmlAttr declares — a genuine type
+  // mismatch between the two packages, not anything wrong at the call site;
+  // the values themselves (lang/dir) are exactly what useHead expects at
+  // runtime, so a narrow escape hatch here beats reconstructing unhead's
+  // full attribute type by hand.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  htmlAttrs: (() => i18nHead.value.htmlAttrs) as any,
   meta: () => i18nHead.value.meta,
   link: () => [
     ...i18nHead.value.link,
