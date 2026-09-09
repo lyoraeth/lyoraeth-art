@@ -454,7 +454,8 @@ onMounted(() => {
   }
 
   .lightbox-leave-active {
-    transition: opacity var(--duration-panel-out) var(--ease-out);
+    /* ease-in, not ease-out: it's actually leaving, see design-system.css */
+    transition: opacity var(--duration-panel-out) var(--ease-in);
   }
 
   .lightbox-enter-from,

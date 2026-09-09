@@ -17,15 +17,17 @@
   /* ── Base ────────────────────────────────────────────────────────────────── */
   html, body { overscroll-behavior: none; }
 
-  /* Entry runs the full --duration-page — it's the one that has to be
-     noticed. Exit uses --duration-exit instead, the shorter half of the
-     same pair: an outgoing page doesn't need watching. */
+  /* Entry runs the full --duration-page on --ease-out — it's the one that
+     has to be noticed. Exit uses --duration-exit (the shorter half of the
+     same pair) and --ease-in instead: an outgoing page doesn't need
+     watching, and ease-out's own coast-to-a-stop tail would read as it
+     hesitating right before it's gone. */
   .page-enter-active {
     transition: opacity var(--duration-page) var(--ease-out), transform var(--duration-page) var(--ease-out);
   }
 
   .page-leave-active {
-    transition: opacity var(--duration-exit) var(--ease-out), transform var(--duration-exit) var(--ease-out);
+    transition: opacity var(--duration-exit) var(--ease-in), transform var(--duration-exit) var(--ease-in);
   }
 
   .page-enter-from,

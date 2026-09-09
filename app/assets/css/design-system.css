@@ -173,12 +173,18 @@
 
   /* ── Motion ──────────────────────────────────────────────────────────
      Tuned against блог/для-cms/how-many-milliseconds-does-your-ui-actually-
-     need.md — one curve for every transition site-wide (ease-in has no
-     place in an interface: a slow start reads as lag exactly where the eye
-     expects confirmation), and, wherever entry and exit get separate
-     tokens, the exit runs 25–50ms shorter — nothing needs to be noticed on
-     its way out. */
-  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+     need.md. --ease-out is the default for everything — a slow start reads
+     as lag exactly where the eye expects confirmation. --ease-in is the
+     one deliberate exception: an element actually leaving (unmounting, not
+     just reverting a hover state — see --ease-out's own row for that)
+     benefits from the opposite shape, since ease-out's coast-to-a-stop tail
+     reads as the element hesitating right before it should be gone.
+     --ease-in is --ease-out's exact point-reflection, not a separate pick,
+     so the pair still feels like one language rather than two.
+     Wherever entry and exit get separate duration tokens, the exit also
+     runs 25–50ms shorter — nothing needs to be noticed on its way out. */
+  --ease-out: cubic-bezier(0.28, 1, 0.63, 1);
+  --ease-in:  cubic-bezier(0.37, 0, 0.72, 0);
 
   /* Hover/press — the article's own quick-pair recipe: a response to a
      click has to outrun the response to a pointer, or the control feels
@@ -189,7 +195,8 @@
   /* The card fill (PostCard/WorkCard) — a radial wipe crossing the whole
      card, not a plain property tween, so it gets more room than a hover
      color change without drifting into "large transition" territory. */
-  --duration-sweep: 300ms;
+  /* НЕ СПРАШИВАЙТЕ МЕНЯ ПОЧЕМУ ТУТ 620, Я САМ НЕ ЗНАЮ, ОНО ПРОСТО ТАК ОЩУЩАЕТСЯ НОРМАЛЬНО, БОЛЬШЕ - СМАЗАНО, МЕНЬШЕ - РЕЗКО. */
+  --duration-sweep: 620ms;
 
   /* Lightbox (modals/panels): article range is 200–300ms in, 150–250 out. */
   --duration-panel-in: 240ms;
@@ -202,7 +209,7 @@
   --duration-exit: 180ms;
 
   /* Scroll reveal on landing-style listings: article range is 400–600ms. */
-  --duration-reveal: 500ms;
+  --duration-reveal: 450ms;
 
   --duration-menu: 120ms;       /* full-viewport panel, where hover timing drags */
 
