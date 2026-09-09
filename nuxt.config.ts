@@ -60,8 +60,6 @@ export default defineNuxtConfig({
       ],
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
-        { name: "theme-color", content: "#0A0C10" },
-        { name: "color-scheme", content: "dark" },
       ],
     },
   },
@@ -78,7 +76,6 @@ export default defineNuxtConfig({
     // Portrait variants: cached long, but not immutable — the file names carry
     // no hash, so a new photo has to be able to replace them.
     '/face/**':        { headers: { 'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' } },
-    '/logo.svg':         { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon-light.svg': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon-dark.svg':  { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon.ico':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
@@ -121,21 +118,11 @@ export default defineNuxtConfig({
     { path: '~/components/sections', pathPrefix: false },
   ],
 
-  modules: ["@nuxtjs/google-fonts", "@nuxtjs/i18n", "@nuxtjs/turnstile"],
+  modules: ["@nuxtjs/i18n", "@nuxtjs/turnstile"],
 
   turnstile: {
     siteKey:   process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA',
     secretKey: process.env.NUXT_TURNSTILE_SECRET_KEY_CONTACT ?? '',
-  },
-
-  googleFonts: {
-    families: {
-      'Golos Text': [400, 600, 700],
-      'Onest': [400, 500, 700],
-      'JetBrains Mono': [500],
-    },
-    download: true,
-    display: 'swap',
   },
 
   i18n: {

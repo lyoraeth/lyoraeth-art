@@ -1,10 +1,6 @@
 <script setup lang="ts">
 /**
  * Footer of the light shell: closing line, colophon, and the legal bar.
- *
- * @remarks
- * Named apart from SiteFooter, which still serves the dark shell until the
- * inner pages move over.
  */
 const { t, tm, rt, locale } = useI18n()
 const localePath = useLocalePath()
