@@ -267,7 +267,14 @@ test.describe('footer', () => {
     await expect(footer.locator('a[href*="privacy"]')).toBeVisible()
   })
 
-  test('sits at the bottom even when the page is short', async ({ page }) => {
+  // main's flex-grow fills whatever room is left under a short page, so the
+  // footer never strands above the fold with visible empty space beneath it
+  // — that's the actual invariant. It doesn't mean the footer's bottom edge
+  // lands exactly on the viewport's: the footer has grown taller than a
+  // typical viewport on its own (this many credit rows), so on a short
+  // enough viewport it already overflows before main contributes anything,
+  // which is correct — there was never a gap to fill in the first place.
+  test('never strands above the fold — no gap between it and the viewport bottom on a short page', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('load')
 
@@ -279,7 +286,7 @@ test.describe('footer', () => {
       main.innerHTML = kept
       return Math.round(window.innerHeight - bottom)
     })
-    expect(gap).toBe(0)
+    expect(gap).toBeLessThanOrEqual(0)
   })
 })
 
@@ -304,6 +311,62 @@ test.describe('phone menu', () => {
     await expect(menu).toBeHidden()
     await expect(page.locator('main')).not.toHaveAttribute('inert', '')
     await expect(burger).toBeFocused()
+  })
+
+  // Regression: the mobile search toggle sits in the header bar, above where
+  // the menu panel covers — it stayed tappable while the menu was open, and
+  // opening it from there didn't close the menu (only the other direction,
+  // menu-closes-search, was wired).
+  test('opening the search toggle closes an already-open menu', async ({ page }) => {
+    await page.goto('/')
+    await ready(page)
+
+    const menu = page.locator('#mobile-menu')
+    const burger = page.locator('header button[aria-controls="mobile-menu"]')
+    const searchToggle = page.locator('button[aria-controls="mobile-search-input"]')
+
+    await burger.click()
+    await expect(menu).toBeVisible()
+
+    await searchToggle.click()
+    await expect(menu).toBeHidden()
+    await expect(page.locator('#mobile-search-input')).toBeVisible()
+  })
+})
+
+test.describe('mobile search toggle', () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+
+  // Regression: closing on an outside click or Escape used to be skipped
+  // entirely whenever the field held text — the intent ("never discard
+  // typed text") was implemented by refusing to close at all, leaving no
+  // way to dismiss the panel once something had been typed into it.
+  test('closes on outside click or Escape without discarding a typed query', async ({ page }) => {
+    await page.goto('/')
+    await ready(page)
+
+    // .search-toggle carries data-open — the field itself never leaves the
+    // DOM (it's animated via opacity/tabindex, not v-if), so that attribute
+    // is the reliable open/closed signal, not the input's own visibility.
+    const field = page.locator('.search-toggle')
+    const toggle = page.locator('button[aria-controls="mobile-search-input"]')
+    const input = page.locator('#mobile-search-input')
+
+    await toggle.click()
+    await expect(field).toHaveAttribute('data-open', 'true')
+    await input.fill('design')
+    await page.locator('body').click({ position: { x: 5, y: 5 } })
+    await expect(field).not.toHaveAttribute('data-open', 'true')
+
+    await toggle.click()
+    await expect(input).toHaveValue('design')
+
+    await page.keyboard.press('Escape')
+    await expect(field).not.toHaveAttribute('data-open', 'true')
+    await expect(toggle).toBeFocused()
+
+    await toggle.click()
+    await expect(input).toHaveValue('design')
   })
 })
 

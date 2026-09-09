@@ -34,14 +34,16 @@ function submit() {
   if (first) navigateTo(first.href)
 }
 
-// a click outside collapses it, but never discards typed text
+// A click outside collapses it, but never discards typed text — closing
+// only clears `open`, the field (and its v-model) stays in the DOM either
+// way, so the query is still there next time it unrolls.
 function onDocumentClick(event: MouseEvent) {
-  if (!open.value || query.value) return
+  if (!open.value) return
   if (!root.value?.contains(event.target as Node)) open.value = false
 }
 
 function onKeydown(event: KeyboardEvent) {
-  if (event.key !== 'Escape' || query.value) return
+  if (event.key !== 'Escape') return
   open.value = false
   root.value?.querySelector('button')?.focus()
 }

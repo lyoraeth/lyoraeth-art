@@ -62,6 +62,14 @@ function toggleMenu() {
   if (menuOpen.value) searchOpen.value = false
 }
 
+// The reverse direction: the mobile search toggle sits in the header bar,
+// above where the menu panel covers, so it stays tappable while the menu is
+// open — opening it from there has to close the menu itself, not just rely
+// on toggleMenu()'s side of the exclusion.
+watch(searchOpen, (open) => {
+  if (open) menuOpen.value = false
+})
+
 // Escape closes from anywhere, and focus returns to the burger
 function onKeydown(event: KeyboardEvent) {
   if (event.key !== 'Escape') return
