@@ -21,13 +21,17 @@ import { vi } from 'vitest'
 // do get reordered; it can't itself be exported from a file that also calls
 // vi.mock(), which is a separate, unrelated limitation.)
 export const nuxtMocks = {
-  locale:     { value: 'en' as 'en' | 'ru' },
-  route:      { path: '/', params: {} as Record<string, string> },
-  state:      new Map<string, { value: unknown }>(),
-  navigateTo: vi.fn(),
-  open:       vi.fn(),
-  seoMeta:    vi.fn(),
-  fetch:      vi.fn(),
+  locale:        { value: 'en' as 'en' | 'ru' },
+  route:         { path: '/', params: {} as Record<string, string> },
+  state:         new Map<string, { value: unknown }>(),
+  navigateTo:    vi.fn(),
+  open:          vi.fn(),
+  seoMeta:       vi.fn(),
+  fetch:         vi.fn(),
+  routerReplace: vi.fn(),
+  /** What useFetch() resolves `data` to — set per-test before calling the
+   *  composable under test. */
+  fetchData:     { value: undefined as unknown },
 }
 
 /** Resets everything between tests — call from `beforeEach`. */
@@ -40,6 +44,8 @@ export function resetNuxtMocks() {
   nuxtMocks.open.mockClear()
   nuxtMocks.seoMeta.mockClear()
   nuxtMocks.fetch.mockReset()
+  nuxtMocks.routerReplace.mockClear()
+  nuxtMocks.fetchData.value = undefined
 }
 
 vi.mock('vue-i18n', () => ({
@@ -53,7 +59,7 @@ vi.mock('vue-i18n', () => ({
 
 vi.mock('#app/composables/router', () => ({
   useRoute:   () => nuxtMocks.route,
-  useRouter:  () => ({ replace: vi.fn() }),
+  useRouter:  () => ({ replace: nuxtMocks.routerReplace }),
   navigateTo: nuxtMocks.navigateTo,
 }))
 
@@ -67,6 +73,13 @@ vi.mock('#app/composables/state', () => ({
 vi.mock('#app/composables/head', () => ({
   useSeoMeta: nuxtMocks.seoMeta,
   useHead:    vi.fn(),
+}))
+
+vi.mock('#app/composables/fetch', () => ({
+  // Real useFetch is itself awaitable (resolves once the request settles);
+  // this mock is already "resolved" by the time a test calls the composable
+  // under test, which is enough for an `await useFetch(...)` call site.
+  useFetch: () => ({ data: nuxtMocks.fetchData }),
 }))
 
 /** `useLocalePath()` stand-in — mirrors `strategy: 'prefix_except_default'`
