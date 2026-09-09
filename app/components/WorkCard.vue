@@ -133,7 +133,7 @@ function onPointerEnter(event: PointerEvent) {
     border-radius: calc(infinity * 1px);
     outline: 1px solid var(--color-border-raised);
     color: var(--color-text-secondary);
-    transition: color var(--duration-hover) var(--ease-out), outline-color var(--duration-hover) var(--ease-out);
+    transition: color var(--duration-ambient) var(--ease-out), outline-color var(--duration-ambient) var(--ease-out);
   }
 
   .work-card__tags-text {
@@ -145,7 +145,7 @@ function onPointerEnter(event: PointerEvent) {
 
   .work-card__date {
     color: var(--color-text-secondary);
-    transition: color var(--duration-hover) var(--ease-out);
+    transition: color var(--duration-ambient) var(--ease-out);
   }
 
   .work-card__title {

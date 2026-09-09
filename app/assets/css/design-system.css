@@ -192,6 +192,11 @@
   --duration-hover: 180ms;
   --duration-press: 90ms;
 
+  /* Card header metadata (date, topic, tags, their outline) — riding along
+     with the card's own hover, not something pressed or pointed at in its
+     own right, so it doesn't need --duration-hover's snappy confirmation. */
+  --duration-ambient: 220ms;
+
   /* The card fill (PostCard/WorkCard) — a radial wipe crossing the whole
      card, not a plain property tween, so it gets more room than a hover
      color change without drifting into "large transition" territory. */

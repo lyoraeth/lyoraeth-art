@@ -96,7 +96,7 @@ function onPointerEnter(event: PointerEvent) {
     justify-content: space-between;
     width: 100%;
     color: var(--color-text-secondary);
-    transition: color var(--duration-hover) var(--ease-out);
+    transition: color var(--duration-ambient) var(--ease-out);
   }
 
   .post-card__title {
