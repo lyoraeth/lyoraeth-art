@@ -94,7 +94,7 @@ const feedUrl = computed(() => (locale.value === 'ru' ? '/ru/rss.xml' : '/rss.xm
 
   .footer-link {
     color: var(--color-accent-strong);
-    transition: color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
 
     &:hover { color: var(--color-accent-strong-hover); }
     &:active {

@@ -119,9 +119,9 @@ async function vote(dir: 'up' | 'down') {
     outline: 1px solid var(--color-border-default);
     color: var(--color-text-secondary);
     cursor: pointer;
-    transition: color var(--duration-hover) var(--ease-base),
-                outline-color var(--duration-hover) var(--ease-base),
-                background-color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out),
+                outline-color var(--duration-hover) var(--ease-out),
+                background-color var(--duration-hover) var(--ease-out);
   }
 
   .vote-btn svg {
@@ -163,7 +163,7 @@ async function vote(dir: 'up' | 'down') {
     font-weight: 600;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
-    transition: color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
   .rating-total.positive { color: var(--color-accent-strong); }
   .rating-total.negative { color: oklch(58% 0.15 270); }

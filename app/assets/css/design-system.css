@@ -172,26 +172,41 @@
   --spacing: 0.25rem;
 
   /* ── Motion ──────────────────────────────────────────────────────────
-     A first pass, tuned once the sections are in place. Two rules stay through
-     the tuning: an exit is 25–50ms shorter than its entry, and everything eases
-     out — hence no ease-in token. */
-  --ease-base: cubic-bezier(0.35, 0.05, 0.35, 0.95);
+     Tuned against блог/для-cms/how-many-milliseconds-does-your-ui-actually-
+     need.md — one curve for every transition site-wide (ease-in has no
+     place in an interface: a slow start reads as lag exactly where the eye
+     expects confirmation), and, wherever entry and exit get separate
+     tokens, the exit runs 25–50ms shorter — nothing needs to be noticed on
+     its way out. */
   --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
 
+  /* Hover/press — the article's own quick-pair recipe: a response to a
+     click has to outrun the response to a pointer, or the control feels
+     stuck. */
   --duration-hover: 180ms;
   --duration-press: 90ms;
-  --duration-exit: 140ms;
-  --duration-dropdown: 200ms;
-  --delay-dropdown: 300ms;      /* filters accidental hovers */
+
+  /* The card fill (PostCard/WorkCard) — a radial wipe crossing the whole
+     card, not a plain property tween, so it gets more room than a hover
+     color change without drifting into "large transition" territory. */
+  --duration-sweep: 300ms;
+
+  /* Lightbox (modals/panels): article range is 200–300ms in, 150–250 out. */
   --duration-panel-in: 240ms;
   --duration-panel-out: 180ms;
+
+  /* Page transition: article range is 200–250ms desktop, 300–400 mobile —
+     see the (pointer: coarse) override below. --duration-exit is this
+     token's own exit half (an outgoing page doesn't need to be watched). */
   --duration-page: 220ms;
-  --duration-page-touch: 350ms;
+  --duration-exit: 180ms;
+
+  /* Scroll reveal on landing-style listings: article range is 400–600ms. */
   --duration-reveal: 500ms;
-  --delay-remote: 80ms;         /* feedback landing away from the cursor */
+
   --duration-menu: 120ms;       /* full-viewport panel, where hover timing drags */
 
-  --default-transition-timing-function: var(--ease-base);
+  --default-transition-timing-function: var(--ease-out);
   --default-transition-duration: var(--duration-hover);
 }
 
@@ -238,6 +253,17 @@
 @media (width < 64rem) {
   :root {
     --text-nav: 2.875rem;
+  }
+}
+
+/* Same pattern for the page transition: the article's mobile range (300–
+   400ms) is slower than desktop's (200–250) — a touch device is the more
+   reliable signal for "mobile" here than viewport width, since a wide
+   tablet in touch mode should still get the slower, easier-to-track value. */
+@media (pointer: coarse) {
+  :root {
+    --duration-page: 350ms;
+    --duration-exit: 310ms;   /* keeps the same ~40ms gap under --duration-page */
   }
 }
 
@@ -424,7 +450,7 @@
  */
 @utility interactive {
   transition-property: color, background-color, border-color, outline-color, box-shadow, opacity, transform;
-  transition-timing-function: var(--ease-base);
+  transition-timing-function: var(--ease-out);
   transition-duration: var(--duration-hover);
 
   &:active {
@@ -442,8 +468,8 @@
   border-radius: calc(infinity * 1px);
   font-size: var(--text-nav);
   color: var(--color-text-primary);
-  transition: background-color var(--duration-hover) var(--ease-base),
-              color var(--duration-hover) var(--ease-base);
+  transition: background-color var(--duration-hover) var(--ease-out),
+              color var(--duration-hover) var(--ease-out);
 
   &:hover { background-color: var(--color-surface-hover); }
   &:active {
@@ -462,7 +488,7 @@
   gap: calc(var(--spacing) * 1.5);
   color: var(--color-text-secondary);
   font-size: var(--text-ui);
-  transition: color var(--duration-hover) var(--ease-base);
+  transition: color var(--duration-hover) var(--ease-out);
 
   &:hover { color: var(--color-text-primary); }
 
@@ -483,8 +509,8 @@
   border-radius: calc(infinity * 1px);
   font-size: var(--text-ui);
   cursor: pointer;
-  transition: background-color var(--duration-hover) var(--ease-base),
-              color var(--duration-hover) var(--ease-base);
+  transition: background-color var(--duration-hover) var(--ease-out),
+              color var(--duration-hover) var(--ease-out);
 
   &:active { transition-duration: var(--duration-press); }
 }
@@ -502,9 +528,9 @@
   outline: 1px solid var(--color-border-default);
   color: var(--color-text-primary);
   cursor: pointer;
-  transition: background-color var(--duration-hover) var(--ease-base),
-              color var(--duration-hover) var(--ease-base),
-              outline-color var(--duration-hover) var(--ease-base);
+  transition: background-color var(--duration-hover) var(--ease-out),
+              color var(--duration-hover) var(--ease-out),
+              outline-color var(--duration-hover) var(--ease-out);
 
   &:hover { background-color: var(--color-surface-hover); }
   &:active {

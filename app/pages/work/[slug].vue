@@ -325,7 +325,7 @@ onMounted(() => {
     gap: calc(var(--spacing) * 1.5);
     margin-top: calc(var(--spacing) * 2);
     color: var(--color-text-secondary);
-    transition: color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   .work-external-link:hover {
@@ -381,7 +381,7 @@ onMounted(() => {
     background-color: oklch(100% 0 0 / 8%);
     color: var(--color-text-inverse);
     cursor: pointer;
-    transition: background-color var(--duration-hover) var(--ease-base);
+    transition: background-color var(--duration-hover) var(--ease-out);
   }
 
   .work-lightbox__close:hover {
@@ -447,9 +447,14 @@ onMounted(() => {
     text-align: center;
   }
 
-  .lightbox-enter-active,
+  /* A real modal, not a hover affordance — --duration-panel-in/out, not
+     --duration-hover: entry gets noticed, exit doesn't need to be. */
+  .lightbox-enter-active {
+    transition: opacity var(--duration-panel-in) var(--ease-out);
+  }
+
   .lightbox-leave-active {
-    transition: opacity var(--duration-hover) var(--ease-base);
+    transition: opacity var(--duration-panel-out) var(--ease-out);
   }
 
   .lightbox-enter-from,

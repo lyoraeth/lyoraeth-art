@@ -70,7 +70,7 @@ function onPointerEnter(event: PointerEvent) {
     z-index: 0;
     background-color: var(--color-fill-strong);
     clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
-    transition: clip-path 500ms ease-out;
+    transition: clip-path var(--duration-sweep) var(--ease-out);
     pointer-events: none;
     /* decoration — never part of what gets selected */
     user-select: none;
@@ -96,12 +96,12 @@ function onPointerEnter(event: PointerEvent) {
     justify-content: space-between;
     width: 100%;
     color: var(--color-text-secondary);
-    transition: color 500ms var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   .post-card__title {
     color: var(--color-text-primary);
-    transition: color 500ms var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   /* Takes the rest of the card and splits it: excerpt against the top, action
@@ -115,7 +115,7 @@ function onPointerEnter(event: PointerEvent) {
     justify-content: space-between;
     gap: calc(var(--spacing) * 6);
     color: var(--color-text-primary);
-    transition: color 500ms var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   .post-card__action {
@@ -133,8 +133,8 @@ function onPointerEnter(event: PointerEvent) {
     visibility: hidden;
     opacity: 0;
     translate: 0 -0.25rem;
-    transition: opacity 500ms ease-out, translate 500ms ease-out,
-                visibility 500ms ease-out;
+    transition: opacity var(--duration-hover) var(--ease-out), translate var(--duration-hover) var(--ease-out),
+                visibility var(--duration-hover) var(--ease-out);
   }
 
   /*

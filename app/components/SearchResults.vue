@@ -104,7 +104,7 @@ const { t } = useI18n()
     padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
     color: var(--color-text-primary);
     text-decoration: none;
-    transition: background-color var(--duration-hover) var(--ease-base);
+    transition: background-color var(--duration-hover) var(--ease-out);
   }
 
   /* Blog rows: the topic drops under the title instead of racing it on the

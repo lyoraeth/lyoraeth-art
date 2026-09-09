@@ -334,7 +334,7 @@ onUnmounted(() => {
     background-color: var(--color-surface-field);
     color: var(--color-text-primary);
     font-size: var(--text-ui);
-    transition: outline-color var(--duration-hover) var(--ease-base);
+    transition: outline-color var(--duration-hover) var(--ease-out);
   }
 
   .filter-search input::placeholder {
@@ -367,7 +367,7 @@ onUnmounted(() => {
     font-size: var(--text-ui);
     font-family: inherit;
     cursor: pointer;
-    transition: outline-color var(--duration-hover) var(--ease-base);
+    transition: outline-color var(--duration-hover) var(--ease-out);
   }
 
   .filter-dropdown__trigger:hover,
@@ -380,7 +380,7 @@ onUnmounted(() => {
     height: calc(var(--spacing) * 2.5);
     flex-shrink: 0;
     color: var(--color-icon-default);
-    transition: transform var(--duration-hover) var(--ease-base);
+    transition: transform var(--duration-hover) var(--ease-out);
   }
 
   .filter-dropdown__chevron.open {
@@ -419,7 +419,7 @@ onUnmounted(() => {
     color: var(--color-text-primary);
     background-color: transparent;
     cursor: pointer;
-    transition: color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   /*
@@ -435,7 +435,7 @@ onUnmounted(() => {
     z-index: -1;
     inset: 0;
     background-color: transparent;
-    transition: background-color var(--duration-hover) var(--ease-base);
+    transition: background-color var(--duration-hover) var(--ease-out);
   }
 
   .filter-dropdown__panel > li:first-child .filter-dropdown__option::before {
@@ -471,8 +471,8 @@ onUnmounted(() => {
     color: var(--color-text-primary);
     background-color: transparent;
     cursor: pointer;
-    transition: background-color var(--duration-hover) var(--ease-base),
-                color var(--duration-hover) var(--ease-base);
+    transition: background-color var(--duration-hover) var(--ease-out),
+                color var(--duration-hover) var(--ease-out);
   }
 
   .filter-sort-btn__icon {

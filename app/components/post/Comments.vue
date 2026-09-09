@@ -208,7 +208,7 @@ async function submit() {
     color: var(--color-text-primary);
     font-family: inherit;
     font-size: var(--text-text);
-    transition: outline-color var(--duration-hover) var(--ease-base);
+    transition: outline-color var(--duration-hover) var(--ease-out);
     resize: none;
   }
   .field-input::placeholder { color: var(--color-text-secondary); }
@@ -228,7 +228,7 @@ async function submit() {
     color: var(--color-text-inverse);
     font-family: inherit;
     cursor: pointer;
-    transition: background-color var(--duration-hover) var(--ease-base);
+    transition: background-color var(--duration-hover) var(--ease-out);
   }
   .submit-btn:hover:not(:disabled) { background-color: var(--color-accent-strong-hover); }
   .submit-btn:active:not(:disabled) { background-color: var(--color-accent-default); }
@@ -253,8 +253,8 @@ async function submit() {
     background-color: var(--color-surface-field);
     cursor: pointer;
     appearance: none;
-    transition: outline-color var(--duration-hover) var(--ease-base),
-                background-color var(--duration-hover) var(--ease-base);
+    transition: outline-color var(--duration-hover) var(--ease-out),
+                background-color var(--duration-hover) var(--ease-out);
   }
   .consent-check:hover { outline-color: var(--color-accent-strong); }
   .consent-check::before {
@@ -281,7 +281,7 @@ async function submit() {
     color: var(--color-accent-strong);
     text-decoration: underline;
     text-underline-offset: 2px;
-    transition: color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
   .consent-link:hover { color: var(--color-accent-strong-hover); }
 

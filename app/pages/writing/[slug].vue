@@ -345,8 +345,8 @@ onMounted(() => {
     border-radius: var(--radius-2xl);
     font-size: var(--text-ui);
     color: var(--color-text-secondary);
-    transition: color var(--duration-hover) var(--ease-base),
-                background-color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out),
+                background-color var(--duration-hover) var(--ease-out);
   }
 
   .toc-link:hover {
@@ -429,7 +429,7 @@ onMounted(() => {
 
   .post-references__list a {
     color: var(--color-accent-strong);
-    transition: color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   .post-references__list a:hover {
@@ -532,7 +532,7 @@ onMounted(() => {
   color: var(--color-accent-strong);
   text-decoration: underline;
   text-underline-offset: 2px;
-  transition: color var(--duration-hover) var(--ease-base);
+  transition: color var(--duration-hover) var(--ease-out);
 }
 :deep(.post-body a:hover) { color: var(--color-accent-strong-hover); }
 

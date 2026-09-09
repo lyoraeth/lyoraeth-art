@@ -115,7 +115,7 @@ const pageInert = provideMainInert()
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 4.5l7 7M11.5 4.5l-7 7' stroke='%23000' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
     mask-size: contain;
     mask-repeat: no-repeat;
-    transition: background-color var(--duration-hover) var(--ease-base);
+    transition: background-color var(--duration-hover) var(--ease-out);
   }
 
   html.shell-redesign input[type="search"]::-webkit-search-cancel-button:hover {

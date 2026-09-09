@@ -116,9 +116,9 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick))
     border-radius: calc(infinity * 1px);
     outline: 1px solid var(--color-border-default);
     overflow: hidden;
-    transition: flex-grow var(--duration-hover) var(--ease-base),
-                background-color var(--duration-hover) var(--ease-base),
-                outline-color var(--duration-hover) var(--ease-base);
+    transition: flex-grow var(--duration-hover) var(--ease-out),
+                background-color var(--duration-hover) var(--ease-out),
+                outline-color var(--duration-hover) var(--ease-out);
   }
 
   /* the circle only lights up while it's still a circle */
@@ -146,7 +146,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick))
     height: calc(var(--spacing) * 10);
     color: var(--color-icon-default);
     cursor: pointer;
-    transition: color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   .search-toggle button:hover { color: var(--color-text-secondary); }
@@ -159,7 +159,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick))
   .search-toggle input {
     min-width: 0;
     opacity: 0;
-    transition: opacity var(--duration-hover) var(--ease-base);
+    transition: opacity var(--duration-hover) var(--ease-out);
   }
 
   .search-toggle[data-open] input {

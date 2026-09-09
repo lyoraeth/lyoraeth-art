@@ -124,7 +124,7 @@ function handleBack() {
   color: var(--color-accent-strong);
   text-decoration: underline;
   text-underline-offset: 2px;
-  transition: color var(--duration-hover) var(--ease-base);
+  transition: color var(--duration-hover) var(--ease-out);
 }
 :deep(.post-body a:hover) { color: var(--color-accent-strong-hover); }
 

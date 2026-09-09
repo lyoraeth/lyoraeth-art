@@ -92,7 +92,7 @@ function onPointerEnter(event: PointerEvent) {
     z-index: 0;
     background-color: var(--color-fill-strong);
     clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
-    transition: clip-path 500ms ease-out;
+    transition: clip-path var(--duration-sweep) var(--ease-out);
     pointer-events: none;
     /* decoration — never part of what gets selected */
     user-select: none;
@@ -133,7 +133,7 @@ function onPointerEnter(event: PointerEvent) {
     border-radius: calc(infinity * 1px);
     outline: 1px solid var(--color-border-raised);
     color: var(--color-text-secondary);
-    transition: color 500ms var(--ease-base), outline-color 500ms var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out), outline-color var(--duration-hover) var(--ease-out);
   }
 
   .work-card__tags-text {
@@ -145,12 +145,12 @@ function onPointerEnter(event: PointerEvent) {
 
   .work-card__date {
     color: var(--color-text-secondary);
-    transition: color 500ms var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   .work-card__title {
     color: var(--color-text-primary);
-    transition: color 500ms var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
   }
 
   .work-card__stack {
@@ -164,8 +164,8 @@ function onPointerEnter(event: PointerEvent) {
     grid-area: 1 / 1;
     display: flex;
     flex-direction: column;
-    transition: opacity 500ms ease-out, translate 500ms ease-out,
-                visibility 500ms ease-out;
+    transition: opacity var(--duration-hover) var(--ease-out), translate var(--duration-hover) var(--ease-out),
+                visibility var(--duration-hover) var(--ease-out);
   }
 
   .work-card__state--short {

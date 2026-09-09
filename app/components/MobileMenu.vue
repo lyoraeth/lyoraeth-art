@@ -49,8 +49,8 @@ const { t } = useI18n()
     /* closed: parked above the viewport and out of focus order */
     translate: 0 -100%;
     visibility: hidden;
-    transition: translate var(--duration-menu) var(--ease-base),
-                visibility var(--duration-menu) var(--ease-base);
+    transition: translate var(--duration-menu) var(--ease-out),
+                visibility var(--duration-menu) var(--ease-out);
   }
 
   .mobile-menu[data-open] {
@@ -71,8 +71,8 @@ const { t } = useI18n()
     height: calc(var(--spacing) * 24);
     padding-inline: var(--spacing-page-padding-x);
     color: var(--color-text-primary);
-    transition: background-color var(--duration-hover) var(--ease-base),
-                color var(--duration-hover) var(--ease-base);
+    transition: background-color var(--duration-hover) var(--ease-out),
+                color var(--duration-hover) var(--ease-out);
   }
 
   .menu-link:hover { background-color: var(--color-surface-hover); }

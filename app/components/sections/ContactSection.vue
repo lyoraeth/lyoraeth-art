@@ -313,7 +313,7 @@ function onFormStart() {
     font-size: var(--text-text);
     line-height: var(--text-text--line-height);
     font-weight: var(--text-text--font-weight);
-    transition: outline-color var(--duration-hover) var(--ease-base);
+    transition: outline-color var(--duration-hover) var(--ease-out);
 
     &::placeholder {
       color: var(--color-text-secondary);
@@ -354,8 +354,8 @@ function onFormStart() {
     border-radius: calc(var(--spacing) * 1);
     background-color: var(--color-surface-field);
     cursor: pointer;
-    transition: background-color var(--duration-hover) var(--ease-base),
-                border-color var(--duration-hover) var(--ease-base);
+    transition: background-color var(--duration-hover) var(--ease-out),
+                border-color var(--duration-hover) var(--ease-out);
   }
 
   .contact-consent__box:hover {
@@ -377,7 +377,7 @@ function onFormStart() {
 
   .contact-consent__link {
     color: var(--color-accent-strong);
-    transition: color var(--duration-hover) var(--ease-base);
+    transition: color var(--duration-hover) var(--ease-out);
 
     &:hover { color: var(--color-accent-strong-hover); }
     &:active {

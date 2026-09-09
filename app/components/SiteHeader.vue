@@ -241,9 +241,9 @@ onUnmounted(() => {
   .burger-line {
     transform-box: fill-box;
     transform-origin: center;
-    transition: translate var(--duration-menu) var(--ease-base),
-                rotate var(--duration-menu) var(--ease-base),
-                opacity var(--duration-menu) var(--ease-base);
+    transition: translate var(--duration-menu) var(--ease-out),
+                rotate var(--duration-menu) var(--ease-out),
+                opacity var(--duration-menu) var(--ease-out);
   }
 
   [aria-expanded='true'] .burger-top {
