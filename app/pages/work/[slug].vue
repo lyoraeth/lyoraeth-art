@@ -88,6 +88,10 @@ const closeButton  = ref<HTMLButtonElement | null>(null)
 // out, keyboard/screen-reader users got none of it — Tab still walked
 // through whatever the backdrop covers, and closing left focus on nothing
 // in particular (the trigger button, still in the DOM, but never reclaimed).
+// useMainInert covers the other half of that same claim: Tab could still
+// reach the page content behind the backdrop, not just skip past it.
+useMainInert(lightboxOpen)
+
 watch(lightboxOpen, async open => {
   if (open) {
     await nextTick()

@@ -374,6 +374,21 @@ test.describe('work case cover lightbox', () => {
     await expect(page.locator('.work-lightbox')).toBeHidden()
     await expect(cover).toBeFocused()
   })
+
+  // Regression: focus moved into the lightbox on open, but <main> behind it
+  // stayed reachable by Tab — aria-modal="true" claimed modal behaviour the
+  // page didn't actually enforce.
+  test('makes the page behind it inert while open', async ({ page }) => {
+    const cover = page.locator('.work-cover')
+    if (await cover.count() === 0) test.skip(true, 'this work item has no cover')
+
+    await expect(page.locator('main')).not.toHaveAttribute('inert')
+    await cover.click()
+    await expect(page.locator('main')).toHaveAttribute('inert')
+
+    await page.keyboard.press('Escape')
+    await expect(page.locator('main')).not.toHaveAttribute('inert')
+  })
 })
 
 test.describe('language switch', () => {

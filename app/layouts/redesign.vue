@@ -15,6 +15,10 @@ useHead({
 /** Held here, not in the header: the page behind an open menu is what has to
  *  go inert, and that's the shell's element. */
 const menuOpen = ref(false)
+
+/** The other source of inert — a page's own overlay (e.g. the case study
+ *  cover lightbox), requested through useMainInert(). See useMainInert.ts. */
+const pageInert = provideMainInert()
 </script>
 
 <template>
@@ -22,7 +26,7 @@ const menuOpen = ref(false)
   <main
     id="main-content"
     class="wrapper px-page-padding-x flex flex-col gap-y-section-gap"
-    :inert="menuOpen || undefined"
+    :inert="menuOpen || pageInert || undefined"
   >
     <slot />
   </main>
