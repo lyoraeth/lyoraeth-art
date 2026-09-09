@@ -376,6 +376,72 @@ test.describe('work case cover lightbox', () => {
   })
 })
 
+test.describe('language switch', () => {
+  test('switches locale from the home page and back from a sub-page, hash dropped when present', async ({ page }) => {
+    await page.goto('/')
+    await ready(page)
+
+    const langLink = page.locator('.header-bar a[aria-label*="Switch language" i], .header-bar a[aria-label*="Сменить язык" i]')
+    await langLink.click()
+    await page.waitForURL(/\/ru\/?$/)
+    await ready(page)
+
+    // and back, from a different page this time
+    await page.goto('/ru/work')
+    await ready(page)
+    await page.locator('.header-bar a[aria-label*="Switch language" i], .header-bar a[aria-label*="Сменить язык" i]').click()
+    await page.waitForURL(url => url.pathname === '/work')
+
+    // switching from an anchored URL drops the hash — the target section may
+    // not exist (or exist at the same id) on the other locale's page
+    await page.goto('/#contact')
+    await ready(page)
+    await expect(
+      page.locator('.header-bar a[aria-label*="Switch language" i], .header-bar a[aria-label*="Сменить язык" i]'),
+    ).toHaveAttribute('href', '/ru')
+  })
+})
+
+test.describe('legal pages', () => {
+  test('privacy renders with linkable section headings', async ({ page }) => {
+    await page.goto('/privacy')
+    await ready(page)
+    await expect(page.locator('h1, h2').first()).toBeVisible()
+    // regression: these used to render via a bare marked() call with no
+    // heading-id renderer — every section was unlinkable
+    await expect(page.locator('.post-body h2[id]').first()).toBeAttached()
+  })
+
+  test('personal-data redirects en visitors to privacy, but serves ru directly', async ({ page }) => {
+    await page.goto('/personal-data')
+    await page.waitForURL('/privacy')
+
+    await page.goto('/ru/personal-data')
+    await ready(page)
+    await expect(page).toHaveURL('/ru/personal-data')
+    await expect(page.locator('.post-body')).toBeVisible()
+  })
+})
+
+test.describe('404 page', () => {
+  test('renders the branded error page, not a bare JSON payload, and is not indexed', async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', err => errors.push(err.message))
+
+    const response = await page.goto('/this-page-does-not-exist')
+    expect(response?.status()).toBe(404)
+    await ready(page)
+
+    await expect(page.locator('.error-cat')).toBeVisible()
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex')
+    // header/footer still render around it — it goes through the normal layout
+    await expect(page.locator('header')).toBeVisible()
+    await expect(page.locator('footer')).toBeVisible()
+
+    expect(errors, `Console errors:\n${errors.join('\n')}`).toHaveLength(0)
+  })
+})
+
 test.describe('footer', () => {
   test('colophon, legal links and a feed for the active locale', async ({ page }) => {
     await page.goto('/ru')
