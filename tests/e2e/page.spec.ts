@@ -290,6 +290,48 @@ test.describe('contact form', () => {
   })
 })
 
+test.describe('post comments', () => {
+  test.beforeEach(async ({ page }) => {
+    // Direct navigation, not a click-through from the card grid: clicking a
+    // card and landing on an empty <main> (no article, no h1 — header and
+    // footer render, the page's own content never does) reproduces 100% of
+    // the time right now. Client-side route transitions into a [slug] page
+    // are exactly the "иногда отрисовка страниц работают криво" routing
+    // issue already on the plan as its own stage — not this one's to fix,
+    // so this test reads the target href off the card (real, current slug,
+    // not hardcoded) and navigates to it directly instead of clicking it.
+    await page.goto('/')
+    await ready(page)
+    const href = await page.locator('.post-card a').first().getAttribute('href')
+    await page.goto(href!)
+    await ready(page)
+    await page.locator('#c-nick').scrollIntoViewIfNeeded()
+  })
+
+  // Not a full submit-retry regression like the contact form's: this widget
+  // is appearance="invisible", and unlike the contact form's visible one it
+  // never resolved a token within a reasonable wait under Playwright here,
+  // so driving an actual submit is impractical to pin down reliably. The
+  // reset()-on-finally fix itself is the same few lines, on the same
+  // NuxtTurnstile API, already exercised by the contact form's equivalent
+  // test — this just checks the form is otherwise intact and field-level
+  // validation still runs (which doesn't depend on the widget resolving).
+  test('client-side validation runs independently of the (invisible) captcha', async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', err => errors.push(err.message))
+
+    // The submit button is legitimately disabled until the widget resolves a
+    // token — dispatching the form's submit event directly is the same path
+    // Vue's @submit.prevent handler runs on a real click, without needing
+    // the button enabled first.
+    await page.locator('.comment-form').evaluate(form => (form as HTMLFormElement).requestSubmit())
+    // p, not the consent <label> itself (also text-text-critical when invalid)
+    await expect(page.locator('.comment-form p.text-text-critical')).toHaveCount(3) // nick + message + consent
+
+    expect(errors, `Console errors:\n${errors.join('\n')}`).toHaveLength(0)
+  })
+})
+
 test.describe('footer', () => {
   test('colophon, legal links and a feed for the active locale', async ({ page }) => {
     await page.goto('/ru')

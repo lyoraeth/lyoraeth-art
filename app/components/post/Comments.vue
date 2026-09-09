@@ -31,14 +31,15 @@ const ve = computed(() => ({
   consent: attempted.value && !consent.value,
 }))
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  })
-}
+// The site-wide date formatter, locale-aware — this used to be a local
+// reimplementation hardcoded to en-GB, so a comment's date showed in English
+// even on the ru site while every other date on the page followed the
+// active locale.
+const formatDate = useFormatDate()
 
 const localePath = useLocalePath()
 const { locale } = useI18n()
+const turnstile = ref<{ reset: () => void } | null>(null)
 
 async function submit() {
   attempted.value = true
@@ -57,12 +58,18 @@ async function submit() {
       },
     })
     state.value = 'success'
-    nick.value = message.value = token.value = ''
+    nick.value = message.value = ''
     consent.value = false
   } catch (e: any) {
     errMsg.value = e?.data?.message ?? t('post.comments.error')
     state.value = 'error'
+  } finally {
+    // A token is single-use, on success or failure alike: clearing it alone
+    // leaves the widget itself showing a stale solved state for a token
+    // that's already spent — reset() re-renders it so the next comment (a
+    // retry, or another one after "написать ещё") gets a real one.
     token.value = ''
+    turnstile.value?.reset()
   }
 }
 </script>
@@ -79,7 +86,7 @@ async function submit() {
             {{ (c.nick[0] ?? '?').toUpperCase() }}
           </div>
           <span class="comment-nick type-ui text-text-secondary">@{{ c.nick }}</span>
-          <span class="comment-date type-ui text-text-decorative">{{ formatDate(c.publishedAt) }}</span>
+          <span class="comment-date type-ui text-text-decorative">{{ formatDate(c.publishedAt, 'medium') }}</span>
         </div>
         <p class="comment-body type-text text-text-primary">{{ c.message }}</p>
       </div>
@@ -112,7 +119,7 @@ async function submit() {
           <p v-if="ve.message" class="type-ui text-text-critical" aria-live="polite">{{ t('form.required') }}</p>
         </div>
 
-        <NuxtTurnstile v-model="token" appearance="invisible" />
+        <NuxtTurnstile ref="turnstile" v-model="token" appearance="invisible" />
 
         <p v-if="state === 'error'" class="type-text text-text-critical">{{ errMsg }}</p>
 
