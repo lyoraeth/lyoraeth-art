@@ -6,7 +6,10 @@ function ruPlural(n: number): 'one' | 'few' | 'many' {
   return 'many'
 }
 
-function enPlural(n: number): 'one' | 'few' | 'many' {
+// No 'few' in English CLDR pluralization — the return type says so, unlike
+// ruPlural's, so a `_few` locale key under an English string never typechecks
+// as reachable (removed the three that existed but couldn't be).
+function enPlural(n: number): 'one' | 'many' {
   return n === 1 ? 'one' : 'many'
 }
 

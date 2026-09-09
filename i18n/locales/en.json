@@ -94,7 +94,6 @@
     "read": "Read the post",
     "min_read": "{n} min read",
     "count_one": "{n} post",
-    "count_few": "{n} posts",
     "count_many": "{n} posts",
     "back": "Writing",
     "prev_post": "Previous",
@@ -121,7 +120,6 @@
     "see_all": "All work →",
     "view_case": "Open the case",
     "count_one": "{n} project",
-    "count_few": "{n} projects",
     "count_many": "{n} projects",
     "view_project": "Open project",
     "prev_project": "Previous",
@@ -137,7 +135,6 @@
     },
     "comments": {
       "count_one": "{n} comment",
-      "count_few": "{n} comments",
       "count_many": "{n} comments",
       "reply": "Reply",
       "first": "No comments yet.",
