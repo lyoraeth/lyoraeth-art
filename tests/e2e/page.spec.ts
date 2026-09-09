@@ -254,6 +254,40 @@ test.describe('contact form', () => {
     // the message explains rather than labels: no "error", no "invalid"
     expect(text!.toLowerCase()).not.toMatch(/ошибк|invalid|error/)
   })
+
+  // Regression: a failed submit cleared the token in JS but never called the
+  // widget's own reset() — it kept showing "verified" for a token that had
+  // already been spent, and a retry sent an empty one. Can't observe the
+  // widget's internal state directly (third-party embed), so this checks
+  // what's actually observable: the retry after a failure goes through at
+  // all, and reset() (called unconditionally in `finally`) never throws.
+  test('a failed send can be retried without reloading the page', async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', err => errors.push(err.message))
+
+    // First call fails, second succeeds — both mocked, so the outcome only
+    // depends on the form's own retry logic, not on whether this sandbox has
+    // real Resend/Turnstile credentials configured.
+    let calls = 0
+    await page.route('**/api/contact', (route) => {
+      calls += 1
+      if (calls === 1) return route.fulfill({ status: 500, json: { message: 'boom' } })
+      return route.fulfill({ status: 200, json: { ok: true } })
+    })
+
+    await page.fill('#contact-from', '@lyoraeth')
+    await page.fill('#contact-message', 'test message')
+    await page.locator('#contact-consent').check()
+
+    await page.locator('#contact button[type=submit]').click()
+    await expect(page.locator('#contact .contact-status[data-state="error"]')).toBeVisible()
+
+    await page.locator('#contact button[type=submit]').click()
+    await expect(page.locator('#contact .contact-status:not([data-state="error"])')).toBeVisible()
+    expect(calls).toBe(2)
+
+    expect(errors, `Console errors:\n${errors.join('\n')}`).toHaveLength(0)
+  })
 })
 
 test.describe('footer', () => {

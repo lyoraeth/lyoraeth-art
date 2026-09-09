@@ -35,6 +35,7 @@ const sending = ref(false)
 const fromField = ref<HTMLInputElement | null>(null)
 const messageField = ref<HTMLTextAreaElement | null>(null)
 const consentField = ref<HTMLInputElement | null>(null)
+const turnstile = ref<{ reset: () => void } | null>(null)
 
 /** An @handle, or something with an at-sign and a dotted domain — no more can
  *  be guessed about a contact than that. */
@@ -84,8 +85,12 @@ async function onSubmit() {
     status.value = { text: captcha ? t('contact.captcha_failed') : t('contact.failed'), failed: true }
   } finally {
     sending.value = false
-    // a token is single-use: whatever the outcome, the next send needs a new one
+    // A token is single-use: whatever the outcome, the next send needs a new
+    // one. Clearing token alone leaves the widget itself showing a stale
+    // "verified" checkmark — reset() re-renders it too, so the token it holds
+    // actually matches what the checkmark claims.
     token.value = ''
+    turnstile.value?.reset()
   }
 }
 
@@ -225,6 +230,7 @@ function onFormStart() {
              when the widget resolves -->
         <div class="contact-captcha">
           <NuxtTurnstile
+            ref="turnstile"
             v-model="token"
             :site-key="turnstileContactSiteKey || undefined"
             :options="{ theme: 'light' }"
