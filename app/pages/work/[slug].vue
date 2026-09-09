@@ -81,7 +81,22 @@ const { depthEl, endEl } = useCaseStudyFunnel(slug)
    Resets on every open, so a previous zoom never carries over. */
 const lightboxOpen = ref(false)
 const imageZoomed  = ref(false)
-watch(lightboxOpen, (open) => { if (!open) imageZoomed.value = false })
+const coverButton  = ref<HTMLButtonElement | null>(null)
+const closeButton  = ref<HTMLButtonElement | null>(null)
+
+// aria-modal="true" claims modal behaviour; without moving focus in and back
+// out, keyboard/screen-reader users got none of it — Tab still walked
+// through whatever the backdrop covers, and closing left focus on nothing
+// in particular (the trigger button, still in the DOM, but never reclaimed).
+watch(lightboxOpen, async (open) => {
+  if (open) {
+    await nextTick()
+    closeButton.value?.focus()
+  } else {
+    imageZoomed.value = false
+    coverButton.value?.focus()
+  }
+})
 
 function onLightboxKeydown(event: KeyboardEvent) {
   if (event.key !== 'Escape' || !lightboxOpen.value) return
@@ -136,6 +151,7 @@ onMounted(() => {
     <div class="layout-grid gap-grid-gap">
       <button
         v-if="item.coverUrl"
+        ref="coverButton"
         type="button"
         class="col-span-4 md:col-span-8 xl:col-span-5 xl:self-start post-column work-cover"
         :aria-label="item.coverAlt ?? title"
@@ -208,6 +224,7 @@ onMounted(() => {
           @click.self="lightboxOpen = false"
         >
           <button
+            ref="closeButton"
             type="button"
             class="work-lightbox__close"
             :aria-label="t('a11y.close')"

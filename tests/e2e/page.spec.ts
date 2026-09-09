@@ -147,6 +147,24 @@ test.describe('writing', () => {
   })
 })
 
+test.describe('writing index topic filter', () => {
+  // Regression: selecting a topic unmounts the option button (v-if on the
+  // panel) right after — closing this way, unlike Escape, left focus on the
+  // removed element, which browsers drop back to <body> rather than
+  // anywhere useful.
+  test('selecting a topic returns focus to the dropdown trigger', async ({ page }) => {
+    await page.goto('/writing')
+    await ready(page)
+
+    const trigger = page.locator('.filter-dropdown__trigger')
+    await trigger.click()
+    await page.waitForSelector('.filter-dropdown__panel')
+    await page.locator('.filter-dropdown__option').first().click()
+
+    await expect(trigger).toBeFocused()
+  })
+})
+
 test.describe('card text stays selectable', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
@@ -329,6 +347,32 @@ test.describe('post comments', () => {
     await expect(page.locator('.comment-form p.text-text-critical')).toHaveCount(3) // nick + message + consent
 
     expect(errors, `Console errors:\n${errors.join('\n')}`).toHaveLength(0)
+  })
+})
+
+test.describe('work case cover lightbox', () => {
+  test.beforeEach(async ({ page }) => {
+    // Direct navigation — see the 'post comments' describe above for why.
+    await page.goto('/')
+    await ready(page)
+    const href = await page.locator('.work-card a').first().getAttribute('href')
+    await page.goto(href!)
+    await ready(page)
+  })
+
+  // Regression: role="dialog" aria-modal="true" claimed modal behaviour the
+  // lightbox didn't actually have — opening it never moved focus in, and
+  // closing it never gave focus back to the button that opened it.
+  test('moves focus in on open and back to the trigger on close', async ({ page }) => {
+    const cover = page.locator('.work-cover')
+    if (await cover.count() === 0) test.skip(true, 'this work item has no cover')
+
+    await cover.click()
+    await expect(page.locator('.work-lightbox__close')).toBeFocused()
+
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.work-lightbox')).toBeHidden()
+    await expect(cover).toBeFocused()
   })
 })
 

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { marked } from 'marked'
 import ruMd from '~/assets/content/personal-data.ru.md?raw'
 
 definePageMeta({ layout: 'redesign' })
@@ -22,7 +21,10 @@ useSeoMeta({
   ogDescription: computed(() => t('personal_data.description')),
 })
 
-const html = computed(() => marked(ruMd) as string)
+// Shared with the blog post body and privacy.vue — see privacy.vue for why
+// this isn't a separate marked() call.
+const { renderPost } = useMarkdown()
+const html = computed(() => renderPost(ruMd))
 </script>
 
 <template>

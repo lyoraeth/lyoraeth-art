@@ -152,6 +152,11 @@ const topicRoot = ref<HTMLElement | null>(null)
 function selectTopic(value: string | null) {
   topicFilter.value = value
   topicOpen.value = false
+  // The option just clicked/activated sits in the panel, which v-if unmounts
+  // right after — closing the panel this way (not just Escape, which already
+  // refocused the trigger) left keyboard focus on a removed element, which
+  // browsers drop back to <body> rather than anywhere useful.
+  topicRoot.value?.querySelector('button')?.focus()
 }
 
 function onDocumentClick(event: MouseEvent) {

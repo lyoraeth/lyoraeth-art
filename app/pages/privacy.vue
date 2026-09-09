@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { marked } from 'marked'
 import enMd from '~/assets/content/privacy.en.md?raw'
 import ruMd from '~/assets/content/privacy.ru.md?raw'
 
@@ -14,7 +13,12 @@ useSeoMeta({
   ogDescription: computed(() => t('privacy.description')),
 })
 
-const html = computed(() => marked(locale.value === 'ru' ? ruMd : enMd) as string)
+// Shared with the blog post body, not a separate marked() call: the plain
+// version this page used to call directly skipped the h2/h3 id-stamping
+// useMarkdown sets up, so a 15-heading document like this one had no
+// linkable sections at all.
+const { renderPost } = useMarkdown()
+const html = computed(() => renderPost(locale.value === 'ru' ? ruMd : enMd))
 </script>
 
 <template>
