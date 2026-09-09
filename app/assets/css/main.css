@@ -1,8 +1,12 @@
 /*
- * Layer order is declared before Tailwind's import so both design systems sit
- * where they belong: legacy holds the dark system's globals, shell the light
- * shell's base, and utilities stay stronger than either — the same precedence
- * the markup assumes when it reaches for a utility class.
+ * Layer order is declared before Tailwind's import so precedence is pinned
+ * regardless of source order — utilities stay stronger than everything else,
+ * the same precedence the markup assumes when it reaches for a utility class.
+ *
+ * `legacy` predates the redesign and originally held the dark shell's
+ * globals; that shell is gone, but the name stuck for what's left of the
+ * shared base (page transition, a couple of cross-component resets) —
+ * nothing in it is dark-theme-specific any more.
  */
 @layer theme, base, legacy, shell, components, utilities;
 
@@ -13,130 +17,6 @@
   /* ── Base ────────────────────────────────────────────────────────────────── */
   html, body { overscroll-behavior: none; }
 
-  /* ── Skip link ───────────────────────────────────────────────────────────── */
-  .skip-link {
-    position: fixed;
-    top: -4rem;
-    left: 1rem;
-    z-index: 9999;
-    padding: 0.5rem 1rem;
-    background: var(--void);
-    color: var(--ember);
-    border: 1px solid var(--ember-border);
-    border-radius: var(--radius-chip);
-    font-size: 0.875rem;
-    text-decoration: none;
-    transition: top 0.15s var(--ease-out-expo);
-  }
-  .skip-link:focus {
-    top: 1rem;
-    outline: 2px solid rgba(214, 154, 106, 0.7);
-    outline: 2px solid oklch(72% 0.1 58 / 70%);
-    outline-offset: 2px;
-  }
-
-  /* ── Global focus-visible ────────────────────────────────────────────────── */
-  :focus-visible {
-    outline: 2px solid rgba(214, 154, 106, 0.7);
-    outline: 2px solid oklch(72% 0.1 58 / 70%);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
-}
-
-@theme inline {
-    /* Stage base surfaces */
-    --color-void:      #0A0C10; /* page background */
-    --color-deep:      #0E1218; /* nested dark surfaces */
-    --color-curtain:   #060708; /* footer curtain, darker than void */
-
-    /* Atmosphere blobs (background ellipses) */
-    --color-teal:      #15414F; /* cold far-field spot */
-    --color-indigo:    #25224A; /* cold far-field spot */
-    --color-warm-haze: #3A2A22; /* warm far-field spot, used sparingly */
-
-    /* Accent — single warm spark */
-    --color-ember:     #D69A6A; /* only accent; never floods large areas */
-
-    /* Text hierarchy */
-    --color-ink:       #E8EAEE; /* primary text */
-    --color-mist:      #8B95A3; /* secondary text */
-    --color-faint:     #5B6573; /* captions, meta, eyebrow labels */
-
-    /* Glass / lines — white-alpha overlays */
-    --color-line:           oklch(100% 0 0 / 10%);  /* main 1px borders */
-    --color-line-soft:      oklch(100% 0 0 / 5.5%); /* thin dividers */
-    --color-glass-fill:     oklch(100% 0 0 / 5%);   /* glass panel fill */
-    --color-glass-fill-hover: oklch(100% 0 0 / 7.5%); /* glass on hover */
-
-    /* Ember-tinted glass */
-    --color-ember-bg:     color-mix(in srgb, #D69A6A 8%,  transparent); /* ember panel tint */
-    --color-ember-border: color-mix(in srgb, #D69A6A 28%, transparent); /* ember border */
-
-    /* ── Spacing / radii ─────────────────────────────────────────────────── */
-    --radius-tag:     6px;
-    --radius-chip:    8px;
-    --radius-viewport: 12px;
-    --radius-card-sm: 16px;  /* approach cards */
-    --radius-card:    18px;  /* work cards */
-    --radius-contact: 20px;
-    --radius-curtain: 24px;  /* curtain top edge */
-
-    /* ── Motion ──────────────────────────────────────────────────────────── */
-    --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);    /* hover-in, reveals — snappy settle */
-    --ease-in-expo:   cubic-bezier(0.7, 0, 0.84, 0);    /* hover-out, exits — smooth fade */
-    --ease-silk:      cubic-bezier(0.25, 0, 0, 1);       /* color, opacity — ultra-smooth decel */
-    --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1); /* interactive feedback — slight overshoot */
-    --ease-glide:     cubic-bezier(0.65, 0, 0.35, 1);    /* slow → fast → slow — sliders, toggles */
-
-    --duration-reveal:   900ms; /* section fade-in */
-}
-
-/* Keep bare CSS custom properties in sync for non-Tailwind consumers */
-/* Fallbacks for browsers without oklch() / color-mix() (Safari < 15.4, Chrome < 111) */
-:root {
-    --line:             rgba(255, 255, 255, 0.10);
-    --line-soft:        rgba(255, 255, 255, 0.055);
-    --glass-fill:       rgba(255, 255, 255, 0.05);
-    --glass-fill-hover: rgba(255, 255, 255, 0.075);
-    --ember-bg:         rgba(214, 154, 106, 0.08);
-    --ember-border:     rgba(214, 154, 106, 0.28);
-}
-@supports (color: oklch(0 0 0)) and (color: color-mix(in srgb, red, blue)) {
-:root {
-    /* Surfaces */
-    --void:      var(--color-void);
-    --deep:      var(--color-deep);
-    --curtain:   var(--color-curtain);
-
-    /* Atmosphere */
-    --teal:      var(--color-teal);
-    --indigo:    var(--color-indigo);
-    --warm-haze: var(--color-warm-haze);
-
-    /* Accent */
-    --ember:     var(--color-ember);
-
-    /* Text */
-    --ink:       var(--color-ink);
-    --mist:      var(--color-mist);
-    --faint:     var(--color-faint);
-
-    /* Glass / lines */
-    --line:           var(--color-line);
-    --line-soft:      var(--color-line-soft);
-    --glass-fill:     var(--color-glass-fill);
-    --glass-fill-hover: var(--color-glass-fill-hover);
-    --ember-bg:       var(--color-ember-bg);
-    --ember-border:   var(--color-ember-border);
-
-    /* Motion */
-    --duration-reveal: 900ms;
-
-}
-} /* end @supports oklch + color-mix */
-
-@layer legacy {
   .page-enter-active,
   .page-leave-active {
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -156,3 +36,4 @@
     }
   }
 }
+

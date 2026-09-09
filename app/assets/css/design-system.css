@@ -1,9 +1,9 @@
 /*
  * Design system of the light catalog redesign: fonts, tokens, grid, type utilities.
  *
- * Imported from main.css so both design systems share one Tailwind graph. The
- * dark system still in main.css uses a disjoint set of token names, so the two
- * coexist until the inner pages migrate.
+ * Imported from main.css so it shares one Tailwind graph with the rest of the
+ * app. The dark shell this once coexisted with is retired — every page now
+ * runs on this token set.
  *
  * Media queries can't read var(), so breakpoint thresholds are literals here and
  * in the markup — when one moves, fix both.

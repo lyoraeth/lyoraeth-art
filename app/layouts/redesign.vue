@@ -66,23 +66,33 @@ const menuOpen = ref(false)
     flex: 1 1 auto;
   }
 
-  /* The skip link is shared by both shells and painted by the dark one, so the
-     light shell repaints it in its own palette. */
+  /* Skip link + focus ring. Used to be shared with the dark shell and
+     repainted here; that shell is gone, so this is the only definition now. */
   html.shell-redesign .skip-link {
+    position: fixed;
+    top: -4rem;
+    left: 1rem;
+    z-index: 9999;
+    padding: 0.5rem 1rem;
     background: var(--color-fill-strong);
     color: var(--color-text-inverse);
-    border-color: var(--color-fill-strong);
+    border: 1px solid var(--color-fill-strong);
     border-radius: calc(infinity * 1px);
     font-size: var(--text-ui);
+    text-decoration: none;
+    transition: top var(--duration-hover) var(--ease-out);
   }
 
   html.shell-redesign .skip-link:focus {
-    outline-color: var(--color-accent-default);
+    top: 1rem;
+    outline: 2px solid var(--color-accent-default);
+    outline-offset: 2px;
   }
 
   html.shell-redesign :focus-visible {
     outline: 2px solid var(--color-accent-default);
     outline-offset: 2px;
+    border-radius: 4px;
   }
 
   /*
