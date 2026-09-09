@@ -1,16 +1,16 @@
-/** Drives the global reading-progress state (rendered by SiteNav) off scroll
- *  position while an article is mounted, and fires `onComplete` once when the
- *  reader reaches ~95%. Resets the shared state on unmount. */
+/** Fires `onComplete` once when the reader scrolls to ~95% of an article
+ *  while it's mounted (used for the post-completed analytics event). The
+ *  visual progress bar this used to drive was dropped from the redesign;
+ *  only the completion trigger survives. */
 export function useReadingProgressBar(opts: { onComplete?: () => void } = {}) {
-  const { progress, active } = useReadingProgress()
   let completed = false
 
   onMounted(() => {
-    active.value = true
     const update = () => {
+      if (completed) return
       const total = document.documentElement.scrollHeight - window.innerHeight
-      progress.value = total > 0 ? Math.min(100, (window.scrollY / total) * 100) : 0
-      if (!completed && progress.value >= 95) {
+      const progress = total > 0 ? (window.scrollY / total) * 100 : 0
+      if (progress >= 95) {
         completed = true
         opts.onComplete?.()
       }
@@ -19,8 +19,6 @@ export function useReadingProgressBar(opts: { onComplete?: () => void } = {}) {
 
     onUnmounted(() => {
       window.removeEventListener('scroll', update)
-      active.value = false
-      progress.value = 0
     })
   })
 }
