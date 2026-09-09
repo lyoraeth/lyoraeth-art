@@ -148,53 +148,6 @@
     transform: translateY(6px);
   }
 
-  /* ── Edge card (outline only — no fill, no blur) ──────────────────────────── */
-  .glass-card {
-    position: relative;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.1);
-    transition:
-      opacity   var(--duration-reveal) var(--ease-out-expo),
-      transform var(--duration-reveal) var(--ease-out-expo);
-  }
-
-  /* Static outline — masked the same way as the hover glow below, so both rings
-     share identical geometry/anti-aliasing instead of a native `border` (different
-     rasterizer) fighting a masked pseudo and reading as a doubled/stepped edge. */
-  .glass-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    pointer-events: none;
-    z-index: 0;
-    background: var(--line-soft);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
-
-  /* Cursor-tracked glow on the border, via --gx/--gy (see useGlowCard.ts) */
-  .glass-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    pointer-events: none;
-    z-index: 0;
-    background: radial-gradient(16rem circle at var(--gx, 50%) var(--gy, 50%), oklch(72% 0.1 58 / 75%), transparent 70%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.3s var(--ease-silk);
-  }
-  .glass-card:hover::after {
-    opacity: 1;
-  }
-
   /* ── Reduced motion ──────────────────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     /* comment-form loading dot (post/Comments.vue) */
