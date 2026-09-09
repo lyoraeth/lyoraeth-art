@@ -55,7 +55,18 @@ export function useToc(opts: {
   }
 
   onMounted(async () => {
-    const onScroll = () => updateActiveId()
+    // Batched to one measurement per frame — a bare scroll listener would
+    // otherwise re-query the DOM on every event, of which a fast scroll
+    // fires far more than the display can paint.
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        updateActiveId()
+        ticking = false
+      })
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
 
     // Registered synchronously (before the await) so it binds to the active

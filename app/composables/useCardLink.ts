@@ -9,9 +9,14 @@
  * honour, while staying out of the way of the ones that mean something else.
  *
  * @returns handlers to spread onto the card with `v-on`
+ *
+ * @param localePath - Injectable so tests can supply a plain function instead
+ * of the real `@nuxtjs/i18n` composable, which needs a live Nuxt app instance
+ * and can't run under a lightweight test environment. Defaults to the real
+ * one, exactly as `@nuxtjs/i18n`'s own `useLocalePath` defaults its `nuxtApp`
+ * parameter — same pattern, same reason.
  */
-export function useCardLink(to: () => string) {
-  const localePath = useLocalePath()
+export function useCardLink(to: () => string, localePath = useLocalePath()) {
 
   /** Where the press started — a release far from it was a drag, not a click. */
   let pressedAt: { x: number; y: number } | null = null
@@ -29,6 +34,11 @@ export function useCardLink(to: () => string) {
     if (pending) clearTimeout(pending)
     pending = null
   }
+
+  // A card can unmount mid-window (list re-sorted/filtered right after the
+  // click) — without this the pending navigation still fires and carries the
+  // reader away from wherever they went next.
+  onUnmounted(cancelPending)
 
   function open(event: MouseEvent) {
     const path = localePath(to())

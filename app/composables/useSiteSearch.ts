@@ -31,11 +31,15 @@ export interface SearchGroups {
   pages:   SearchResult[]
 }
 
-/** Site-wide search, shared by the header field and the phone search toggle. */
-export function useSiteSearch() {
+/** Site-wide search, shared by the header field and the phone search toggle.
+ *
+ * `localePath` is injectable so tests can supply a plain function instead of
+ * the real `@nuxtjs/i18n` composable, which needs a live Nuxt app instance
+ * and can't run under a lightweight test environment — same pattern
+ * `@nuxtjs/i18n`'s own `useLocalePath` uses for its `nuxtApp` parameter. */
+export function useSiteSearch(localePath = useLocalePath()) {
   const { t } = useI18n()
   const loc = useLoc()
-  const localePath = useLocalePath()
 
   const posts   = useState<PostItem[]>('search-posts', () => [])
   const work    = useState<WorkItem[]>('search-work', () => [])
@@ -56,9 +60,13 @@ export function useSiteSearch() {
       ])
       posts.value = postsRes
       work.value = workRes
-    } finally {
+    } catch {
       // a failed fetch still counts as settled — search just stays empty,
-      // not worth a dedicated error state for two small lists
+      // not worth a dedicated error state for two small lists. Caught here,
+      // not left to `finally` alone: a finally block runs but doesn't stop
+      // the rejection from propagating, which left every call site an
+      // unhandled-rejection warning on a flaky connection.
+    } finally {
       loading.value = false
       loaded.value = true
     }

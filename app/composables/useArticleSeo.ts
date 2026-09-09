@@ -24,6 +24,9 @@ export function useArticleSeo(opts: {
       ? sanityFmt(opts.coverUrl()!, 'jpg', { w: 1200, q: 80 })
       : `https://lyoraeth.art/og/${opts.type}/${encodeURIComponent(slug)}?l=${locale.value}`,
   )
+  // Both branches produce a 1200px-wide image — width doesn't depend on
+  // whether the height could be derived, so it's never gated on it.
+  const ogImageWidth = 1200
   const ogImageHeight = computed(() => {
     if (generated.value) return 630
     if (opts.coverWidth() && opts.coverHeight()) return Math.round(1200 * opts.coverHeight()! / opts.coverWidth()!)
@@ -38,7 +41,7 @@ export function useArticleSeo(opts: {
     ogTitle:            () => opts.title(),
     ogDescription:      () => opts.description(),
     ogImage:            ogImage,
-    ogImageWidth:       computed(() => ogImageHeight.value ? 1200 : undefined),
+    ogImageWidth:       ogImageWidth,
     ogImageHeight:      ogImageHeight,
     ogImageAlt:         ogImageAlt,
     ogType:             'article',

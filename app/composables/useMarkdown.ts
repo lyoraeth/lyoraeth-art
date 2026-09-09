@@ -7,8 +7,10 @@ export function slugifyHeading(text: string) {
   return text.toLowerCase().replace(/[^a-z0-9а-яёa-z\s-]/gi, '').trim().replace(/\s+/g, '-')
 }
 
+// Quotes included: used inside HTML attributes (image href/alt/title) as well
+// as text content, and an unescaped `"` there would close the attribute early.
 function escapeHtml(raw: string) {
-  return raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 // Delegated to for every fenced code block except ```mermaid — reproducing
@@ -32,8 +34,8 @@ export function useMarkdown() {
         return `<h${depth}>${inner}</h${depth}>\n`
       },
       image({ href, title, text }) {
-        const caption = title ? `<figcaption class="post-caption">${title}</figcaption>` : ''
-        return `<figure class="post-figure"><img src="${href}" alt="${text ?? ''}" loading="lazy" class="post-img">${caption}</figure>`
+        const caption = title ? `<figcaption class="post-caption">${escapeHtml(title)}</figcaption>` : ''
+        return `<figure class="post-figure"><img src="${escapeHtml(href)}" alt="${escapeHtml(text ?? '')}" loading="lazy" class="post-img">${caption}</figure>`
       },
       code(token) {
         if (token.lang === 'mermaid') {

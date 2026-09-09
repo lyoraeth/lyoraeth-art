@@ -5,6 +5,9 @@
 .nitro
 .cache
 dist
+
+# Vitest coverage reports
+coverage
 # @nuxt/test-utils self-registers here on every `pnpm test`
 .nuxtrc
 
