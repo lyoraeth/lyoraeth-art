@@ -48,7 +48,7 @@ afterEach(() => {
 
 describe('useReveal', () => {
   it('observes a ref element on mount', async () => {
-    const { result, unmount } = withSetup(() => {
+    const { unmount } = withSetup(() => {
       const { observe } = useReveal()
       const el = ref(document.createElement('div'))
       onMounted(() => observe(el.value))

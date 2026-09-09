@@ -76,7 +76,6 @@ function onPointerEnter(event: PointerEvent) {
     user-select: none;
   }
 
-  
   .post-card__link {
     color: inherit;
     text-decoration: none;
@@ -105,8 +104,6 @@ function onPointerEnter(event: PointerEvent) {
     transition: color 500ms var(--ease-base);
   }
 
-  
-  
   /* Takes the rest of the card and splits it: excerpt against the top, action
      against the bottom edge. The action holds its place while hidden, so
      nothing shifts when it appears. */
@@ -140,7 +137,6 @@ function onPointerEnter(event: PointerEvent) {
                 visibility 500ms ease-out;
   }
 
-  
   /*
    * Hover states only where a pointer can hover. On touch :hover latches after
    * a tap, which would leave a card stuck open behind the navigation.

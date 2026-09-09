@@ -34,7 +34,8 @@ const renderOgImage = defineCachedFunction(async (type: 'writing' | 'work', slug
     title   = (locale === 'ru' && doc.title.ru ? doc.title.ru : doc.title.en) ?? ''
     const topic = locale === 'ru' ? (doc.topic?.ru ?? doc.topic?.en) : doc.topic?.en
     caption = topic ? [topic] : []
-  } else {
+  }
+  else {
     const doc = await client.fetch<{ title: { en: string; ru?: string }; teaser?: { en: string; ru?: string } | null } | null>(
       `*[_type == "work" && coalesce(slug.current, _id) == $s][0]{ title, teaser }`, { s: slug },
     )
@@ -54,7 +55,7 @@ const renderOgImage = defineCachedFunction(async (type: 'writing' | 'work', slug
   getKey: (type, slug, locale) => `${type}-${slug}-${locale}`,
 })
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const type    = getRouterParam(event, 'type')
   const slugRaw = getRouterParam(event, 'slug') || ''
   const slug    = decodeURIComponent(slugRaw).replace(/\.png$/, '')

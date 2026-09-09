@@ -28,7 +28,8 @@ function flatten(obj: Record<string, JsonValue>, prefix = ''): Map<string, JsonV
     const path = prefix ? `${prefix}.${key}` : key
     if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
       for (const [k, v] of flatten(value as Record<string, JsonValue>, path)) out.set(k, v)
-    } else {
+    }
+    else {
       out.set(path, value)
     }
   }
@@ -90,7 +91,10 @@ describe('i18n locale files stay structurally mirrored', () => {
     for (const path of arrayPaths(en)) {
       const enArr = at(en, path) as JsonValue[]
       const ruArr = at(ru, path) as JsonValue[] | undefined
-      if (!Array.isArray(ruArr)) { mismatches.push(`${path}: missing in ru.json`); continue }
+      if (!Array.isArray(ruArr)) {
+        mismatches.push(`${path}: missing in ru.json`)
+        continue
+      }
       if (enArr.length !== ruArr.length) mismatches.push(`${path}: en=${enArr.length} ru=${ruArr.length}`)
     }
     expect(mismatches, mismatches.join('\n')).toHaveLength(0)

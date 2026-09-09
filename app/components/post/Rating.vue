@@ -32,9 +32,14 @@ async function vote(dir: 'up' | 'down') {
         down: rating.value.down + (dir === 'down' ? 1 : 0),
       }
     }
-  } catch (e: any) {
+  }
+  catch (e) {
+    // $fetch errors don't have a single, documented shape — a narrow local
+    // cast is the pragmatic middle ground between `any` and writing out
+    // ofetch's internal error types by hand.
+    const err = e as { response?: { status?: number }; statusCode?: number }
     // 409 = уже проголосовал (IP dedup на сервере, но localStorage был сброшен)
-    if (e?.response?.status === 409 || e?.statusCode === 409) {
+    if (err?.response?.status === 409 || err?.statusCode === 409) {
       voted.value = dir
       localStorage.setItem(storageKey, dir)
     }

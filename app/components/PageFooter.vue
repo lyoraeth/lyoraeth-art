@@ -6,6 +6,9 @@ const { t, tm, rt, locale } = useI18n()
 const localePath = useLocalePath()
 
 const credits = computed(() =>
+  // tm()'s generic return type collapses to Record<string, any> without a
+  // locale-message schema declared — item's real shape isn't recoverable here.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (tm('footer.credits') as unknown[]).map((item: any) => ({
     label: rt(item.label),
     value: rt(item.value),

@@ -53,9 +53,9 @@ const filtered = computed<PostItem[]>(() => {
   if (search.value.trim()) {
     const q = search.value.toLowerCase()
     posts = posts.filter(p =>
-      p.title.en.toLowerCase().includes(q) ||
-      (p.title.ru ?? '').toLowerCase().includes(q) ||
-      p.tags.some(tag => tag.toLowerCase().includes(q)),
+      p.title.en.toLowerCase().includes(q)
+      || (p.title.ru ?? '').toLowerCase().includes(q)
+      || p.tags.some(tag => tag.toLowerCase().includes(q)),
     )
   }
 
@@ -104,7 +104,7 @@ function setCardRef(instance: unknown) {
   }
 }
 
-watch(filtered, (posts) => {
+watch(filtered, posts => {
   const stillFiltered = new Set(posts.map(p => p._id))
   for (const id of cardEls.keys()) {
     if (!stillFiltered.has(id)) cardEls.delete(id)
@@ -132,7 +132,9 @@ watch(filtered, (posts) => {
     // and a transition can't be observed starting from a style that was
     // never itself committed to a render. The reflow forces that commit for
     // both cases alike before `in` goes on.
-    cardEls.forEach(el => { void el.offsetHeight })
+    cardEls.forEach(el => {
+      void el.offsetHeight
+    })
     cardEls.forEach(el => el.classList.add('in'))
   })
 })

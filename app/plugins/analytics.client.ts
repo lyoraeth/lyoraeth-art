@@ -18,10 +18,12 @@ export default defineNuxtPlugin(() => {
     }
   }
   window.addEventListener('scroll', onScroll, { passive: true })
-  router.afterEach(() => { fired = new Set() })
+  router.afterEach(() => {
+    fired = new Set()
+  })
 
   // ── Outbound clicks — delegated; any <a> to another host ──
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', e => {
     const a = (e.target as HTMLElement)?.closest?.('a')
     if (!a) return
     const href = a.getAttribute('href') || ''
@@ -30,6 +32,7 @@ export default defineNuxtPlugin(() => {
       if (new URL(href).host !== window.location.host) {
         track(EV.outboundClick, { href })
       }
-    } catch { /* malformed href — ignore */ }
+    }
+    catch { /* malformed href — ignore */ }
   }, { capture: true, passive: true })
 })

@@ -1,7 +1,18 @@
+// WebMCP is an experimental browser API with no official DOM types yet —
+// this is the minimal shape registerTool() actually needs, not the full API.
+interface ModelContext {
+  registerTool: (tool: {
+    name: string
+    description: string
+    inputSchema: Record<string, unknown>
+    execute: (args: { contact: string; message: string }) => Promise<{ success: boolean; message: string }>
+  }) => void
+}
+
 export default defineNuxtPlugin(() => {
   if (!('modelContext' in navigator)) return
 
-  const ctx = (navigator as Navigator & { modelContext: any }).modelContext
+  const ctx = (navigator as Navigator & { modelContext: ModelContext }).modelContext
 
   ctx.registerTool({
     name: 'send_message',

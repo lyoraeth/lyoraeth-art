@@ -16,6 +16,9 @@ const githubUrl = computed(() =>
   settings.value?.githubHandle ? `https://github.com/${settings.value.githubHandle}` : undefined,
 )
 
+// tm()'s generic return type collapses to Record<string, any> without a
+// locale-message schema declared — line's real shape isn't recoverable here.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const lead = computed(() => (tm('contact.lead') as unknown[]).map((line: any) => rt(line)))
 
 /* ── Form ─────────────────────────────────────────────────────────────────── */
@@ -79,11 +82,17 @@ async function onSubmit() {
     status.value = { text: t('contact.sent'), failed: false }
     from.value = message.value = ''
     consent.value = false
-  } catch (error: any) {
+  }
+  catch (e) {
+    // $fetch errors don't have a single, documented shape — a narrow local
+    // cast is the pragmatic middle ground between `any` and writing out
+    // ofetch's internal error types by hand.
+    const error = e as { statusCode?: number; data?: { message?: string } }
     // a rejected token is worth its own line: the fix is a refresh, not a retype
     const captcha = error?.statusCode === 400 && /captcha/i.test(error?.data?.message ?? '')
     status.value = { text: captcha ? t('contact.captcha_failed') : t('contact.failed'), failed: true }
-  } finally {
+  }
+  finally {
     sending.value = false
     // A token is single-use: whatever the outcome, the next send needs a new
     // one. Clearing token alone leaves the widget itself showing a stale

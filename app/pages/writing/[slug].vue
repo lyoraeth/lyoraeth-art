@@ -16,11 +16,11 @@ if (!post.value) {
 }
 
 const title = computed(() =>
-  post.value ? (locale.value === 'ru' && post.value.title.ru ? post.value.title.ru : post.value.title.en) : ''
+  post.value ? (locale.value === 'ru' && post.value.title.ru ? post.value.title.ru : post.value.title.en) : '',
 )
 
 const excerpt = computed(() =>
-  post.value ? (locale.value === 'ru' && post.value.excerpt.ru ? post.value.excerpt.ru : post.value.excerpt.en) : ''
+  post.value ? (locale.value === 'ru' && post.value.excerpt.ru ? post.value.excerpt.ru : post.value.excerpt.en) : '',
 )
 
 const { ogImage, pageUrl } = useArticleSeo({
@@ -228,6 +228,8 @@ onMounted(() => {
           </ol>
         </nav>
 
+        <!-- bodyHtml is our own rendered markdown (useMarkdown), not user input -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <div class="post-body post-column" v-html="bodyHtml" />
 
         <footer v-if="post.references?.length" id="post-references" class="post-column post-references">

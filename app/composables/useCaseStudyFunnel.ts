@@ -9,7 +9,7 @@ export function useCaseStudyFunnel(slug: string) {
 
   onMounted(() => {
     track(EV.workOpen, { slug })
-    caseIo = new IntersectionObserver((entries) => {
+    caseIo = new IntersectionObserver(entries => {
       for (const e of entries) {
         if (!e.isIntersecting) continue
         if (e.target === depthEl.value)     track(EV.workDepth, { slug })

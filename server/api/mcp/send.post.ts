@@ -9,7 +9,7 @@ interface McpContactBody {
  *  No captcha (the browser-agent bridge can't solve one); emails via Resend.
  *  400 on empty fields, 413 on oversized input, 503 when the mailer is
  *  unconfigured. Rate-limited at the nginx layer alongside /api/contact. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const { contact, message } = await readBody<McpContactBody>(event)
 
   if (!contact?.trim() || !message?.trim()) {

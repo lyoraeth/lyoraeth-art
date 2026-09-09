@@ -51,7 +51,7 @@ export async function renderFeed(event: H3Event, locale: 'en' | 'ru') {
 
   const prefix = locale === 'ru' ? '/ru' : ''
 
-  const items = posts.map((post) => {
+  const items = posts.map(post => {
     const link  = `${BASE}${prefix}/writing/${post.slug}`
     const title = (locale === 'ru' ? post.title.ru : null) ?? post.title.en
     const body  = (locale === 'ru' ? post.body.ru : null) ?? post.body.en ?? ''

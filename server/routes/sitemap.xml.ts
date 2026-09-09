@@ -9,10 +9,10 @@ type Stamped = { _updatedAt?: string; publishedAt?: string }
 const stamp = (d?: string) => d?.slice(0, 10)
 
 function url(loc: string, priority: string, changefreq: string, alt: { en: string; ru: string }, lastmod?: string) {
-  const links =
-    `<xhtml:link rel="alternate" hreflang="en" href="${alt.en}"/>` +
-    `<xhtml:link rel="alternate" hreflang="ru" href="${alt.ru}"/>` +
-    `<xhtml:link rel="alternate" hreflang="x-default" href="${alt.en}"/>`
+  const links
+    = `<xhtml:link rel="alternate" hreflang="en" href="${alt.en}"/>`
+      + `<xhtml:link rel="alternate" hreflang="ru" href="${alt.ru}"/>`
+      + `<xhtml:link rel="alternate" hreflang="x-default" href="${alt.en}"/>`
   return `  <url><loc>${loc}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}<priority>${priority}</priority><changefreq>${changefreq}</changefreq>${links}</url>`
 }
 
@@ -28,7 +28,7 @@ function pair(path: string, priority: string, changefreq: string, lastmod?: stri
 /** GET /sitemap.xml — static pages plus every post/work slug, each emitted as
  *  paired EN + /ru URLs with hreflang alternates. `lastmod` uses the doc's
  *  `_updatedAt` (falling back to `publishedAt` for posts). */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
 
   let posts: (Pick<PostItem, 'slug'> & Stamped)[] = []

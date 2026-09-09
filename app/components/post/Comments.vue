@@ -38,7 +38,6 @@ const ve = computed(() => ({
 const formatDate = useFormatDate()
 
 const localePath = useLocalePath()
-const { locale } = useI18n()
 const turnstile = ref<{ reset: () => void } | null>(null)
 
 async function submit() {
@@ -60,10 +59,17 @@ async function submit() {
     state.value = 'success'
     nick.value = message.value = ''
     consent.value = false
-  } catch (e: any) {
-    errMsg.value = e?.data?.message ?? t('post.comments.error')
+    await refresh() // pull the just-posted comment into the list above
+  }
+  catch (e) {
+    // $fetch errors don't have a single, documented shape — a narrow local
+    // cast is the pragmatic middle ground between `any` and writing out
+    // ofetch's internal error types by hand.
+    const err = e as { data?: { message?: string } }
+    errMsg.value = err?.data?.message ?? t('post.comments.error')
     state.value = 'error'
-  } finally {
+  }
+  finally {
     // A token is single-use, on success or failure alike: clearing it alone
     // leaves the widget itself showing a stale solved state for a token
     // that's already spent — reset() re-renders it so the next comment (a
@@ -107,7 +113,7 @@ async function submit() {
           <label class="type-ui text-text-primary" for="c-nick">{{ t('post.comments.nick') }}</label>
           <input id="c-nick" v-model="nick" class="field-input" type="text"
             :class="{ 'is-error': ve.nick }"
-            autocomplete="nickname" :placeholder="t('post.comments.nick_placeholder')" />
+            autocomplete="nickname" :placeholder="t('post.comments.nick_placeholder')" >
           <p v-if="ve.nick" class="type-ui text-text-critical" aria-live="polite">{{ t('form.required') }}</p>
         </div>
 
@@ -124,7 +130,7 @@ async function submit() {
         <p v-if="state === 'error'" class="type-text text-text-critical">{{ errMsg }}</p>
 
         <label class="consent-label type-ui" :class="ve.consent ? 'text-text-critical' : 'text-text-secondary'">
-          <input type="checkbox" v-model="consent" class="consent-check" />
+          <input v-model="consent" type="checkbox" class="consent-check" >
           <i18n-t keypath="post.comments.consent" tag="span" scope="global">
             <template #consent>
               <NuxtLink :to="localePath('/personal-data')" target="_blank" class="consent-link">{{ t('post.comments.consent_link') }}</NuxtLink>
@@ -137,7 +143,7 @@ async function submit() {
         <p v-if="ve.consent" class="type-ui text-text-critical" aria-live="polite">{{ t('form.required_consent') }}</p>
 
         <button type="submit" class="submit-btn type-ui" :disabled="state === 'loading' || !token">
-          <span v-if="state === 'loading'" class="loading-dot"></span>
+          <span v-if="state === 'loading'" class="loading-dot"/>
           <span v-else>{{ t('post.comments.submit') }}</span>
         </button>
       </form>

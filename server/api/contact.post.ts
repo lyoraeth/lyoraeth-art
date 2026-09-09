@@ -9,7 +9,7 @@ interface ContactBody {
 /** POST /api/contact — public contact form. Verifies a Cloudflare Turnstile
  *  token before emailing via Resend. 400 on empty fields or captcha failure,
  *  503 when the mailer is unconfigured. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const { token, contact, message } = await readBody<ContactBody>(event)
 
   if (!contact?.trim() || !message?.trim()) {
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 413, message: 'Message too long' })
   }
 
-  const { turnstileContactSecretKey, resendApiKey, mailerFrom, mailerTo } = useRuntimeConfig(event)
+  const { resendApiKey, mailerFrom, mailerTo } = useRuntimeConfig(event)
   const valid = await verifyTurnstileToken(token, event)
   if (!valid.success) throw createError({ statusCode: 400, message: 'Captcha failed — please try again' })
 

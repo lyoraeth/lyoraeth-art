@@ -72,7 +72,10 @@ export function useToc(opts: {
     // Registered synchronously (before the await) so it binds to the active
     // component instance — after `await nextTick()` there is none.
     onUnmounted(() => window.removeEventListener('scroll', onScroll))
-    watch(opts.content, async () => { await nextTick(); updateActiveId() })
+    watch(opts.content, async () => {
+      await nextTick()
+      updateActiveId()
+    })
 
     await nextTick()
     updateActiveId()

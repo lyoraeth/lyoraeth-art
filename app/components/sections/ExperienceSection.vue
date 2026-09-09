@@ -4,7 +4,10 @@ interface Job { period: string; title: string; description: string[] }
 
 const { t, tm, rt } = useI18n()
 
+// tm()'s generic return type collapses to Record<string, any> without a
+// locale-message schema declared — item's real shape isn't recoverable here.
 const specs = computed(() =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (tm('experience.specs') as unknown[]).map((item: any): Spec => ({
     label: rt(item.label),
     value: rt(item.value),
@@ -12,9 +15,11 @@ const specs = computed(() =>
 )
 
 const jobs = computed(() =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (tm('experience.jobs') as unknown[]).map((item: any): Job => ({
     period: rt(item.period),
     title: rt(item.title),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     description: (item.description as unknown[]).map((p: any) => rt(p)),
   })),
 )

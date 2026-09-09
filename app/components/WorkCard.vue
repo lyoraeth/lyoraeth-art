@@ -98,7 +98,6 @@ function onPointerEnter(event: PointerEvent) {
     user-select: none;
   }
 
-  
   .work-card__link {
     color: inherit;
     text-decoration: none;
@@ -154,9 +153,6 @@ function onPointerEnter(event: PointerEvent) {
     transition: color 500ms var(--ease-base);
   }
 
-  
-  
-  
   .work-card__stack {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -187,8 +183,6 @@ function onPointerEnter(event: PointerEvent) {
     pointer-events: none;
   }
 
-  
-  
   .work-card__action {
     display: flex;
     flex-direction: row;

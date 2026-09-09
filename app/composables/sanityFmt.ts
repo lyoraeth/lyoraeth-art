@@ -10,7 +10,8 @@ export function sanityFmt(
     if (opts.q !== undefined) u.searchParams.set('q', String(opts.q))
     if (opts.w !== undefined) u.searchParams.set('w', String(opts.w))
     return u.toString()
-  } catch {
+  }
+  catch {
     return url
   }
 }

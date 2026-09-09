@@ -64,7 +64,7 @@ test.describe('header', () => {
 
   test('anchors clear the sticky header', async ({ page }) => {
     const padding = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).scrollPaddingTop
+      getComputedStyle(document.documentElement).scrollPaddingTop,
     )
     // the bar, not the whole header: the 1px bottom border is deliberate slack
     const height = (await page.locator(bar).boundingBox())!.height
@@ -287,7 +287,7 @@ test.describe('contact form', () => {
     // depends on the form's own retry logic, not on whether this sandbox has
     // real Resend/Turnstile credentials configured.
     let calls = 0
-    await page.route('**/api/contact', (route) => {
+    await page.route('**/api/contact', route => {
       calls += 1
       if (calls === 1) return route.fulfill({ status: 500, json: { message: 'boom' } })
       return route.fulfill({ status: 200, json: { ok: true } })
@@ -560,7 +560,6 @@ test.describe('mobile search toggle', () => {
 
 test.describe('performance', () => {
   test('LCP under 2.5s', async ({ page }) => {
-    let lcp = 0
     await page.addInitScript(() => {
       new PerformanceObserver(list => {
         const entries = list.getEntries()
@@ -571,7 +570,7 @@ test.describe('performance', () => {
     await page.goto('/')
     await ready(page)
     await page.waitForTimeout(500)
-    lcp = await page.evaluate(() => (window as any).__lcp ?? 0)
+    const lcp = await page.evaluate(() => (window as any).__lcp ?? 0)
 
     console.log(`LCP: ${Math.round(lcp)}ms`)
     expect(lcp, `LCP too high: ${Math.round(lcp)}ms`).toBeLessThan(2500)
@@ -588,7 +587,7 @@ test.describe('performance', () => {
     await page.waitForTimeout(500)
 
     const heapMB = await page.evaluate(
-      () => ((performance as any).memory?.usedJSHeapSize ?? 0) / 1024 / 1024
+      () => ((performance as any).memory?.usedJSHeapSize ?? 0) / 1024 / 1024,
     )
     console.log(`JS heap after full scroll: ${heapMB.toFixed(1)} MB`)
 
@@ -599,15 +598,12 @@ test.describe('performance', () => {
 // ── Event listener leak probe ─────────────────────────────────────────────────
 
 test('event listener count does not grow on navigation', async ({ page }) => {
-  const countListeners = () =>
-    page.evaluate(() => (window as any).__listenerCount ?? 'unsupported')
-
   await page.goto('/')
   await ready(page)
   await page.waitForTimeout(500)
 
   const heap1 = await page.evaluate(
-    () => ((performance as any).memory?.usedJSHeapSize ?? 0) / 1024 / 1024
+    () => ((performance as any).memory?.usedJSHeapSize ?? 0) / 1024 / 1024,
   )
 
   await page.reload()
@@ -615,7 +611,7 @@ test('event listener count does not grow on navigation', async ({ page }) => {
   await page.waitForTimeout(500)
 
   const heap2 = await page.evaluate(
-    () => ((performance as any).memory?.usedJSHeapSize ?? 0) / 1024 / 1024
+    () => ((performance as any).memory?.usedJSHeapSize ?? 0) / 1024 / 1024,
   )
   const growthMB = heap2 - heap1
 

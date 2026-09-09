@@ -17,7 +17,6 @@
  * parameter — same pattern, same reason.
  */
 export function useCardLink(to: () => string, localePath = useLocalePath()) {
-
   /** Where the press started — a release far from it was a drag, not a click. */
   let pressedAt: { x: number; y: number } | null = null
   const DRAG_THRESHOLD = 4

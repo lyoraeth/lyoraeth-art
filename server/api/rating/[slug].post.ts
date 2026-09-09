@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 /** POST /api/rating/:slug — record one up/down vote. Dedupes per voter with a
  *  salted SHA-256 of IP+slug as the vote doc id, so a repeat vote hits Sanity's
  *  create conflict and returns 409 (Already voted). 400 on a bad `dir` body. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const slug = getRouterParam(event, 'slug')!
   const { dir } = await readBody<{ dir: 'up' | 'down' }>(event)
   if (dir !== 'up' && dir !== 'down') throw createError({ statusCode: 400 })
@@ -27,8 +27,13 @@ export default defineEventHandler(async (event) => {
       .createIfNotExists({ _id: ratingId, _type: 'rating', slug, up: 0, down: 0 })
       .patch(ratingId, { inc: { [dir]: 1 } })
       .commit()
-  } catch (e: any) {
-    const status = e?.statusCode ?? e?.response?.statusCode ?? e?.status
+  }
+  catch (e) {
+    // Sanity client errors don't have a single, documented shape — probing
+    // a few likely spots is the pragmatic middle ground between `any` and
+    // writing out the client's internal error types by hand.
+    const err = e as { statusCode?: number; response?: { statusCode?: number }; status?: number }
+    const status = err?.statusCode ?? err?.response?.statusCode ?? err?.status
     if (status === 409) throw createError({ statusCode: 409, message: 'Already voted' })
     throw e
   }

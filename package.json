@@ -11,6 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "analyze": "nuxt analyze"
   },
   "dependencies": {
@@ -31,11 +33,13 @@
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
+    "@nuxt/eslint": "^1.17.0",
     "@nuxt/test-utils": "^4.0.3",
     "@playwright/test": "^1.61.0",
     "@types/nodemailer": "^8.0.1",
     "@vitest/coverage-v8": "4.1.9",
     "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.10.0",
     "happy-dom": "^20.10.6",
     "sharp": "^0.35.2",
     "typescript": "^6.0.3",

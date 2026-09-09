@@ -60,13 +60,15 @@ export function useSiteSearch(localePath = useLocalePath()) {
       ])
       posts.value = postsRes
       work.value = workRes
-    } catch {
+    }
+    catch {
       // a failed fetch still counts as settled — search just stays empty,
       // not worth a dedicated error state for two small lists. Caught here,
       // not left to `finally` alone: a finally block runs but doesn't stop
       // the rejection from propagating, which left every call site an
       // unhandled-rejection warning on a flaky connection.
-    } finally {
+    }
+    finally {
       loading.value = false
       loaded.value = true
     }
@@ -90,8 +92,8 @@ export function useSiteSearch(localePath = useLocalePath()) {
 
     const matchedWork = work.value
       .filter(w =>
-        bothLoc(w.title).some(s => s.includes(q)) ||
-        w.tags.some(tag => tag.toLowerCase().includes(q)),
+        bothLoc(w.title).some(s => s.includes(q))
+        || w.tags.some(tag => tag.toLowerCase().includes(q)),
       )
       .slice(0, RESULT_LIMIT)
       .map((w): SearchResult => ({
@@ -103,9 +105,9 @@ export function useSiteSearch(localePath = useLocalePath()) {
 
     const matchedPosts = posts.value
       .filter(p =>
-        bothLoc(p.title).some(s => s.includes(q)) ||
-        bothLoc(p.topic).some(s => s.includes(q)) ||
-        p.tags.some(tag => tag.toLowerCase().includes(q)),
+        bothLoc(p.title).some(s => s.includes(q))
+        || bothLoc(p.topic).some(s => s.includes(q))
+        || p.tags.some(tag => tag.toLowerCase().includes(q)),
       )
       .slice(0, RESULT_LIMIT)
       .map((p): SearchResult => ({

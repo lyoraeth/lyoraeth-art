@@ -3,17 +3,18 @@ import { Resend } from 'resend'
 /** POST /api/csp-report — browser CSP violation sink (report-uri target).
  *  Parses the report envelope and emails a digest via Resend (best-effort).
  *  Always answers 204, even on malformed/empty bodies. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const config = useRuntimeConfig(event)
 
   const raw = await readRawBody(event)
   if (!raw) return sendNoContent(event)
 
-  let report: Record<string, unknown> = {}
+  let report: Record<string, unknown>
   try {
     const parsed = JSON.parse(raw)
     report = parsed['csp-report'] ?? parsed
-  } catch {
+  }
+  catch {
     return sendNoContent(event)
   }
 

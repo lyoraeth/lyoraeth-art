@@ -57,12 +57,17 @@ useHead({
           addressLocality: t('schema.address_locality'),
           addressCountry: 'RU',
         },
+        // tm()'s generic return type collapses to Record<string, any> without
+        // a locale-message schema declared — item's real shape isn't
+        // recoverable here (same gap as the htmlAttrs cast above).
         knowsLanguage: (tm('schema.knows_language') as unknown[])
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .map((name: any) => ({ '@type': 'Language', name: rt(name) })),
         sameAs: [
           'https://github.com/lyoraeth',
           'https://t.me/lyoraeth_art',
         ],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         knowsAbout: (tm('schema.knows_about') as unknown[]).map((item: any) => rt(item)),
       })),
     },

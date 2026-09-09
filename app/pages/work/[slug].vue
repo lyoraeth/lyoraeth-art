@@ -22,7 +22,7 @@ const bodyParagraphs = computed(() =>
 )
 
 const metaDescription = computed(() =>
-  loc(item.value?.excerpt) || loc(item.value?.teaser)
+  loc(item.value?.excerpt) || loc(item.value?.teaser),
 )
 
 const { ogImage, pageUrl } = useArticleSeo({
@@ -88,11 +88,12 @@ const closeButton  = ref<HTMLButtonElement | null>(null)
 // out, keyboard/screen-reader users got none of it — Tab still walked
 // through whatever the backdrop covers, and closing left focus on nothing
 // in particular (the trigger button, still in the DOM, but never reclaimed).
-watch(lightboxOpen, async (open) => {
+watch(lightboxOpen, async open => {
   if (open) {
     await nextTick()
     closeButton.value?.focus()
-  } else {
+  }
+  else {
     imageZoomed.value = false
     coverButton.value?.focus()
   }

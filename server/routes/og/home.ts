@@ -7,7 +7,7 @@ import { OG_FONTS, ogCard } from '../../utils/ogTemplate'
  *  by locale (the RU name/role card is shared by both, same as the static
  *  og-image.png this replaced), so the render is cheap enough to skip
  *  caching entirely. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const card = ogCard({
     title:   ['Данил', 'Климов'],
     caption: ['Фронтенд-разработчик.', 'Vue, TypeScript, Nuxt, GSAP.'],

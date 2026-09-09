@@ -17,10 +17,17 @@ export const OG_FONTS = [
 
 const C = { bg: '#FAFAFA', ink: '#1F2123', muted: '#5B636B', ember: '#C94C17' }
 
+// Minimal local stand-in for satori's own (internal, unexported) vnode type
+// — just enough shape for this hyperscript helper, not satori's full API.
+interface VNode {
+  type:  string
+  props: Record<string, unknown> & { children: (VNode | string)[] }
+}
+
 // tiny hyperscript for satori's vnode shape
-const h = (type: string, props: any, ...kids: any[]): any => ({
+const h = (type: string, props: Record<string, unknown>, ...kids: (VNode | string | null | undefined)[]): VNode => ({
   type,
-  props: { ...props, children: kids.flat().filter(k => k != null) },
+  props: { ...props, children: kids.flat().filter((k): k is VNode | string => k != null) },
 })
 
 const logoSrc  = `data:image/png;base64,${logoLightPng}`
@@ -62,47 +69,47 @@ export function ogCard({ title, caption = [], link }: OgCardOptions) {
       backgroundColor: C.bg, overflow: 'hidden',
     },
   },
-    // faint right-side wordmark fragment — decorative, sits behind the text
-    h('img', {
-      src: decorSrc, width: 682, height: 630,
-      style: { display: 'flex', position: 'absolute', left: '518px', top: '0px' },
-    }),
+  // faint right-side wordmark fragment — decorative, sits behind the text
+  h('img', {
+    src: decorSrc, width: 682, height: 630,
+    style: { display: 'flex', position: 'absolute', left: '518px', top: '0px' },
+  }),
 
+  h('div', {
+    style: {
+      display: 'flex', flexDirection: 'column', position: 'relative',
+      paddingTop: '64px', paddingLeft: '64px',
+    },
+  },
+  logo(28),
+
+  h('div', { style: { display: 'flex', marginTop: '40px', width: '48px', height: '4px', borderRadius: '2px', backgroundColor: C.ember } }),
+
+  h('div', {
+    style: {
+      display: 'flex', marginTop: '24px', color: C.ink,
+      fontFamily: 'PP Pangram Sans', fontWeight: 600, wordBreak: 'break-word',
+      ...titleStyle,
+    },
+  }, titleNode),
+
+  ...caption.map((line, i) =>
     h('div', {
       style: {
-        display: 'flex', flexDirection: 'column', position: 'relative',
-        paddingTop: '64px', paddingLeft: '64px',
+        display: 'flex', marginTop: i === 0 ? '32px' : '8px', maxWidth: '454px',
+        color: C.muted, fontFamily: 'PP Pangram Sans', fontWeight: 600,
+        fontSize: '20px', lineHeight: '25px', letterSpacing: '0.4px',
       },
+    }, line),
+  ),
+
+  h('div', {
+    style: {
+      display: 'flex', marginTop: caption.length ? '64px' : '96px',
+      color: C.muted, fontFamily: 'PP Pangram Sans', fontWeight: 600,
+      fontSize: '14px', lineHeight: '17.5px', letterSpacing: '0.28px',
     },
-      logo(28),
-
-      h('div', { style: { display: 'flex', marginTop: '40px', width: '48px', height: '4px', borderRadius: '2px', backgroundColor: C.ember } }),
-
-      h('div', {
-        style: {
-          display: 'flex', marginTop: '24px', color: C.ink,
-          fontFamily: 'PP Pangram Sans', fontWeight: 600, wordBreak: 'break-word',
-          ...titleStyle,
-        },
-      }, titleNode),
-
-      ...caption.map((line, i) =>
-        h('div', {
-          style: {
-            display: 'flex', marginTop: i === 0 ? '32px' : '8px', maxWidth: '454px',
-            color: C.muted, fontFamily: 'PP Pangram Sans', fontWeight: 600,
-            fontSize: '20px', lineHeight: '25px', letterSpacing: '0.4px',
-          },
-        }, line),
-      ),
-
-      h('div', {
-        style: {
-          display: 'flex', marginTop: caption.length ? '64px' : '96px',
-          color: C.muted, fontFamily: 'PP Pangram Sans', fontWeight: 600,
-          fontSize: '14px', lineHeight: '17.5px', letterSpacing: '0.28px',
-        },
-      }, link),
-    ),
+  }, link),
+  ),
   )
 }

@@ -1,8 +1,12 @@
 import { nuxtMocks, resetNuxtMocks, fakeLocalePath } from './_nuxt-mocks'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi  } from 'vitest'
 
-function seedWork(items: unknown[])  { nuxtMocks.state.set('search-work', { value: items }) }
-function seedPosts(items: unknown[]) { nuxtMocks.state.set('search-posts', { value: items }) }
+function seedWork(items: unknown[]) {
+  nuxtMocks.state.set('search-work', { value: items })
+}
+function seedPosts(items: unknown[]) {
+  nuxtMocks.state.set('search-posts', { value: items })
+}
 
 const workItem = (over: Record<string, unknown> = {}) => ({
   _id: 'w1', slug: 'crm-rebuild', year: 2025, tags: ['CRM', 'Vue'],
@@ -83,5 +87,5 @@ describe('useSiteSearch', () => {
 
 // vitest runs outside Nuxt, so auto-imports don't resolve — import manually
 import { useSiteSearch } from '../../app/composables/useSiteSearch'
-import { vi } from 'vitest'
+
 vi.stubGlobal('$fetch', nuxtMocks.fetch)

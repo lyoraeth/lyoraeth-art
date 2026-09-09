@@ -1,6 +1,6 @@
 /** GET /api/work — work items by manual order. `?limit=N` caps the count
  *  (`limit=0` returns all). Response cached 5 min, keyed by the limit param. */
-export default defineCachedEventHandler(async (event) => {
+export default defineCachedEventHandler(async event => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
   if (!sanityProjectId) return []
 
@@ -25,7 +25,7 @@ export default defineCachedEventHandler(async (event) => {
       "coverAlt": cover.alt
     }
   `)
-}, { maxAge: 60 * 5, name: 'work-list', getKey: (event) => String(getQuery(event).limit ?? '3') })
+}, { maxAge: 60 * 5, name: 'work-list', getKey: event => String(getQuery(event).limit ?? '3') })
 
 export interface WorkItem {
   _id:         string

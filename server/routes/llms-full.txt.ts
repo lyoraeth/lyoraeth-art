@@ -1,23 +1,46 @@
 const BASE = 'https://lyoraeth.art'
 
+// Just the fields this route's own GROQ projections actually select — work's
+// `body` is a genuine { en, ru } field on that schema, unlike a post's,
+// which is a plain string (bodyRu lives in its own separate field there).
+interface LlmsWorkItem {
+  slug:    string
+  title?:  { en?: string }
+  teaser?: { en?: string }
+  excerpt?: { en?: string }
+  body?:   { en?: string } | null
+  tags?:   string[]
+  url?:    string
+  year?:   number
+}
+interface LlmsPostItem {
+  slug:    string
+  title?:  { en?: string }
+  publishedAt?: string
+  readingTime?: number
+  topic?:  { en?: string }
+  tags?:   string[]
+  body?:   string | null
+}
+
 /** GET /llms-full.txt — plain-text index of all work + writing (EN, full post
  *  bodies inline) for LLM crawlers. Empty-ish when the CMS is unconfigured. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
 
-  let work:  any[] = []
-  let posts: any[] = []
+  let work:  LlmsWorkItem[] = []
+  let posts: LlmsPostItem[] = []
 
   if (sanityProjectId) {
     const client = createSanityClient(sanityProjectId, sanityDataset)
     ;[work, posts] = await Promise.all([
-      client.fetch<any[]>(`
+      client.fetch<LlmsWorkItem[]>(`
         *[_type == "work"] | order(order asc) {
           "slug": coalesce(slug.current, _id),
           title, teaser, excerpt, body, tags, url, year
         }
       `),
-      client.fetch<any[]>(`
+      client.fetch<LlmsPostItem[]>(`
         *[_type == "post"] | order(publishedAt desc) {
           "slug": slug.current,
           title, publishedAt, readingTime, topic, tags, body

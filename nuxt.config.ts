@@ -1,8 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
+  compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
   runtimeConfig: {
@@ -24,7 +24,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  css: ["~/assets/css/main.css"],
+  css: ['~/assets/css/main.css'],
 
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
@@ -37,16 +37,16 @@ export default defineNuxtConfig({
         // media-query favicon support fall through to the static ones below,
         // which stay on the dark-ink mark — the safer default against the
         // still-common light browser chrome.
-        { rel: "icon", type: "image/svg+xml", href: "/favicon-light.svg", media: "(prefers-color-scheme: light)" },
-        { rel: "icon", type: "image/svg+xml", href: "/favicon-dark.svg", media: "(prefers-color-scheme: dark)" },
-        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
-        { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
-        { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16.png" },
-        { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
-        { rel: "manifest", href: "/site.webmanifest" },
-        { rel: "preconnect", href: "https://cdn.sanity.io" },
-        { rel: "preconnect", href: "https://challenges.cloudflare.com" },
-        { rel: "preconnect", href: "https://stat.lyoraeth.art" },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon-light.svg', media: '(prefers-color-scheme: light)' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon-dark.svg', media: '(prefers-color-scheme: dark)' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/site.webmanifest' },
+        { rel: 'preconnect', href: 'https://cdn.sanity.io' },
+        { rel: 'preconnect', href: 'https://challenges.cloudflare.com' },
+        { rel: 'preconnect', href: 'https://stat.lyoraeth.art' },
       ],
       style: [
         // Cascade layer order, pinned before any stylesheet loads. Nuxt inlines
@@ -92,24 +92,24 @@ export default defineNuxtConfig({
         // Report-Only: violations logged in DevTools, nothing blocked yet.
         // Switch to Content-Security-Policy once allowlist is verified in prod.
         'Content-Security-Policy-Report-Only': [
-          "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://stat.lyoraeth.art",
-          "style-src 'self' 'unsafe-inline'",
-          "img-src 'self' https://cdn.sanity.io data: blob:",
-          "font-src 'self' data:",
-          "connect-src 'self' https://*.sanity.io https://stat.lyoraeth.art",
-          "frame-src https://challenges.cloudflare.com",
-          "object-src 'none'",
-          "base-uri 'self'",
-          "form-action 'self'",
-          "report-uri /api/csp-report",
+          'default-src \'self\'',
+          'script-src \'self\' \'unsafe-inline\' https://challenges.cloudflare.com https://stat.lyoraeth.art',
+          'style-src \'self\' \'unsafe-inline\'',
+          'img-src \'self\' https://cdn.sanity.io data: blob:',
+          'font-src \'self\' data:',
+          'connect-src \'self\' https://*.sanity.io https://stat.lyoraeth.art',
+          'frame-src https://challenges.cloudflare.com',
+          'object-src \'none\'',
+          'base-uri \'self\'',
+          'form-action \'self\'',
+          'report-uri /api/csp-report',
         ].join('; '),
       },
     },
   },
 
   devServer: {
-    host: "0.0.0.0",
+    host: '0.0.0.0',
     port: 3000,
   },
 
@@ -118,7 +118,18 @@ export default defineNuxtConfig({
     { path: '~/components/sections', pathPrefix: false },
   ],
 
-  modules: ["@nuxtjs/i18n", "@nuxtjs/turnstile"],
+  modules: ['@nuxtjs/i18n', '@nuxtjs/turnstile', '@nuxt/eslint'],
+
+  eslint: {
+    config: {
+      stylistic: {
+        // Matches the style already used throughout the codebase, not a
+        // preference imposed by the linter: no semicolons, single quotes.
+        semi: false,
+        quotes: 'single',
+      },
+    },
+  },
 
   turnstile: {
     siteKey:   process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA',
@@ -127,20 +138,20 @@ export default defineNuxtConfig({
 
   i18n: {
     locales: [
-      { code: "en", language: "en-US", file: "en.json", name: "English" },
-      { code: "ru", language: "ru-RU", file: "ru.json", name: "Русский" },
+      { code: 'en', language: 'en-US', file: 'en.json', name: 'English' },
+      { code: 'ru', language: 'ru-RU', file: 'ru.json', name: 'Русский' },
     ],
-    defaultLocale: "en",
-    strategy: "prefix_except_default",
-    langDir: "locales/",
-    baseUrl: "https://lyoraeth.art",
-    vueI18n: "./i18n.config.ts",
+    defaultLocale: 'en',
+    strategy: 'prefix_except_default',
+    langDir: 'locales/',
+    baseUrl: 'https://lyoraeth.art',
+    vueI18n: './i18n.config.ts',
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: "i18n_locale",
+      cookieKey: 'i18n_locale',
       cookieSecure: true,
       alwaysRedirect: false,
-      fallbackLocale: "en",
+      fallbackLocale: 'en',
     },
   },
-});
+})

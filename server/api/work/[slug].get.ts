@@ -15,7 +15,7 @@ export interface AdjacentWork {
 
 /** GET /api/work/:slug — one work item, matched by slug or raw `_id`.
  *  404 when not found; null when the CMS is unconfigured. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const slug = getRouterParam(event, 'slug')!
   const { sanityProjectId, sanityDataset } = useRuntimeConfig(event)
   if (!sanityProjectId) return null

@@ -11,7 +11,7 @@ interface CommentBody {
 /** POST /api/comment — submit a post comment. Verifies Turnstile, stores the
  *  comment unapproved in Sanity, then emails an HMAC-signed one-click approve
  *  link (see /api/comment/approve). The email send is best-effort. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const { token, nick, message, postSlug } = await readBody<CommentBody>(event)
 
   if (!nick?.trim() || !message?.trim() || !postSlug) {

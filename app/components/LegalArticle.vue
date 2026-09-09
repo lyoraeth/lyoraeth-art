@@ -16,7 +16,8 @@ const router = useRouter()
 function handleBack() {
   if (window.history.length > 1) {
     router.back()
-  } else {
+  }
+  else {
     window.close()
     navigateTo(localePath('/'))
   }
@@ -32,6 +33,8 @@ function handleBack() {
       {{ t('error.go_home') }}
     </button>
 
+    <!-- html is our own rendered markdown (useMarkdown), not user input -->
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <div class="post-body post-column" v-html="html" />
   </div>
 </template>

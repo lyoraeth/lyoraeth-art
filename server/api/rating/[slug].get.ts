@@ -1,6 +1,6 @@
 /** GET /api/rating/:slug — current up/down vote tallies for a post.
  *  Returns zeros when the CMS is unconfigured or the doc doesn't exist yet. */
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const slug = getRouterParam(event, 'slug')!
   const { sanityProjectId, sanityDataset, sanityToken } = useRuntimeConfig(event)
   if (!sanityProjectId) return { up: 0, down: 0 }

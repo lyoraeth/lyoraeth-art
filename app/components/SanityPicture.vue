@@ -31,7 +31,8 @@ function degrade(img: HTMLImageElement) {
     fallbackStep = 1
     pictureRef.value?.querySelectorAll('source').forEach(s => s.remove())
     img.src = sanityFmt(props.src, 'jpg', { w: props.width, q: props.quality })
-  } else if (fallbackStep === 1) {
+  }
+  else if (fallbackStep === 1) {
     fallbackStep = 2
     img.src = props.src
   }
@@ -47,7 +48,8 @@ onMounted(() => {
   if (img.naturalWidth === 0 && props.src) {
     // errored before hydration — the error event is long gone, re-run the chain
     degrade(img)
-  } else if (img.naturalWidth > 0) {
+  }
+  else if (img.naturalWidth > 0) {
     img.dispatchEvent(new Event('load'))
   }
 })

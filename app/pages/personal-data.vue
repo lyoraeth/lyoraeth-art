@@ -10,7 +10,7 @@ if (locale.value !== 'ru') {
   await navigateTo(localePath('/privacy'), { redirectCode: 301 })
 }
 
-watch(locale, (lang) => {
+watch(locale, lang => {
   if (lang !== 'ru') navigateTo(localePath('/privacy'))
 })
 

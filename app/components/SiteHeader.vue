@@ -66,7 +66,7 @@ function toggleMenu() {
 // above where the menu panel covers, so it stays tappable while the menu is
 // open — opening it from there has to close the menu itself, not just rely
 // on toggleMenu()'s side of the exclusion.
-watch(searchOpen, (open) => {
+watch(searchOpen, open => {
   if (open) menuOpen.value = false
 })
 
