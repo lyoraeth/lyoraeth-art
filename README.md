@@ -20,11 +20,9 @@ Personal site — work, writing, contact. The site itself is the demo.
 
 ## What it is
 
-Ninth iteration. First one built on a real brief, a design system, and a stack chosen for reasons.
+Third redesign. One light theme, a 12-column grid, hairline dividers. Figma brief, a design-token system, SSR-first.
 
-Dark theme, editorial layout. Flat content framed by hairline borders with a cursor-tracked ember edge, a film-grain overlay, and sharp type up front. `backdrop-filter` glass is used only on interface chrome — nav, mobile dock, dropdowns — not on content.
-
-EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
+EN / RU. Cookieless analytics. Self-hosted media and fonts. CI/CD, deploys on push.
 
 ---
 
@@ -34,108 +32,112 @@ EN / RU. Self-hosted analytics. Full CI/CD. Deploys on push.
 | :--- | :--- |
 | **Nuxt 4** | SSR, file-based routing, Nitro server |
 | **Vue 3** | Composition API throughout |
-| **Tailwind CSS v4** | Utility-first, reads design tokens from CSS variables |
-| **Sanity** | Headless CMS — work items and writing posts |
+| **Tailwind CSS v4** | Utility-first, reads design tokens from CSS variables (`@theme static`) |
+| **Sanity** | Headless CMS — work items, posts, site settings; the Studio lives in `studio/` |
 | **@nuxtjs/i18n** | EN / RU, `prefix_except_default`, cookie-persisted locale |
-| **Resend** | Contact form email delivery |
+| **marked** | Markdown post bodies, with a custom renderer |
+| **satori + resvg** | Dynamic OG cards rendered server-side |
+| **ffmpeg + libjxl** | The image pipeline — jxl / avif / webp / jpg, encoded on the server |
+| **Resend** | Contact-form and comment-approval email |
 | **Cloudflare Turnstile** | Invisible CAPTCHA — no fingerprinting, no tracking cookies |
 | **Umami** | Self-hosted analytics — cookie-free, no third parties |
-| **Docker + GitHub Actions** | Multi-stage build, GHCR, SSH deploy on push to main |
+| **Docker + GitHub Actions** | Multi-stage build, GHCR, SSH deploy on push to `main` |
 
 ---
 
 ## Design
 
-### Concept
-Content uses hairline frames, figure captions, and FPO-style cover placeholders (crop marks + diagonals — the standard "for position only" print marker). Interface chrome — nav, mobile dock, dropdowns — sits above it on frosted glass. The background is a single static layered gradient: a soft overhead light, a faint cool-to-warm shift down the page, and darkened side edges. Dark mode only.
+One light theme, no dark mode. Content on a plain surface split by 1px dividers; sections and cards on a 12 → 8 → 4 column grid. `sm` is off — no 640px step. No background layers, grain or glass.
 
-### Cards
-Flat and outline-only — a near-transparent fill, a 1px border and a cursor-tracked ember glow that runs along it. Both the static ring and the glow are identically masked pseudo-elements sharing one geometry, so they can't drift into a stepped double edge. No `backdrop-filter` on content: glass lives only on the reader's tools (nav, dock, dropdowns) and, dialed way down, on the Approach cells.
+Two typefaces, self-hosted: **PP Neue Montreal** (Medium) for body and UI, **PP Pangram Sans** (Semibold) for display. The woff2 files are licensed and kept out of the repo, served from `/fonts/` by nginx outside Nuxt — no external font requests in production.
 
-### Logo
-Designed in Figma, exported as SVG. Prepared in all required formats: `favicon.ico`, `favicon-16/32.png`, `apple-touch-icon.png`, `site.webmanifest`. Inlined in the nav to inherit `currentColor`.
-
-### Typography
-Three typefaces, three jobs. **Onest** — body and UI, neutral and highly legible. **Golos Text** — headings, a bit more character. **JetBrains Mono** — tags, labels, metadata — anything that needs to read as a code artifact. All three are self-hosted via `@nuxtjs/google-fonts` with `download: true`, so there are zero external font requests in production.
+The logo is a Figma SVG, inlined in the header to inherit `currentColor`, with `favicon.ico`, `favicon-16/32.png`, `apple-touch-icon.png`, `site.webmanifest` and theme-aware SVG favicons prepared alongside.
 
 ---
 
 ## How it's built
 
-### Design system
-All design tokens — color, spacing, radius, easing, blur — are CSS custom properties in `main.css`. Tailwind reads them via `@theme inline`. Components read them directly. No magic numbers anywhere in the codebase; radii sit on a deliberate even scale (4 / 6 / 8 / 12 / 16 / 18…).
+### Design tokens
+Everything — colour, spacing, radius, type scale, motion — is a CSS custom property in `assets/css/design-system.css`, declared in a `@theme static` block so Tailwind keeps them even when a scoped component style is the only consumer. Components read them directly; there are no magic numbers.
 
-Every transition duration and animation is a token (`--duration-reveal`, `--ease-out-expo`, etc.). A single `@media (prefers-reduced-motion: reduce)` block sets them all to zero — no conditional logic scattered across components.
+Colours are `oklch` with a hex fallback: an `@supports not (color: oklch(0 0 0))` block outside `@layer theme` redeclares the palette, so an engine without `oklch` gets a valid colour with no visual degradation.
 
 ### Motion
-Scroll reveals and entrance transitions run on `IntersectionObserver` — no scroll event listeners, no layout thrashing. Scrolling itself is the browser's: nothing intercepts wheel or touch events, so momentum, find-in-page and keyboard paging behave as the platform intends. Smooth behaviour is limited to anchor jumps via `scroll-behavior`.
+Durations and curves are set from the physiology of vision rather than by feel — the reasoning is a post on the site, *How Many Milliseconds an Interface Actually Needs*. One `--ease-out` curve for everything, with `--ease-in` (its point-reflection) for elements that leave the screen. The base pair is `--duration-hover: 180ms` and `--duration-press: 90ms`; larger movements have their own tokens, and page transitions run longer on touch (`@media (pointer: coarse)`). One `prefers-reduced-motion` block in the shell flattens every animation and transition to instant.
 
-Reading progress bar on post pages — a passive `scroll` listener updates shared `useState`, rendered as a 1.5px ember line at the bottom of the nav. Activates only on `writing/[slug]`, resets and cleans up on unmount.
+Scrolling is the browser's own — nothing intercepts wheel or touch. Anchor jumps use `scroll-behavior` and `scroll-padding-top`. Scroll-triggered reveals (the writing listing) run on `IntersectionObserver`.
 
-Table of contents on post pages — headings are extracted from the raw Markdown at render time and turned into anchor links (`slugify` on h2/h3 text, injected via a custom `marked` renderer). On desktop (≥1152px) the TOC renders as a `position: fixed` sidebar to the right of the content without shifting the layout. On tablet/mobile it collapses into a button in the nav bar that opens a glass dropdown. Active section is tracked with a passive scroll listener comparing heading positions against a reading-line at 50% of viewport height. TOC always includes Introduction (everything before the first heading), any post headings, and appends Sources and Comments as visually separated entries at the bottom.
+### Cards
+The whole card is the click target, with no stretched link over it — the real link is on the heading, the card forwards the pointer gestures a link honours. Text stays selectable: a drag selects, a plain click opens, ctrl/⌘/middle-click opens a new tab, a click on body text waits out the double-click window. Hover states are behind `@media (hover: hover)` so a tap doesn't latch them; the hover fill is a `clip-path` circle grown from the pointer's entry point.
 
-### SSR and hydration
-The server renders complete, readable HTML. Anything that touches `window`, `document`, or pointer events lives in `onMounted` or a `.client`-suffixed plugin. Vue's hydration never sees a mismatch because the client picks up exactly where the server left off.
+### Header, menu, search
+Sticky header; below `lg` it collapses to a burger and a full-screen menu teleported to `body`. Search is a separate layer, mutually exclusive with the menu from both directions; Escape and outside clicks close the results dropdown before the menu. The search catalogue (work, posts, legal pages) is fetched once per session on first focus, filtered on the client after. While the menu — or a page's own lightbox — is open, `<main>` is `inert`, both sources combined into one flag via `provide`/`inject`.
+
+### Maintenance notice
+A strip above the header, shown only while `siteSettings.notice.enabled` is set — toggled from the CMS without a deploy. `html:has(.site-notice)` sets `--notice-h` while it's mounted; the sticky header and `scroll-padding-top` read `var(--notice-h, 0)` to clear it.
+
+### Media pipeline
+Images are uploaded to Sanity as-is; the site does not use Sanity's CDN transforms (no jxl, unreliable avif, softening at high quality). A scheduled Nitro task (`server/tasks/media/sync.ts`, every five minutes inside the app container) pulls each referenced original once and encodes the delivery variants: **jxl** via `cjxl` — progressive, first in the `<picture>` fallback order — and **avif / webp / jpg** via `ffmpeg`, each with hand-tuned settings. The task works to a per-run budget so a backlog of new covers spreads over ticks instead of pinning the CPU, and prunes variants whose source is no longer referenced.
+
+Variants are written to `/media/{sha1}-{family}-{width}.{ext}` and served static with immutable caching. There are two families: `full` keeps the source ratio, `cover` is a 4:3 top-anchored crop the server produces so the narrow layout doesn't ship a whole full-page screenshot to render a strip of it. `SanityPicture.vue` builds the art-directed `<picture>`; if a variant hasn't been encoded yet, an `<img>` error drops the `<source>`s and the raw Sanity URL takes over. The hero portrait stays a set of static files in `public/face/` — one photo, hand-compressed with different settings.
+
+Post bodies can reference gallery images with `![caption](gallery:key){fit=cover pos=top ar=16/9}` — a `marked` extension resolves the key against the post's `gallery` array and emits the same self-hosted `<picture>`.
 
 ### CMS (Sanity)
-Work items and writing posts are managed in Sanity Studio; site-wide settings (availability status, contacts, CV files, the hero portrait) live in a `siteSettings` singleton. Content is fetched server-side via GROQ queries inside Nitro API routes — the Sanity token never leaves the server. Images go through Sanity's CDN transformation pipeline: the server builds `?w=&fm=webp&q=` URLs, the component renders a `<picture>` with WebP → JPEG fallback.
+Work items and posts are edited in Sanity Studio (`lyoraeth.sanity.studio`, schema in `studio/schemaTypes/`); a `siteSettings` singleton holds the social handles, CV files and the maintenance-notice flag. Content is fetched server-side through GROQ inside Nitro API routes — the Sanity token never reaches the browser.
 
-Post bodies are written in Markdown — stored as a plain `text` field in Sanity, fetched as a string via GROQ, and parsed on the frontend with `marked`. The custom renderer wraps images in `<figure>` and adds `target="_blank"` to external links. Posts support a structured `references` array (title + URL) rendered as a numbered footer below the body.
+Post bodies are Markdown stored as plain text, parsed with `marked`. The custom renderer stamps anchor ids onto `h2`/`h3`, wraps images in `<figure>`, opens external links in a new tab, turns ` ```mermaid ` fences into diagram containers (mermaid itself is a dynamic import, only on posts that have one), and handles the `gallery:` scheme above. Posts also carry a `references` array (title + URL) rendered as a numbered footer.
 
-Comments on writing posts are stored in Sanity and fetched client-side with a public read token. Writes go through a Nitro endpoint that validates Turnstile before calling Sanity's mutation API.
+Comments are stored in Sanity with `approved: false`. Writes go through a Nitro endpoint that verifies Turnstile first; on success Resend sends an email with the comment and an **Approve** link — `GET /api/comment/approve?id=…&token=…`, where the token is an HMAC-SHA256 of the document id signed with the Sanity write token, verified with `timingSafeEqual`. No Studio interaction needed to moderate. `GET /api/comments/[slug]` returns only approved comments.
 
-### Performance
-- Fonts: self-hosted, `font-display: swap`, preloaded — zero render-blocking external requests
-- Images: WebP via Sanity CDN (`?fm=webp`), `loading="lazy"` everywhere except above-the-fold covers; cover dimensions pulled from Sanity asset metadata and passed as explicit `width`/`height` — zero CLS. AVIF was dropped after CDN pre-hydration failures caused broken `<picture>` fallback chains in SSR.
-- Static assets (avatar, logo, favicons): `Cache-Control: public, max-age=31536000, immutable`
-- Stage background: a single static layered gradient (`contain: layout style paint`) — zero per-frame JS, no animated blur layers to composite
-- JS: SSR-first — the page is readable before any script runs; observers are progressive enhancement
-- Work cards: `loading="eager"` on all card images (above-the-fold section); `/api/work` response cached for 5 minutes server-side
-- Analytics: Umami script is a single lightweight beacon, no tracking cookies, no external calls
-- Server-Timing: a Nitro plugin hooks into `request` and `beforeResponse` to emit an `app;dur=` metric — visible in DevTools → Network → Timing, no overhead in production
+### Table of contents
+On a post, headings are pulled from the raw Markdown at render time and turned into anchor links (the same `slugify` the renderer stamps on `h2`/`h3`). From `80rem` up the TOC is a `position: sticky` sidebar in its own grid column; below that it's a plain, always-visible list inline in the article. Active section is tracked with a rAF-batched scroll listener. The list always opens with an Introduction entry (everything before the first heading) and appends Sources and Comments as separate entries.
 
-### Security
-All routes carry `Strict-Transport-Security` (preload), `Cross-Origin-Opener-Policy: same-origin`, `X-Frame-Options: DENY`, and `Permissions-Policy` explicitly disabling camera, microphone, geolocation, payment, USB, Bluetooth, and interest-cohort.
-
-A `Content-Security-Policy-Report-Only` header is in place with a verified allowlist. Violations are collected by `POST /api/csp-report` and delivered as email alerts via Resend — no third-party reporting service. The header will be promoted to enforced `Content-Security-Policy` once the report stream confirms the allowlist is complete.
-
-`GET /api/health` returns `{"ok":true}` unconditionally — used as the Docker `HEALTHCHECK` target (interval 30 s, timeout 5 s, start-period 10 s).
-
-Well-known security files are served as static assets: `/.well-known/security.txt` (with PGP signature), `/pgp-key.txt`, and `/humans.txt`. Vulnerability disclosure policy is documented in [SECURITY.md](SECURITY.md) — 72 h acknowledgment, 14-day resolution target.
-
-Rate limiting on `POST /api/comment` and `POST /api/contact` is enforced at the nginx level via `limit_req_zone` (10 req/min per IP, burst 5, `nodelay`). Requests beyond the burst cap receive 429 before reaching the application. The zone definition lives in nginx-proxy-manager's `http.conf` custom include; the `limit_req` directives are applied per-location in NPM's Advanced tab.
-
-Browser compatibility: every `oklch()` and `color-mix()` value is preceded by an `rgba()` fallback — the cascade ensures older engines get a valid color without any visual degradation.
+### SSR and hydration
+The server renders complete, readable HTML. Anything touching `window`, `document` or pointer events lives in `onMounted` or a `.client` plugin, so hydration never sees a mismatch. Every page component has a single element root — `<NuxtPage>` wraps it in `<Transition mode="out-in">`, and a Fragment root there leaves the incoming page unmounted on a client-side navigation.
 
 ### SEO and discoverability
-- `useSeoMeta` on every page — `og:title`, `og:description`, `og:image`, `twitter:card`
-- JSON-LD `Person` schema on the homepage; `BlogPosting` schema (headline, datePublished, image, author) on each post
-- Dynamic `sitemap.xml` generated by a Nitro route, cached for 24 h
-- `llms.txt` with structured site description and real Markdown links for AI crawlers
-- `llms-full.txt` — dynamic Nitro route that fetches all work and writing from Sanity at request time and renders them as plain text. Post bodies are already Markdown strings — included as-is. Cached for 1 h with `stale-while-revalidate`. Always up to date — no build-time generation step needed.
-- WebMCP `send_message` tool registered on the page — AI agents can submit the contact form programmatically without scraping
+- `useSeoMeta` on every page; canonical, `hreflang` alternates and `og:locale` come from the i18n routing config via `useLocaleHead`, so they stay correct across locale switches.
+- JSON-LD: one `Person` node on the homepage with an `@id`; each post's `BlogPosting` and each case's `CreativeWork` reference it by id rather than repeating it, alongside `BreadcrumbList`. The writing index carries `Blog`.
+- OG images: a page with a cover uses a size-capped JPEG off the Sanity CDN; a page without one gets a branded card rendered on the fly by `satori` + `resvg` (`server/routes/og/[type]/[slug]`, localised via `?l=`), with a fixed card for the homepage. The renderer caches a base64 string, not a `Buffer` — Nitro's cache layer serialises entries as JSON and mangles binary.
+- Dynamic `sitemap.xml` (Nitro route, cached 24h); `rss.xml` per locale.
+- `llms.txt` plus `llms-full.txt` — the latter a Nitro route that pulls all work and writing from Sanity at request time and renders them as plain text, cached 1h with `stale-while-revalidate`.
+- A WebMCP `send_message` tool is registered on the page so an agent can submit the contact form without scraping.
 
-### Contact form
-`POST /api/contact` — Nitro endpoint. Validates Turnstile server-side, calls Resend SDK. No SMTP, no separate mail server. If Turnstile fails, the request is rejected before anything is sent.
+### Performance
+- Images: the pipeline above — modern formats, a width ladder, explicit `width`/`height` from Sanity asset metadata so there's no CLS. Covers load eager with `fetchpriority="high"`, everything else lazy.
+- Fonts: self-hosted woff2, `font-display: swap` — no render-blocking external requests.
+- Static assets carry `Cache-Control: public, max-age=31536000, immutable`.
+- The page is server-rendered — readable before any script runs; observers are progressive enhancement.
+- `/api/work` and a few other read endpoints are cached server-side via `defineCachedEventHandler`.
+- Umami is a single lightweight beacon, no cookies, no external calls.
+- A Nitro plugin emits a `Server-Timing: app;dur=` metric — visible in DevTools, no production overhead.
 
-### Comments
-`POST /api/comment` — stores a nickname + message in Sanity with `approved: false`. Email is never requested or stored — only the handle the user chooses. Turnstile-gated.
+### Security
+Every route carries `Strict-Transport-Security` (preload), `Cross-Origin-Opener-Policy: same-origin`, `X-Frame-Options: DENY`, and a `Permissions-Policy` disabling camera, microphone, geolocation, payment, USB, Bluetooth and interest-cohort.
 
-On successful write, Resend sends an email with the comment text and an **Approve** button. The button links to `GET /api/comment/approve?id=…&token=…`, where the token is an HMAC-SHA256 of the Sanity document ID signed with the Sanity write token. The endpoint verifies the token with `timingSafeEqual`, patches `approved: true` via the Sanity client, and returns a minimal HTML confirmation page. No Sanity Studio interaction required for moderation.
+A `Content-Security-Policy-Report-Only` header is in place with a verified allowlist; violations go to `POST /api/csp-report` and out as Resend email alerts — no third-party reporting service. It'll be promoted to enforced once the report stream confirms the allowlist.
 
-`GET /api/comments/[slug]` — returns only `approved: true` comments for a given post slug.
+`GET /api/health` returns `{"ok":true}` — the Docker `HEALTHCHECK` target (it hits `127.0.0.1`, not `localhost`: alpine resolves `localhost` to `::1` too and busybox `wget` tries IPv6 first, where node doesn't listen).
 
-### Legal
-Privacy policy and personal data consent (152-ФЗ, separate document since 01.09.2025) are static Markdown files parsed at build time with `marked`. No CMS dependency for legal pages.
+Well-known files are static: `/.well-known/security.txt` (PGP-signed), `/pgp-key.txt`, `/humans.txt`. Disclosure policy is in [SECURITY.md](SECURITY.md).
+
+Rate limiting on `POST /api/comment`, `/api/contact` and `/api/mcp/send` is enforced at the nginx layer (`limit_req_zone`, per-location in nginx-proxy-manager's config). Requests past the burst cap get 429 before reaching the app.
+
+### The rest of the server
+- `POST /api/contact` — validates Turnstile server-side, sends via the Resend SDK. No SMTP, no mail server.
+- `POST /api/mcp/send` — the same, for the WebMCP tool; no captcha (an agent can't solve one), so it's length-capped and rate-limited instead.
+- `POST /api/rating/[slug]` — records an up/down vote, deduped per voter by a salted SHA-256 of IP + slug as the document id; the raw IP is never stored.
+- Legal pages are Markdown in `app/assets/content/`, rendered through the same `marked` setup — no CMS dependency.
 
 ### i18n
-Two locales, `prefix_except_default` — `/` for EN, `/ru/` for RU. Browser language detected on first visit, stored in `i18n_locale` cookie. All internal navigation uses `localePath()` — no hardcoded routes.
+Two locales, `prefix_except_default` — `/` for EN, `/ru/` for RU. Browser language is detected on first visit and stored in `i18n_locale`. All internal navigation goes through `localePath()`.
 
 ### CI/CD
-Push to `main` → GitHub Actions: multi-stage Docker build → push to GHCR → SSH into VPS → pull, restart, prune. ~3 minutes from push to live. The VPS runs nginx-proxy-manager for SSL termination — no custom nginx config.
+Push to `main` → GitHub Actions: multi-stage Docker build → push to GHCR → SSH into the VPS → `docker compose pull && up -d`, prune, smoke-test. A few minutes from push to live. The VPS runs nginx-proxy-manager for SSL — no hand-written nginx config.
 
 ### DNS and network
-Cloudflare is used as DNS only (gray cloud, no proxy). The VPS is hosted at Sprinthost, St. Petersburg — a Russian IP range. Routing traffic through Cloudflare's proxy made the site inaccessible in Russia without a VPN, since Cloudflare's IP ranges are blocked by Roskomnadzor. DNS-only keeps all Cloudflare configuration intact (rules, SSL settings, etc.) while resolving the domain directly to the VPS IP, which is reachable from within Russia.
+Cloudflare is DNS-only (grey cloud, no proxy). The VPS is at Sprinthost in St. Petersburg, on a Russian IP range. Routing through Cloudflare's proxy made the site unreachable inside Russia without a VPN, since those ranges are blocked; DNS-only keeps the Cloudflare config while resolving straight to the VPS.
 
 ---
 
@@ -146,12 +148,18 @@ pnpm install
 pnpm dev          # localhost:3000
 ```
 
-Copy `.env.example` → `.env`, fill in Sanity project ID, Turnstile keys, Resend API key.
+Copy `.env.example` → `.env` and fill in the Sanity project id, Turnstile keys and Resend key.
 
 ```bash
 pnpm build
 pnpm preview
+
+pnpm lint
+pnpm test         # vitest
+pnpm test:e2e     # playwright
 ```
+
+The media pipeline needs `ffmpeg` and `cjxl` on `PATH` for the sync task; the Docker image installs both.
 
 ---
 
@@ -159,23 +167,28 @@ pnpm preview
 
 ```
 app/
-  components/         # SiteNav, SiteFooter, sections/*, WorkCard, post/*
-  pages/              # index, work/[slug], writing/[slug]
-                      # privacy (EN/RU), personal-data (RU — 152-ФЗ consent)
+  components/         # SiteHeader, PageFooter, SiteNotice, sections/*
+                      # WorkCard, PostCard, SanityPicture, SearchResults, post/*
+  composables/        # useSiteSearch, useMarkdown, useToc, useCardLink,
+                      # useArticleSeo, useMainInert, mediaSrc, …
+  pages/              # index, work/[slug], writing/[slug], listings,
+                      # privacy (EN/RU), personal-data (RU — 152-ФЗ)
   assets/
-    css/              # main.css (tokens + global styles)
+    css/              # main.css (layer order), design-system.css (tokens)
     content/          # privacy.en.md, privacy.ru.md, personal-data.ru.md
-i18n/locales/
-  en.json  ru.json
+shared/
+  media.ts            # naming + width ladder shared by the pipeline and the client
+i18n/locales/         # en.json  ru.json
 server/
-  api/                # contact.post, comment.post, comment/approve.get
-                      # comments/[slug].get, csp-report.post, health.get
-                      # work.get, work/[slug].get, post/[slug].get
-                      # rating/*, settings.get, status.get, mcp/send.post
-  routes/             # sitemap.xml.ts, llms-full.txt.ts
-  utils/              # Sanity client, image formatter
-.github/workflows/
-  deploy.yml
+  api/                # contact, comment(+approve), comments/[slug], rating/*
+                      # csp-report, health, mcp/send, work(+[slug]),
+                      # post/[slug], posts, settings
+  routes/             # sitemap.xml, rss.xml (+ru), llms-full.txt, og/*
+  tasks/media/sync.ts # the scheduled image-encoding task
+  routes/media/       # serves the encoded variants
+  utils/              # Sanity client, media encoder, OG template
+studio/               # Sanity Studio — schema, config, migration scripts
+.github/workflows/deploy.yml
 Dockerfile
 docker-compose.yml    # app + umami + umami-db
 ```

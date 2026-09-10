@@ -51,7 +51,7 @@ The contact and comment forms are protected by **Cloudflare Turnstile**. To run 
 
 ### 3.6. Fonts
 
-Golos Text, Onest and JetBrains Mono are served from `lyoraeth.art`. **No requests are made to Google** and no data is shared with font providers.
+PP Neue Montreal and PP Pangram Sans are served from `lyoraeth.art`. **No requests are made to Google** and no data is shared with font providers.
 
 ## 4. Cookies and local storage
 
