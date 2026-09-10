@@ -12,7 +12,7 @@ interface CommentBody {
  *  comment unapproved in Sanity, then emails an HMAC-signed one-click approve
  *  link (see /api/comment/approve). The email send is best-effort. */
 export default defineEventHandler(async event => {
-  const { token, nick, message, postSlug } = await readBody<CommentBody>(event)
+  const { token, nick, message, postSlug } = await readBody<CommentBody>(event) ?? {}
 
   if (!nick?.trim() || !message?.trim() || !postSlug) {
     throw createError({ statusCode: 400, message: 'All fields are required' })

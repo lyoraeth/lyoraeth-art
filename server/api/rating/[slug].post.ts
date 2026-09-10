@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto'
  *  create conflict and returns 409 (Already voted). 400 on a bad `dir` body. */
 export default defineEventHandler(async event => {
   const slug = getRouterParam(event, 'slug')!
-  const { dir } = await readBody<{ dir: 'up' | 'down' }>(event)
+  const { dir } = await readBody<{ dir: 'up' | 'down' }>(event) ?? {}
   if (dir !== 'up' && dir !== 'down') throw createError({ statusCode: 400 })
 
   const { sanityProjectId, sanityDataset, sanityToken } = useRuntimeConfig(event)

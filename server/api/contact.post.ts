@@ -10,7 +10,7 @@ interface ContactBody {
  *  token before emailing via Resend. 400 on empty fields or captcha failure,
  *  503 when the mailer is unconfigured. */
 export default defineEventHandler(async event => {
-  const { token, contact, message } = await readBody<ContactBody>(event)
+  const { token, contact, message } = await readBody<ContactBody>(event) ?? {}
 
   if (!contact?.trim() || !message?.trim()) {
     throw createError({ statusCode: 400, message: 'All fields are required' })

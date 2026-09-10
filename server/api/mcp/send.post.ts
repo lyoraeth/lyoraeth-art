@@ -10,7 +10,7 @@ interface McpContactBody {
  *  400 on empty fields, 413 on oversized input, 503 when the mailer is
  *  unconfigured. Rate-limited at the nginx layer alongside /api/contact. */
 export default defineEventHandler(async event => {
-  const { contact, message } = await readBody<McpContactBody>(event)
+  const { contact, message } = await readBody<McpContactBody>(event) ?? {}
 
   if (!contact?.trim() || !message?.trim()) {
     throw createError({ statusCode: 400, message: 'All fields are required' })
