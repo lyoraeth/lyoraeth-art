@@ -4,6 +4,11 @@ services:
     container_name: lyoraeth-app
     restart: unless-stopped
     env_file: .env
+    # Self-hosted image variants written by the media:sync task. Bind-mounted
+    # so they survive a redeploy (a new container every deploy) and stay
+    # inspectable on the host.
+    volumes:
+      - ./media:/app/media
     networks:
       - server_network
 
