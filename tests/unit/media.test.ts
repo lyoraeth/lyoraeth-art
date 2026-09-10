@@ -38,6 +38,10 @@ describe('effectiveWidths', () => {
   it('caps a tiny source at a single width', () => {
     expect(effectiveWidths('cover', 300)).toEqual([300])
   })
+
+  it('trims the cover ladder to the source too', () => {
+    expect(effectiveWidths('cover', 1000)).toEqual([480, 960, 1000])
+  })
 })
 
 describe('mediaBasename', () => {

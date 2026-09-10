@@ -36,7 +36,9 @@ export const MEDIA_MIME: Record<MediaFormat, string> = {
  * a given viewport actually loads.
  */
 export const MEDIA_WIDTHS: Record<MediaFamily, readonly number[]> = {
-  cover: [480, 960, 1440],
+  // cover shows below 80rem — often a 2–3× phone or tablet, ~350–620 CSS px,
+  // so the ladder reaches 1920 for a crisp 3× render
+  cover: [480, 960, 1440, 1920],
   full:  [640, 1280, 1920, 2560],
 }
 
@@ -61,6 +63,22 @@ export function effectiveWidths(family: MediaFamily, sourceWidth: number): numbe
 export function mediaBasename(hash: string, family: MediaFamily, width: number, format: MediaFormat): string {
   return `${hash}-${family}-${width}.${format}`
 }
+
+/** The `<source srcset>` for one family/format — every generated width, as
+ *  `/media/…` URLs. `sourceWidth` decides which widths exist (see
+ *  `effectiveWidths`). */
+export function mediaSrcset(hash: string, family: MediaFamily, sourceWidth: number, format: MediaFormat): string {
+  return effectiveWidths(family, sourceWidth)
+    .map(w => `/media/${mediaBasename(hash, family, w, format)} ${w}w`)
+    .join(', ')
+}
+
+/**
+ * The viewport at which a case study switches from the stacked 4:3 crop to
+ * the two-column source-ratio layout — the `<picture>` art-direction
+ * breakpoint, matching `@media (width >= 80rem)` in the page CSS.
+ */
+export const MEDIA_ART_DIRECTION = '(min-width: 80rem)'
 
 /**
  * The content hash for a Sanity image, pulled from its asset URL or `_id`.

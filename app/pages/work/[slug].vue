@@ -165,9 +165,12 @@ onMounted(() => {
         <SanityPicture
           :src="item.coverUrl"
           :alt="item.coverAlt ?? title"
+          family="both"
+          :source-width="item.coverWidth"
+          :source-height="item.coverHeight"
+          sizes="(min-width: 80rem) 42vw, (min-width: 48rem) 41rem, calc(100vw - 3rem)"
           loading="eager"
           fetchpriority="high"
-          :width="900"
         />
       </button>
 
@@ -244,7 +247,10 @@ onMounted(() => {
             <SanityPicture
               :src="item.coverUrl"
               :alt="item.coverAlt ?? title"
-              :width="2400"
+              family="full"
+              :source-width="item.coverWidth"
+              :source-height="item.coverHeight"
+              sizes="100vw"
               class="work-lightbox__img"
               :class="{ 'work-lightbox__img--zoomed': imageZoomed }"
               @click="imageZoomed = !imageZoomed"

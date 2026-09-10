@@ -389,6 +389,26 @@ test.describe('work case cover lightbox', () => {
     await page.keyboard.press('Escape')
     await expect(page.locator('main')).not.toHaveAttribute('inert')
   })
+
+  // The case cover goes through SanityPicture → the self-hosted media
+  // pipeline: an art-directed <picture> whose sources are all /media/ URLs,
+  // and those must actually resolve.
+  test('serves the cover from the self-hosted /media/ pipeline', async ({ page }) => {
+    const cover = page.locator('.work-cover')
+    if (await cover.count() === 0) test.skip(true, 'this work item has no cover')
+
+    const srcsets = await cover.locator('source').evaluateAll(
+      els => els.map(el => (el as HTMLSourceElement).srcset),
+    )
+    expect(srcsets.length).toBeGreaterThanOrEqual(8) // 4 formats × (full + cover)
+    expect(srcsets.every(s => /^\/media\/[0-9a-f]{40}-(cover|full)-\d+\.(jxl|avif|webp|jpg)/.test(s))).toBe(true)
+
+    // first URL of the first srcset — it should 200, not fall through to <img>
+    const url = srcsets[0]!.split(' ')[0]!
+    const res = await page.request.get(url)
+    expect(res.status()).toBe(200)
+    expect(res.headers()['cache-control']).toContain('immutable')
+  })
 })
 
 test.describe('language switch', () => {

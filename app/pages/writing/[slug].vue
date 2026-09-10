@@ -193,10 +193,12 @@ onMounted(() => {
           <SanityPicture
             :src="post.coverUrl"
             :alt="post.coverAlt ?? title"
+            family="full"
+            :source-width="post.coverWidth"
+            :source-height="post.coverHeight"
+            sizes="(min-width: 48rem) 41rem, calc(100vw - 3rem)"
             loading="eager"
             fetchpriority="high"
-            :width="900"
-            :height="post.coverWidth && post.coverHeight ? Math.round(900 * post.coverHeight / post.coverWidth) : undefined"
           />
         </div>
 
