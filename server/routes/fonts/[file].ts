@@ -25,6 +25,10 @@ export default defineEventHandler(async event => {
     'Content-Type':   'font/woff2',
     'Content-Length': String(info.size),
     'Cache-Control':  'public, max-age=31536000, immutable',
+    // The font is licensed. A direct download can't be prevented (the browser
+    // has to fetch it to render), but this stops another origin from
+    // hotlinking it into their own pages.
+    'Cross-Origin-Resource-Policy': 'same-origin',
   })
   return sendStream(event, createReadStream(path))
 })
