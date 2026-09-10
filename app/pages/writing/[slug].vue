@@ -161,7 +161,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="post" class="flex flex-col gap-y-section-gap py-section-padding-y">
+  <div class="flex flex-col gap-y-section-gap py-section-padding-y">
+   <!-- Root stays unconditional, with nothing beside it: a v-if root (or a
+        sibling comment/text) makes the page a Fragment, and <NuxtPage>'s
+        <Transition mode="out-in"> then leaves it unmounted on a client-side
+        navigation. `post` is guaranteed by the 404 throw in setup. -->
+   <template v-if="post">
     <!-- Back + prev/next -->
     <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-2">
       <NuxtLink :to="localePath('/writing')" class="post-nav-link">
@@ -310,6 +315,7 @@ onMounted(() => {
         </nav>
       </aside>
     </div>
+   </template>
   </div>
 </template>
 

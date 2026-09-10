@@ -115,7 +115,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="item" class="flex flex-col gap-y-section-gap py-section-padding-y">
+  <div class="flex flex-col gap-y-section-gap py-section-padding-y">
+   <!-- Root stays unconditional, with nothing beside it: a v-if root (or a
+        sibling comment/text) makes the page a Fragment, and <NuxtPage>'s
+        <Transition mode="out-in"> then leaves it unmounted on a client-side
+        navigation. `item` is guaranteed by the 404 throw in setup. -->
+   <template v-if="item">
     <div class="flex items-center justify-between flex-wrap gap-x-6 gap-y-2">
       <NuxtLink :to="localePath('/work')" class="post-nav-link">
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -262,6 +267,7 @@ onMounted(() => {
         </div>
       </Transition>
     </Teleport>
+   </template>
   </div>
 </template>
 

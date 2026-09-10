@@ -223,6 +223,38 @@ test.describe('card text stays selectable', () => {
   })
 })
 
+test.describe('client-side navigation', () => {
+  // Regression: a page with a Fragment root (multiple roots, a v-if root, a
+  // comment beside the root) breaks <NuxtPage>'s <Transition mode="out-in">
+  // on a client-side route change — the URL updates but the incoming page
+  // never mounts, so <main> is left empty. A full page.goto() masked it (SSR,
+  // no client transition), which is why earlier tests navigated that way.
+  test('clicking a card actually renders the destination, no root-node warnings', async ({ page }) => {
+    const warnings: string[] = []
+    page.on('console', m => {
+      if (/single root node|non-element root|cannot be animated/i.test(m.text())) warnings.push(m.text())
+    })
+
+    // each hop is a fresh load then a *clicked* (client-side) navigation —
+    // the click is what exercises <Transition>, goBack() just churns the
+    // homepage reveal animation and detaches cards mid-click
+    for (const [from, cardLink, dest] of [
+      ['/',        '.post-card a', /\/writing\/[^/]+$/],
+      ['/',        '.work-card a', /\/work\/[^/]+$/],
+      ['/writing', '.post-card a', /\/writing\/[^/]+$/],
+      ['/work',    '.work-card a', /\/work\/[^/]+$/],
+    ] as const) {
+      await page.goto(from)
+      await ready(page)
+      await page.locator(cardLink).first().click()
+      await page.waitForURL(dest)
+      await expect(page.locator('main h1').first()).toBeVisible()
+    }
+
+    expect(warnings).toEqual([])
+  })
+})
+
 test.describe('cards on touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
 
