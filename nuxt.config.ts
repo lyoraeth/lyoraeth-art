@@ -17,6 +17,9 @@ export default defineNuxtConfig({
     // (/app/media → /root/lyoraeth/media); locally it's a gitignored folder.
     mediaRoot:                  process.env.NUXT_MEDIA_ROOT                       ?? 'media',
     mediaSyncBatch:             process.env.NUXT_MEDIA_SYNC_BATCH                 ?? '12',
+    // Licensed woff2 — not in the repo/image, bind-mounted in prod
+    // (/app/fonts → /root/lyoraeth/fonts); dev serves them from public/fonts.
+    fontsRoot:                  process.env.NUXT_FONTS_ROOT                       ?? 'public/fonts',
     public: {
       turnstileContactSiteKey:  process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY_CONTACT ?? '',
       umamiWebsiteId:           process.env.NUXT_PUBLIC_UMAMI_WEBSITE_ID           ?? '',
