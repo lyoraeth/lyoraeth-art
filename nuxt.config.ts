@@ -13,6 +13,10 @@ export default defineNuxtConfig({
     mailerFrom:                 process.env.NUXT_MAILER_FROM                      ?? 'lyoraeth.art <hello@lyoraeth.art>',
     mailerTo:                   process.env.NUXT_MAILER_TO                        ?? '',
     turnstileContactSecretKey:  process.env.NUXT_TURNSTILE_SECRET_KEY_CONTACT     ?? '',
+    // Self-hosted media pipeline. mediaRoot is a bind-mounted dir in prod
+    // (/app/media → /root/lyoraeth/media); locally it's a gitignored folder.
+    mediaRoot:                  process.env.NUXT_MEDIA_ROOT                       ?? 'media',
+    mediaSyncBatch:             process.env.NUXT_MEDIA_SYNC_BATCH                 ?? '12',
     public: {
       turnstileContactSiteKey:  process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY_CONTACT ?? '',
       umamiWebsiteId:           process.env.NUXT_PUBLIC_UMAMI_WEBSITE_ID           ?? '',
@@ -62,6 +66,14 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
       ],
     },
+  },
+
+  nitro: {
+    // The media:sync task keeps /media/ in step with referenced content.
+    // Runs inside the app container on this schedule (node-server preset has
+    // its own scheduler); also runnable by hand via `nitro task run`.
+    experimental: { tasks: true },
+    scheduledTasks: { '*/5 * * * *': ['media:sync'] },
   },
 
   routeRules: {
