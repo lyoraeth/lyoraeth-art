@@ -8,6 +8,9 @@ RUN pnpm build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
+# ffmpeg (avif/webp/jpg) + cjxl (jxl — only cjxl does progressive) for the
+# media:sync task. alpine's builds are current: ffmpeg 8, libjxl 0.11.
+RUN apk add --no-cache ffmpeg libjxl-tools
 COPY --from=builder /app/.output ./
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
