@@ -6,12 +6,17 @@ import { test, expect, type Page } from '@playwright/test'
  *
  * 'load' alone isn't enough to interact, though — the markup is there but the
  * handlers are not, and a click on a submit button would post the form the
- * native way, reloading the page. Vue sets __vue_app__ on the root once it has
- * hydrated, which is the moment the page becomes clickable.
+ * native way, reloading the page. __vue_app__ appears at createApp, before
+ * hydration attaches listeners; the root instance's isMounted flips true only
+ * once hydration has finished walking the tree, which is the real signal that
+ * a click will land on a wired handler.
  */
 async function ready(page: Page) {
   await page.waitForLoadState('load')
-  await page.waitForFunction(() => Boolean((document.querySelector('#__nuxt') as any)?.__vue_app__))
+  await page.waitForFunction(() => {
+    const app = (document.querySelector('#__nuxt') as any)?.__vue_app__
+    return Boolean(app?._instance?.isMounted)
+  })
 }
 
 // ── Console error / warning collector ────────────────────────────────────────
