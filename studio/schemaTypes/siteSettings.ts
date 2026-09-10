@@ -1,10 +1,22 @@
 import { defineType, defineField } from 'sanity'
+import { localeString } from './locale'
 
 export default defineType({
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
   fields: [
+    defineField({
+      name: 'notice',
+      title: 'Maintenance notice',
+      type: 'object',
+      description: 'A slim strip above the header. Turn on during works on the live site.',
+      fields: [
+        { name: 'enabled', title: 'Show the notice', type: 'boolean', initialValue: false },
+        localeString({ name: 'text', title: 'Text', maxChars: 80, soft: true }),
+      ],
+      options: { collapsible: true, collapsed: true },
+    }),
     defineField({
       name: 'telegramHandle',
       title: 'Telegram handle',

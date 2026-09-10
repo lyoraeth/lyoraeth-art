@@ -164,6 +164,11 @@
   /* the menu and anchor scrolling are measured from it */
   --spacing-header-height: 7rem;
 
+  /* the maintenance strip above the header, when SiteNotice is on. --notice-h
+     is the live offset — set to this value on <html> only while the strip is
+     mounted (SiteNotice's own :has() rule), 0 otherwise. */
+  --spacing-notice-height: 2.5rem;
+
   /* Repeat Tailwind's defaults on purpose: component styles call these from
      <style scoped>, which Tailwind never scans, so they have to be declared to
      exist at runtime. Figma has no radius scale yet; when it does, it lands here. */

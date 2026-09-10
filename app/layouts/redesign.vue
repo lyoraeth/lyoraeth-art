@@ -19,9 +19,18 @@ const menuOpen = ref(false)
 /** The other source of inert — a page's own overlay (e.g. the case study
  *  cover lightbox), requested through useMainInert(). See useMainInert.ts. */
 const pageInert = provideMainInert()
+
+/** Maintenance strip — off unless the CMS flag is set. Shares the fetch with
+ *  ContactSection via the key, so it costs nothing extra. */
+const loc = useLoc()
+const { data: settings } = await useFetch('/api/settings', { key: 'site-settings' })
+const noticeText = computed(() =>
+  settings.value?.notice?.enabled ? loc(settings.value.notice.text) : '',
+)
 </script>
 
 <template>
+  <SiteNotice v-if="noticeText" :text="noticeText" />
   <SiteHeader v-model:menu-open="menuOpen" />
   <main
     id="main-content"
@@ -43,7 +52,7 @@ const pageInert = provideMainInert()
    */
   html.shell-redesign {
     /* anchors stop below the header instead of under it */
-    scroll-padding-top: var(--spacing-header-height);
+    scroll-padding-top: calc(var(--spacing-header-height) + var(--notice-h, 0px));
   }
 
   html.shell-redesign body {

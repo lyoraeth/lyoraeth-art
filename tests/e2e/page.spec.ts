@@ -458,6 +458,19 @@ test.describe('legal pages', () => {
   })
 })
 
+test.describe('maintenance notice', () => {
+  // The flag lives in the CMS and the layout reads it during SSR, so the
+  // "on" state can't be mocked from the browser — it's covered by the
+  // SiteNotice component test. Here: off by default, header unoffset.
+  test('is absent by default and the header sits flush at the top', async ({ page }) => {
+    await page.goto('/')
+    await ready(page)
+    await expect(page.locator('.site-notice')).toHaveCount(0)
+    const top = await page.locator('.header').first().evaluate(el => getComputedStyle(el).top)
+    expect(top).toBe('0px')
+  })
+})
+
 test.describe('404 page', () => {
   test('renders the branded error page, not a bare JSON payload, and is not indexed', async ({ page }) => {
     const errors: string[] = []

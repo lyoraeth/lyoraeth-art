@@ -3,6 +3,7 @@ export interface SiteSettings {
   githubHandle:    string
   cvUrlEn:         string | null
   cvUrlRu:         string | null
+  notice:          { enabled: boolean; text: { en: string; ru: string } | null } | null
 }
 
 const DEFAULTS: SiteSettings = {
@@ -10,6 +11,7 @@ const DEFAULTS: SiteSettings = {
   githubHandle:    'lyoraeth',
   cvUrlEn:         null,
   cvUrlRu:         null,
+  notice:          null,
 }
 
 /** GET /api/settings — site-wide settings singleton (social handles, CV asset
@@ -25,7 +27,8 @@ export default defineEventHandler(async event => {
       telegramHandle,
       githubHandle,
       "cvUrlEn": cvEn.asset->url,
-      "cvUrlRu": cvRu.asset->url
+      "cvUrlRu": cvRu.asset->url,
+      notice { enabled, text }
     }
   `)
 

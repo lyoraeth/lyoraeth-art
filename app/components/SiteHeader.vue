@@ -222,7 +222,8 @@ onUnmounted(() => {
     /* sticky rather than fixed: the header then occupies its height in flow and
        the content below doesn't have to be pushed down */
     position: sticky;
-    top: 0;
+    /* clears the maintenance strip when it's up (SiteNotice sets --notice-h) */
+    top: var(--notice-h, 0px);
     z-index: 40;
   }
 
