@@ -82,6 +82,45 @@ export default defineType({
     }),
 
     defineField({
+      name: 'gallery',
+      title: 'Body images',
+      type: 'array',
+      group: 'media',
+      description: 'Reference in the body as ![alt](gallery:key){fit=cover pos=top ar=16/9}. The pipeline encodes each to jxl/avif/webp/jpg on the server.',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'key',
+              title: 'Key',
+              type: 'string',
+              description: 'The name the body markdown references — lowercase, digits, hyphens.',
+              validation: rule => rule.required().regex(/^[a-z0-9-]+$/, { name: 'lowercase, digits and hyphens only' }),
+            },
+            {
+              name: 'image',
+              title: 'Image',
+              type: 'image',
+              validation: rule => rule.required(),
+            },
+            {
+              name: 'alt',
+              title: 'Alt text',
+              type: 'string',
+              validation: rule => rule.required().warning('Describes the image for screen readers and search engines'),
+            },
+          ],
+          preview: { select: { title: 'key', subtitle: 'alt', media: 'image' } },
+        },
+      ],
+      validation: rule => rule.unique().custom((items?: { key?: string }[]) => {
+        const keys = (items ?? []).map(i => i.key).filter(Boolean)
+        return new Set(keys).size === keys.length || 'Keys must be unique within a post'
+      }),
+    }),
+
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',

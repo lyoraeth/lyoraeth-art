@@ -73,6 +73,12 @@ export function mediaSrcset(hash: string, family: MediaFamily, sourceWidth: numb
     .join(', ')
 }
 
+/** `<source>` `{ type, srcset }` pairs for one family, in fallback order —
+ *  for the single-family case (a body image). */
+export function mediaSources(hash: string, family: MediaFamily, sourceWidth: number): { type: string; srcset: string }[] {
+  return MEDIA_FORMATS.map(f => ({ type: MEDIA_MIME[f], srcset: mediaSrcset(hash, family, sourceWidth, f) }))
+}
+
 /**
  * The viewport at which a case study switches from the stacked 4:3 crop to
  * the two-column source-ratio layout — the `<picture>` art-direction

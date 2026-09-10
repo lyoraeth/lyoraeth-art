@@ -44,24 +44,29 @@ export default defineTask({
     const sources: Source[] = []
     const tmpFiles: string[] = []
 
-    // CMS covers
+    // CMS images: covers (both families — the case study crops below xl) and
+    // post body-gallery images (full only — inline text-column images).
     if (cfg.sanityProjectId) {
       const client = createSanityClient(cfg.sanityProjectId, cfg.sanityDataset)
-      const rows = await client.fetch<{ url: string | null; width: number | null }[]>(`
-        *[_type in ["work", "post"] && !(_id in path("drafts.**")) && defined(cover.asset)]{
-          "url": cover.asset->url,
-          "width": cover.asset->metadata.dimensions.width
+      const rows = await client.fetch<{
+        cover:   { url: string | null; width: number | null } | null
+        gallery: { url: string | null; width: number | null }[] | null
+      }[]>(`
+        *[_type in ["work", "post"] && !(_id in path("drafts.**"))]{
+          "cover": cover.asset->{ url, "width": metadata.dimensions.width },
+          "gallery": gallery[].image.asset->{ url, "width": metadata.dimensions.width }
         }
       `)
+
       const seen = new Set<string>()
-      for (const { url, width } of rows) {
+      const addCms = (url: string | null | undefined, width: number | null | undefined, families: MediaFamily[]) => {
         const hash = sanityAssetHash(url)
-        if (!hash || !url || !width || seen.has(hash)) continue
+        if (!hash || !url || !width || seen.has(hash)) return
         seen.add(hash)
         sources.push({
           hash,
           width,
-          families: ['cover', 'full'],
+          families,
           load: async () => {
             const res = await fetch(url)
             if (!res.ok) throw new Error(`fetch ${url} → ${res.status}`)
@@ -71,6 +76,11 @@ export default defineTask({
             return file
           },
         })
+      }
+
+      for (const row of rows) {
+        addCms(row.cover?.url, row.cover?.width, ['cover', 'full'])
+        for (const g of row.gallery ?? []) addCms(g?.url, g?.width, ['full'])
       }
     }
 

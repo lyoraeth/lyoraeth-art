@@ -62,5 +62,55 @@ describe('useMarkdown().renderPost', () => {
   })
 })
 
+const GALLERY = [{
+  key: 'flow-1',
+  alt: 'The pipeline, end to end',
+  url: 'https://cdn.sanity.io/images/x/production/54c07979619d90658589b216960e1ce570f39285-1852x962.png',
+  width: 1852,
+  height: 962,
+}]
+
+describe('useMarkdown() gallery images', () => {
+  it('resolves gallery:key to a self-hosted <picture> with all four formats', () => {
+    const { renderPost } = useMarkdown(GALLERY)
+    const html = renderPost('![Diagram](gallery:flow-1)')
+    expect(html).toContain('<figure class="post-figure"><picture>')
+    expect(html).toContain('type="image/jxl"')
+    expect(html).toContain('type="image/avif"')
+    expect(html).toContain('/media/54c07979619d90658589b216960e1ce570f39285-full-1280.webp 1280w')
+    // <img> floor is the raw Sanity URL, dims from the asset
+    expect(html).toContain('src="https://cdn.sanity.io/images/x/production/54c07979619d90658589b216960e1ce570f39285-1852x962.png"')
+    expect(html).toContain('width="1852" height="962"')
+    // the markdown alt becomes the caption
+    expect(html).toContain('<figcaption class="post-caption">Diagram</figcaption>')
+  })
+
+  it('turns {ar=16/9 fit=cover pos=top} into a whitelisted inline style', () => {
+    const { renderPost } = useMarkdown(GALLERY)
+    const html = renderPost('![x](gallery:flow-1){ar=16/9 fit=cover pos=top}')
+    expect(html).toContain('style="aspect-ratio:16/9;object-fit:cover;object-position:top"')
+  })
+
+  it('ignores fit/pos without a ratio, and drops an unknown pos value', () => {
+    const { renderPost } = useMarkdown(GALLERY)
+    expect(renderPost('![x](gallery:flow-1){fit=cover pos=top}')).not.toContain('aspect-ratio')
+    expect(renderPost('![x](gallery:flow-1){ar=4/3 pos=evil;}')).not.toContain('object-position')
+  })
+
+  it('drops an unknown key as a comment rather than emitting a broken image', () => {
+    const { renderPost } = useMarkdown(GALLERY)
+    const html = renderPost('![x](gallery:does-not-exist)')
+    expect(html).toContain('<!-- gallery: does-not-exist not found -->')
+    expect(html).not.toContain('<img')
+  })
+
+  it('leaves a plain markdown image untouched', () => {
+    const { renderPost } = useMarkdown(GALLERY)
+    const html = renderPost('![x](https://x.test/a.png)')
+    expect(html).toContain('src="https://x.test/a.png"')
+    expect(html).not.toContain('<picture>')
+  })
+})
+
 // vitest runs outside Nuxt, so auto-imports don't resolve — import manually
 import { useMarkdown, slugifyHeading } from '../../app/composables/useMarkdown'

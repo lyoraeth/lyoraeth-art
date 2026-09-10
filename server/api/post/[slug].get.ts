@@ -24,6 +24,12 @@ export default defineEventHandler(async event => {
       "coverWidth":  cover.asset->metadata.dimensions.width,
       "coverHeight": cover.asset->metadata.dimensions.height,
       references,
+      "gallery": gallery[]{
+        key, alt,
+        "url":    image.asset->url,
+        "width":  image.asset->metadata.dimensions.width,
+        "height": image.asset->metadata.dimensions.height
+      },
       "body": { "en": body, "ru": bodyRu },
       "prev": *[_type=="post" && publishedAt < ^.publishedAt] | order(publishedAt desc)[0]{ "slug": slug.current, title },
       "next": *[_type=="post" && publishedAt > ^.publishedAt] | order(publishedAt asc)[0]{ "slug": slug.current, title }
@@ -67,6 +73,16 @@ export interface PostDetail {
   excerpt:     { en: string; ru: string | null }
   wordCount:   number
   references:  { title: string; href: string }[] | null
+  gallery:     GalleryImage[] | null
   prev:        AdjacentPost | null
   next:        AdjacentPost | null
+}
+
+/** One body image, referenced from the markdown as `gallery:{key}`. */
+export interface GalleryImage {
+  key:    string
+  alt:    string
+  url:    string | null
+  width:  number | null
+  height: number | null
 }

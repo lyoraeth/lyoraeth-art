@@ -71,7 +71,7 @@ useHead({
 
 const formatDate = useFormatDate()
 
-const { renderPost } = useMarkdown()
+const { renderPost } = useMarkdown(post.value?.gallery ?? null)
 const bodyHtml = computed(() => {
   if (!post.value) return ''
   const raw = locale.value === 'ru' ? post.value.body.ru : post.value.body.en
@@ -108,6 +108,28 @@ async function renderMermaid() {
 
 onMounted(renderMermaid)
 watch(bodyHtml, renderMermaid)
+
+/* ── Body <picture> resilience ──
+   A gallery image renders as a <picture> of /media/ sources, and <picture>
+   does NOT fall through when its chosen source 404s (a variant the sync task
+   hasn't reached yet). SanityPicture handles that with a Vue error handler;
+   the markdown output is a plain string, so the page wires the same recovery
+   by hand — on an error, drop the <source>s and let <img src> (the Sanity
+   original) take over. */
+function guardBodyPictures() {
+  for (const img of document.querySelectorAll<HTMLImageElement>('.post-body picture img')) {
+    if (img.dataset.guarded) continue
+    img.dataset.guarded = '1'
+    img.addEventListener('error', () => {
+      img.closest('picture')?.querySelectorAll('source').forEach(s => s.remove())
+    }, { once: true })
+    // errored before this ran (SSR'd, already failed): re-trigger the chain
+    if (img.complete && img.naturalWidth === 0) img.closest('picture')?.querySelectorAll('source').forEach(s => s.remove())
+  }
+}
+
+onMounted(() => nextTick(guardBodyPictures))
+watch(bodyHtml, () => nextTick(guardBodyPictures))
 
 /* ── TOC ──
    One data source, two renderings: a sticky sidebar at xl (its own grid
@@ -539,6 +561,8 @@ onMounted(() => {
 :deep(.post-body a:hover) { color: var(--color-accent-strong-hover); }
 
 :deep(.post-body .post-figure) { margin: 2rem 0; }
+/* gallery images wrap the img in <picture> for the format fallback */
+:deep(.post-body .post-figure picture) { display: contents; }
 :deep(.post-body .post-img) {
   width: 100%;
   height: auto;
