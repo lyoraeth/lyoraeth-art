@@ -24,6 +24,9 @@ export default defineType({
   }],
   preview: {
     select: { title: 'nick', subtitle: 'message' },
-    prepare: ({ title, subtitle }: any) => ({ title, subtitle: subtitle?.slice(0, 60) }),
+    prepare: ({ title, subtitle }: { title?: string; subtitle?: string }) => ({
+      title,
+      subtitle: subtitle?.slice(0, 60),
+    }),
   },
 })

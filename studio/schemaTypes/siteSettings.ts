@@ -10,14 +10,14 @@ export default defineType({
       title: 'Telegram handle',
       type: 'string',
       description: 'Without @, e.g. "lyoraeth"',
-      validation: Rule => Rule.required(),
+      validation: rule => rule.required(),
     }),
     defineField({
       name: 'githubHandle',
       title: 'GitHub handle',
       type: 'string',
       description: 'Without @, e.g. "lyoraeth"',
-      validation: Rule => Rule.required(),
+      validation: rule => rule.required(),
     }),
     defineField({
       name: 'cvEn',

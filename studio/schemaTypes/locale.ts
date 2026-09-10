@@ -91,7 +91,9 @@ export function coverImage(options: { title: string; description?: string; group
     description: options.description,
     group: options.group,
     type: 'image',
-    options: { hotspot: true },
+    // No hotspot: the media pipeline crops the 4:3 `cover` variant on the
+    // server (top-anchored), and the `full` variant is uncropped — the
+    // editor's crop point never reaches either.
     fields: [
       {
         name: 'alt',

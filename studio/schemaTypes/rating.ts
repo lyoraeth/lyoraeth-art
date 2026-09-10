@@ -11,7 +11,7 @@ export default defineType({
   ],
   preview: {
     select: { title: 'slug', up: 'up', down: 'down' },
-    prepare: ({ title, up, down }: any) => ({
+    prepare: ({ title, up, down }: { title?: string; up?: number; down?: number }) => ({
       title,
       subtitle: `+${up ?? 0} / -${down ?? 0}`,
     }),

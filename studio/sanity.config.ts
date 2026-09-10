@@ -3,7 +3,7 @@ import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import { schemaTypes } from './schemaTypes'
 
-const singletons = new Set(['siteStatus', 'siteSettings'])
+const singletons = new Set(['siteSettings'])
 
 export default defineConfig({
   name:    'lyoraeth-art',
@@ -20,8 +20,6 @@ export default defineConfig({
             S.listItem().title('Posts').schemaType('post').child(S.documentTypeList('post')),
             S.listItem().title('Comments').schemaType('comment').child(S.documentTypeList('comment')),
             S.divider(),
-            S.listItem().title('Site Status').id('siteStatus')
-              .child(S.document().schemaType('siteStatus').documentId('siteStatus')),
             S.listItem().title('Site Settings').id('siteSettings')
               .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
           ]),
