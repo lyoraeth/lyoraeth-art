@@ -13,6 +13,9 @@ useSeoMeta({
   ogDescription: () => t('seo.og_description'),
   ogType: 'website',
   ogImage: 'https://lyoraeth.art/og/home',
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
+  ogImageAlt: () => t('seo.og_title'),
   twitterCard: 'summary_large_image',
   twitterImage: 'https://lyoraeth.art/og/home',
 })
