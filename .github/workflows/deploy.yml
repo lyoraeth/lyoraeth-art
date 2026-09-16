@@ -9,6 +9,9 @@ on:
       - 'SECURITY.md'
       - 'LICENSE'
       - 'darkstage-design-spec.md'
+  # manual re-run of the current main, e.g. to retest after a diagnosis
+  # without needing a throwaway commit
+  workflow_dispatch:
 
 # a second push landing mid-deploy would race the first on the VPS —
 # queue instead of running both at once, and don't cancel a deploy that's
@@ -27,6 +30,7 @@ jobs:
   verify:
     name: Verify
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
 
@@ -50,6 +54,7 @@ jobs:
     name: Build image
     runs-on: ubuntu-latest
     needs: verify
+    timeout-minutes: 10
     permissions:
       contents: read
       packages: write
@@ -104,6 +109,10 @@ jobs:
     name: E2E against the built image
     runs-on: ubuntu-latest
     needs: build
+    # worst case (every test individually hitting its 30s timeout) is
+    # ~36 * 30s ≈ 18 minutes — this caps a genuine hang without needing a
+    # manual cancel
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -182,6 +191,7 @@ jobs:
     name: Promote to latest
     runs-on: ubuntu-latest
     needs: [build, e2e]
+    timeout-minutes: 5
     permissions:
       contents: read
       packages: write
@@ -203,6 +213,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, promote]
     environment: production
+    timeout-minutes: 10
     steps:
       - name: Deploy via SSH, with auto-rollback on a failed health check
         uses: appleboy/ssh-action@v1
