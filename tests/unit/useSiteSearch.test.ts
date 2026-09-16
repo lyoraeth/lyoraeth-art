@@ -1,5 +1,5 @@
 import { nuxtMocks, resetNuxtMocks, fakeLocalePath } from './_nuxt-mocks'
-import { describe, it, expect, beforeEach, vi  } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 
 function seedWork(items: unknown[]) {
   nuxtMocks.state.set('search-work', { value: items })
@@ -87,5 +87,3 @@ describe('useSiteSearch', () => {
 
 // vitest runs outside Nuxt, so auto-imports don't resolve — import manually
 import { useSiteSearch } from '../../app/composables/useSiteSearch'
-
-vi.stubGlobal('$fetch', nuxtMocks.fetch)

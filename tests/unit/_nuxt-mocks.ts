@@ -82,6 +82,10 @@ vi.mock('#app/composables/fetch', () => ({
   useFetch: () => ({ data: nuxtMocks.fetchData }),
 }))
 
+vi.mock('#build/fetch.mjs', () => ({
+  $fetch: nuxtMocks.fetch,
+}))
+
 /** `useLocalePath()` stand-in — mirrors `strategy: 'prefix_except_default'`
  *  from nuxt.config.ts. `@nuxtjs/i18n`'s own composable needs a live Nuxt app
  *  instance and can't be reached this way (see `useCardLink`/`useSiteSearch`'s
