@@ -11,7 +11,10 @@ import tailwindcss from '@tailwindcss/vite'
  */
 function localAppVersion() {
   try {
-    const out = execSync('node scripts/computeVersion.mjs').toString()
+    // stdio: the Docker builder stage has no git — execSync's default stdio
+    // pipes the child's stderr straight to ours, so the caught error would
+    // still dump a scary (if harmless) crash trace into the build log
+    const out = execSync('node scripts/computeVersion.mjs', { stdio: ['ignore', 'pipe', 'ignore'] }).toString()
     return {
       version: out.match(/^version=(.+)$/m)?.[1] ?? 'dev',
       sha: out.match(/^sha=(.+)$/m)?.[1] ?? '',

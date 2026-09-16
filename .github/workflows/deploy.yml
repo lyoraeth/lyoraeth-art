@@ -142,15 +142,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create dummy font stubs
+        # the licensed woff2 files are deliberately kept out of the repo/image
+        # (see Dockerfile) — content doesn't matter here, only that the font
+        # route has something to serve instead of 404ing on every page load
+        run: |
+          mkdir -p /tmp/e2e-fonts
+          touch /tmp/e2e-fonts/PPNeueMontreal-Medium.woff2
+          touch /tmp/e2e-fonts/PPPangramSans-Semibold.woff2
+
       - name: Run the built image
         run: |
           docker run -d --name app-under-test -p 3000:3000 \
+            -v /tmp/e2e-fonts:/app/fonts:ro \
+            -e NUXT_FONTS_ROOT="/app/fonts" \
             -e NUXT_SANITY_PROJECT_ID="${{ vars.SANITY_PROJECT_ID }}" \
             -e NUXT_SANITY_DATASET="${{ vars.SANITY_DATASET }}" \
             -e NUXT_PUBLIC_TURNSTILE_SITE_KEY_CONTACT="1x00000000000000000000AA" \
             -e NUXT_TURNSTILE_SECRET_KEY_CONTACT="1x0000000000000000000000000000000AA" \
             -e NUXT_RESEND_API_KEY="dummy" \
             -e NUXT_MAILER_TO="dummy@example.com" \
+            -e NUXT_PUBLIC_APP_VERSION="${{ needs.build.outputs.app_version }}" \
+            -e NUXT_PUBLIC_APP_COMMIT_SHA="${{ needs.build.outputs.app_commit_sha }}" \
             "${{ needs.build.outputs.image }}"
 
       - name: Wait for the container to report healthy
@@ -170,11 +183,15 @@ jobs:
         run: pnpm exec playwright test
 
       - name: Container logs on failure
-        if: failure()
+        # cancelled(), not just failure(): a job killed by timeout-minutes
+        # is "cancelled" in GitHub's terms, not "failed" - without this,
+        # exactly the run that most needs these logs is the one that loses
+        # them
+        if: failure() || cancelled()
         run: docker logs app-under-test
 
       - name: Upload Playwright report
-        if: failure()
+        if: failure() || cancelled()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report

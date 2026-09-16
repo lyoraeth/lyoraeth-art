@@ -15,6 +15,12 @@ useSeoMeta({ title: computed(() => `${code.value} — lyoraeth`) })
 
 // Error pages must never be indexed
 useHead({ meta: [{ name: 'robots', content: 'noindex' }] })
+
+// error.vue replaces app.vue as the root component on an error page, so
+// app.vue's own onMounted (the e2e hydration-ready signal) never fires here
+onMounted(() => {
+  document.documentElement.dataset.hydrated = 'true'
+})
 </script>
 
 <template>

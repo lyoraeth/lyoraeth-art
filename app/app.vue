@@ -76,6 +76,16 @@ useHead({
     },
   ],
 })
+
+// e2e's own hydration-ready signal. `app._instance.isMounted` (Vue's private
+// internal flag) turned out to be unreliable across builds — it never flips
+// in the production Docker image despite the page being fully rendered and
+// interactive, for reasons tied to how that specific build gets optimized.
+// A plain DOM attribute we set ourselves doesn't depend on Vue internals at
+// all, so it can't drift the same way.
+onMounted(() => {
+  document.documentElement.dataset.hydrated = 'true'
+})
 </script>
 
 <template>
