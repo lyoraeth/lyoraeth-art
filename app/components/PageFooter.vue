@@ -17,6 +17,10 @@ const credits = computed(() =>
 
 /** Feeds are served per locale (see server/routes). */
 const feedUrl = computed(() => (locale.value === 'ru' ? '/ru/rss.xml' : '/rss.xml'))
+
+/** Set at deploy time from git history (see scripts/computeVersion.mjs). */
+const { public: { appVersion, appCommitSha } } = useRuntimeConfig()
+const commitUrl = computed(() => `https://github.com/lyoraeth/lyoraeth-art/commit/${appCommitSha}`)
 </script>
 
 <template>
@@ -37,6 +41,20 @@ const feedUrl = computed(() => (locale.value === 'ru' ? '/ru/rss.xml' : '/rss.xm
             <dt>{{ t('footer.feed_label') }}</dt>
             <dd>
               <a :href="feedUrl" class="footer-link">{{ t('footer.feed') }}</a>
+            </dd>
+          </div>
+
+          <div class="credits-row">
+            <dt>{{ t('footer.version_label') }}</dt>
+            <dd>
+              <a
+                v-if="appCommitSha"
+                :href="commitUrl"
+                target="_blank"
+                rel="noopener"
+                class="footer-link"
+              >v{{ appVersion }}</a>
+              <span v-else>v{{ appVersion }}</span>
             </dd>
           </div>
         </dl>

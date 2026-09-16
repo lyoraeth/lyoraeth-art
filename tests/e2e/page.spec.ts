@@ -533,7 +533,7 @@ test.describe('footer', () => {
     await page.waitForLoadState('load')
 
     const footer = page.locator('footer')
-    await expect(footer.locator('.credits-row')).toHaveCount(8)
+    await expect(footer.locator('.credits-row')).toHaveCount(9)
     await expect(footer.locator('a[href$="rss.xml"]')).toHaveAttribute('href', '/ru/rss.xml')
     await expect(footer.locator('a[href*="privacy"]')).toBeVisible()
   })

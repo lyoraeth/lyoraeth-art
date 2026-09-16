@@ -1,5 +1,28 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { execSync } from 'node:child_process'
 import tailwindcss from '@tailwindcss/vite'
+
+/**
+ * In prod the deploy job sets NUXT_PUBLIC_APP_VERSION/_SHA as container env
+ * (see docker-compose.yml, scripts/computeVersion.mjs) — the runtime image
+ * has no .git and never needs one. Locally, where that env is never set,
+ * compute the same thing live so `pnpm dev` shows a real, clickable version
+ * instead of a permanent placeholder.
+ */
+function localAppVersion() {
+  try {
+    const out = execSync('node scripts/computeVersion.mjs').toString()
+    return {
+      version: out.match(/^version=(.+)$/m)?.[1] ?? 'dev',
+      sha: out.match(/^sha=(.+)$/m)?.[1] ?? '',
+    }
+  }
+  catch {
+    return { version: 'dev', sha: '' }
+  }
+}
+
+const devVersion = process.env.NUXT_PUBLIC_APP_VERSION ? undefined : localAppVersion()
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -24,6 +47,11 @@ export default defineNuxtConfig({
       turnstileContactSiteKey:  process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY_CONTACT ?? '',
       umamiWebsiteId:           process.env.NUXT_PUBLIC_UMAMI_WEBSITE_ID           ?? '',
       umamiScriptUrl:           process.env.NUXT_PUBLIC_UMAMI_SCRIPT_URL           ?? '',
+      // set by the deploy job (scripts/computeVersion.mjs) as plain container
+      // env — not baked into the image, so a rollback can restore an older
+      // value without rebuilding
+      appVersion:               process.env.NUXT_PUBLIC_APP_VERSION               ?? devVersion?.version ?? 'dev',
+      appCommitSha:             process.env.NUXT_PUBLIC_APP_COMMIT_SHA            ?? devVersion?.sha     ?? '',
     },
   },
 

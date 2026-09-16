@@ -7,6 +7,11 @@ services:
     environment:
       # licensed woff2 live on the host, not in the image
       NUXT_FONTS_ROOT: /app/fonts
+      # exported by the deploy step (scripts/computeVersion.mjs) right before
+      # `docker compose up` — plain container env, not a build arg, so a
+      # rollback can restore an older value without rebuilding the image
+      NUXT_PUBLIC_APP_VERSION: ${APP_VERSION:-dev}
+      NUXT_PUBLIC_APP_COMMIT_SHA: ${APP_COMMIT_SHA:-}
     # ./media — image variants written by the media:sync task; ./fonts — the
     # licensed woff2. Both bind-mounted so they survive a redeploy and stay
     # inspectable on the host.

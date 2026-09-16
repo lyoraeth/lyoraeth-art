@@ -257,6 +257,7 @@
     ],
     "feed_label": "Feed",
     "feed": "RSS",
+    "version_label": "Version",
     "privacy_policy": "Privacy policy",
     "personal_data": "Personal data processing",
     "top": "Back to top ↑"
