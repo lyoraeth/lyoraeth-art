@@ -245,16 +245,15 @@ jobs:
             APP_VERSION="${{ needs.build.outputs.app_version }}"
             APP_COMMIT_SHA="${{ needs.build.outputs.app_commit_sha }}"
 
-            # `docker compose`'s ${VAR} interpolation reads its own project
-            # .env file, not necessarily the calling shell's exported vars
-            # (confirmed the hard way: the exported-only version silently
-            # fell back to the compose file's own ${APP_VERSION:-dev}
-            # default on the very first real deploy) - writing them into
-            # .env is the one substitution source compose is guaranteed to
-            # read
-            sed -i '/^APP_VERSION=/d;/^APP_COMMIT_SHA=/d' .env
-            echo "APP_VERSION=$APP_VERSION" >> .env
-            echo "APP_COMMIT_SHA=$APP_COMMIT_SHA" >> .env
+            # written directly under their real container names — compose's
+            # ${VAR} substitution turned out not to reliably see the calling
+            # shell's exported vars (confirmed the hard way: it silently fell
+            # back to a hardcoded default on the very first real deploy);
+            # env_file: .env has no such ambiguity, it just injects whatever
+            # is in the file
+            sed -i '/^NUXT_PUBLIC_APP_VERSION=/d;/^NUXT_PUBLIC_APP_COMMIT_SHA=/d' .env
+            echo "NUXT_PUBLIC_APP_VERSION=$APP_VERSION" >> .env
+            echo "NUXT_PUBLIC_APP_COMMIT_SHA=$APP_COMMIT_SHA" >> .env
 
             # the image's digest and env are read straight off the running
             # container — nothing extra to keep in sync on the VPS, and it
@@ -292,9 +291,9 @@ jobs:
             fi
 
             docker tag "$PREV_IMAGE" ${{ env.IMAGE }}:latest
-            sed -i '/^APP_VERSION=/d;/^APP_COMMIT_SHA=/d' .env
-            echo "APP_VERSION=$PREV_VERSION" >> .env
-            echo "APP_COMMIT_SHA=$PREV_SHA" >> .env
+            sed -i '/^NUXT_PUBLIC_APP_VERSION=/d;/^NUXT_PUBLIC_APP_COMMIT_SHA=/d' .env
+            echo "NUXT_PUBLIC_APP_VERSION=$PREV_VERSION" >> .env
+            echo "NUXT_PUBLIC_APP_COMMIT_SHA=$PREV_SHA" >> .env
             docker compose up -d app
 
             if wait_healthy && curl -sf -o /dev/null https://lyoraeth.art; then
