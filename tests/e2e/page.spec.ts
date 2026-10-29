@@ -195,6 +195,23 @@ test.describe('project docs', () => {
     await expect(page.locator('aside .docs-nav__link[aria-current="page"]')).toHaveCount(1)
   })
 
+  // The bare /docs address redirects to the first page. Reached by a click
+  // (client-side) it once rendered an empty page: the redirect ran inside the
+  // page's setup, whose instance was unmounted while it waited.
+  test('the docs link on the landing page opens the first page client-side', async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', err => errors.push(err.message))
+
+    await page.goto(`/projects/${slug}`)
+    await ready(page)
+    await page.locator('.project-links a[href$="/docs"]').click()
+
+    await page.waitForURL(url => /\/docs\/[^/]+$/.test(url.pathname))
+    await expect(page.locator('main h1')).toHaveCount(1)
+    await expect(page.locator('.docs-body')).toBeVisible()
+    expect(errors, `Page errors:\n${errors.join('\n')}`).toHaveLength(0)
+  })
+
   test('clicking a page in the tree renders it client-side, no root-node warnings', async ({ page }) => {
     const warnings: string[] = []
     page.on('console', m => {

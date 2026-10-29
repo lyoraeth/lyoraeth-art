@@ -9,7 +9,21 @@ import type { ProjectDetail } from '../../../../../server/api/project/[slug].get
 // page, the mobile menu closes itself, and <NuxtPage>'s transition waits for
 // the page's own data like every other route instead of showing the previous
 // page's text while the next one loads.
-definePageMeta({ layout: 'redesign', key: route => route.path })
+definePageMeta({
+  layout: 'redesign',
+  key:    route => route.path,
+  // The bare /docs address has no page of its own — it is the first one. The
+  // redirect lives here, before the page exists: done from setup it had to
+  // await the navigation, and on a client-side click the instance was already
+  // unmounted (its data cleared) by the time the code after it ran.
+  middleware: async to => {
+    if (to.params.page) return
+    const index = await $fetch<DocsIndexPayload>(`/api/project/${to.params.slug}/docs`).catch(() => null)
+    const first = index && docsPages(index).find(p => !p.landing)
+    // no index (GitHub unreachable): fall through, the page shows its own notice
+    if (first) return navigateTo(`${to.path.replace(/\/$/, '')}/${first.key}`, { replace: true, redirectCode: 302 })
+  },
+})
 
 const { locale, t } = useI18n()
 const localePath = useLocalePath()
@@ -34,11 +48,7 @@ if (indexError.value?.statusCode === 404) {
 const pages = computed(() => (index.value ? docsPages(index.value).filter(p => !p.landing) : []))
 const current = computed(() => pages.value.find(p => p.key === requested) ?? null)
 
-// the bare /docs address has no page of its own — it is the first one
-if (index.value && !requested && pages.value[0]) {
-  await navigateTo(localePath(`/projects/${slug}/docs/${pages.value[0].key}`), { replace: true, redirectCode: 302 })
-}
-else if (index.value && requested && !current.value) {
+if (index.value && requested && !current.value) {
   throw createError({ statusCode: 404, statusMessage: 'Docs page not found' })
 }
 
