@@ -37,7 +37,13 @@ test.describe('runtime errors', () => {
   test('no console errors on page load', async ({ page }) => {
     const errors: string[] = []
     page.on('console', msg => {
-      if (msg.type() === 'error') errors.push(msg.text())
+      if (msg.type() !== 'error') return
+      // A /media/ variant that is not encoded yet 404s and the picture falls
+      // back to the original on purpose (see SanityPicture) — the browser logs
+      // it all the same. A harness with an empty media directory, like the one
+      // in CI, hits it for every image in the first screen.
+      if (msg.location().url.includes('/media/')) return
+      errors.push(msg.text())
     })
     page.on('pageerror', err => errors.push(err.message))
 
