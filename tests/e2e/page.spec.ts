@@ -102,15 +102,25 @@ test.describe('hero', () => {
     await ready(page)
   })
 
-  test('name, portrait and the latest post are rendered', async ({ page }) => {
+  test('name, frame and the contact action are rendered', async ({ page }) => {
     await expect(page.locator('#hero-title')).toBeVisible()
 
-    const img = page.locator('.hero-portrait img')
+    const img = page.locator('.hero-art img')
     await expect(img).toBeVisible()
     // the browser picked a source and decoded it, rather than falling back to alt
     expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0)
 
-    await expect(page.locator('.hero-meta a')).toHaveAttribute('href', /\/writing\//)
+    await expect(page.locator('.hero-cta')).toHaveAttribute('href', /#contact$/)
+  })
+
+  // the frame leaves the wrapper for the whole window — it must not leave a
+  // sideways scroll behind, at any width
+  test('the full-width frame does not scroll the page sideways', async ({ page }) => {
+    for (const width of [390, 768, 1280, 1760]) {
+      await page.setViewportSize({ width, height: 900 })
+      const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth])
+      expect(scroll, `at ${width}px`).toBeLessThanOrEqual(client)
+    }
   })
 })
 

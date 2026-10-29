@@ -1,100 +1,70 @@
 <script setup lang="ts">
-import type { PostItem } from '../../../server/api/posts.get'
-
 const { t } = useI18n()
-const loc = useLoc()
 const localePath = useLocalePath()
 
-const { data: posts } = await useFetch<PostItem[]>('/api/posts', {
-  query: { limit: 1 },
-  key: 'latest-post',
-  default: () => [] as PostItem[],
-})
-
-const latest = computed(() => posts.value[0] ?? null)
+/** The frame's widths — one file per format per width under /hero/. */
+const WIDTHS = [1280, 1920, 2560, 3840]
+const srcset = (ext: string) => WIDTHS.map(w => `/hero/hero-${w}.${ext} ${w}w`).join(', ')
 </script>
 
 <template>
   <!--
-    Rows are auto rather than fractions: their height is set by the portrait and
-    the text under it. Equal fractions would level the rows to the tallest one,
-    and the empty second row would take as much as the portrait.
+    Two parts: a canvas — the painting across the whole window, with the name
+    and the painting's caption on it — and under it a solid strip of the page
+    carrying the data and the action. The section leaves the page wrapper for
+    the full window; its content goes back onto the site's grid through
+    wrappers of its own.
   -->
   <section class="hero" aria-labelledby="hero-title">
-    <div class="hero-intro">
-      <hgroup class="flex flex-col gap-hero-heading-gap">
-        <h1 id="hero-title" class="type-display-3xl text-text-primary">{{ t('hero.name') }}</h1>
-        <p class="flex flex-col gap-hero-subtitle-gap">
-          <span class="type-display-lg text-text-secondary">{{ t('hero.role') }}</span>
-          <span class="type-display-lg text-text-primary">{{ t('hero.stack') }}</span>
-        </p>
-      </hgroup>
+    <div class="hero-canvas">
+      <!--
+        Formats newest to oldest, the browser takes the first it understands —
+        the same order and reasoning as the media pipeline. The caption is in
+        the text, so the picture itself carries no alt.
+      -->
+      <picture class="hero-art">
+        <source type="image/jxl" :srcset="srcset('jxl')" sizes="100vw">
+        <source type="image/avif" :srcset="srcset('avif')" sizes="100vw">
+        <source type="image/webp" :srcset="srcset('webp')" sizes="100vw">
+        <img
+          src="/hero/hero-1920.jpg"
+          :srcset="srcset('jpg')"
+          sizes="100vw"
+          alt=""
+          width="3840"
+          height="3093"
+          fetchpriority="high"
+          loading="eager"
+        >
+      </picture>
 
-      <NuxtLink
-        :to="`${localePath('/')}#contact`"
-        class="py-4 px-9 bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-default w-fit text-text-inverse rounded-full type-cta"
-      >
-        {{ t('hero.cta') }}
-      </NuxtLink>
+      <div class="hero-canvas__text wrapper px-page-padding-x">
+        <h1 id="hero-title" class="hero-name type-display-3xl">{{ t('hero.name') }}</h1>
+        <p class="hero-credit type-ui">{{ t('hero.credit') }}</p>
+      </div>
     </div>
 
-    <!--
-      Reference for how images are served across the site.
-
-      The source is a high-resolution png; 1x/2x/3x are derived from the actual
-      maximum display size, and each runs through the formats with its own
-      compression settings. Sources go newest to oldest — jxl, avif, webp, jpeg:
-      the browser takes the first it understands.
-
-      jxl leads deliberately, though on this image it's ~16% heavier than avif:
-      it decodes progressively, resolving from a blurred frame on a slow
-      connection, where avif waits for the whole file.
-
-      sizes describes the real display width and has to match the CSS: it doesn't
-      read var(), and it sets the image's own size as well as which file to pick
-      — when the two disagree, the image sticks to the value from sizes.
-    -->
-    <picture class="hero-portrait">
-      <source
-        type="image/jxl"
-        srcset="/face/face-400.jxl 400w, /face/face-800.jxl 800w, /face/face-1200.jxl 1200w"
-        sizes="(min-width: 48rem) 20rem, calc(100vw - 3rem)"
-      >
-      <source
-        type="image/avif"
-        srcset="/face/face-400.avif 400w, /face/face-800.avif 800w, /face/face-1200.avif 1200w"
-        sizes="(min-width: 48rem) 20rem, calc(100vw - 3rem)"
-      >
-      <source
-        type="image/webp"
-        srcset="/face/face-400.webp 400w, /face/face-800.webp 800w, /face/face-1200.webp 1200w"
-        sizes="(min-width: 48rem) 20rem, calc(100vw - 3rem)"
-      >
-      <img
-        src="/face/face-800.jpg"
-        srcset="/face/face-400.jpg 400w, /face/face-800.jpg 800w, /face/face-1200.jpg 1200w"
-        sizes="(min-width: 48rem) 20rem, calc(100vw - 3rem)"
-        :alt="t('hero.name')"
-        width="400"
-        height="500"
-        fetchpriority="high"
-        loading="eager"
-      >
-    </picture>
-
-    <aside class="hero-meta" :aria-label="t('hero.about')">
-      <p class="type-body-lg text-text-secondary">
-        {{ t('hero.meta') }} {{ t('hero.latest') }}
-        <!-- inline element: the link runs on with the text instead of starting a line -->
-        <NuxtLink
-          v-if="latest"
-          :to="localePath(`/writing/${latest.slug}`)"
-          class="text-text-primary hover:text-accent-strong-hover active:text-accent-default transition-colors"
-        >
-          {{ loc(latest.title) }}
-        </NuxtLink>
-      </p>
-    </aside>
+    <!-- the same four columns as every section header below — title, count,
+         an empty one, the action — so the hero and the sections share their
+         verticals -->
+    <div class="hero-band wrapper px-page-padding-x">
+      <dl class="hero-cell">
+        <dt>{{ t('hero.role_label') }}</dt>
+        <dd>{{ t('hero.role') }}</dd>
+      </dl>
+      <dl class="hero-cell">
+        <dt>{{ t('hero.stack_label') }}</dt>
+        <dd>{{ t('hero.stack') }}</dd>
+      </dl>
+      <dl class="hero-cell hero-cell--work">
+        <dt>{{ t('hero.work_label') }}</dt>
+        <dd>{{ t('hero.work') }}</dd>
+      </dl>
+      <NuxtLink :to="`${localePath('/')}#contact`" class="hero-cta">
+        <span class="hero-cta__label">{{ t('hero.cta_label') }}</span>
+        <span class="hero-cta__text">{{ t('hero.cta') }} <span class="hero-cta__arrow" aria-hidden="true">→</span></span>
+      </NuxtLink>
+    </div>
   </section>
 </template>
 
@@ -102,77 +72,173 @@ const latest = computed(() => posts.value[0] ?? null)
 /* In the components layer, so utility classes in the markup still win. */
 @layer components {
   /*
-   * Three layouts, collected here rather than spread across four elements as
-   * utilities. Read top to bottom, narrow to wide:
-   *
-   *   < 768     no columns: portrait → intro → text, three rows by content
-   *   768…1024  two columns: intro and portrait in the first row, text below
-   *             them across the full width, ranged left, no width limit
-   *   >= 1024   intro spans both rows on the left; on the right the portrait
-   *             and, under it, the text — ranged right and width-limited
+   * Leaves the wrapper for the full window. 100vw counts a classic scrollbar,
+   * so the body clips the few pixels it overhangs (see the redesign layout).
    */
   .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: repeat(3, auto);
-    column-gap: var(--spacing-grid-gap);
-    row-gap: var(--spacing-hero-gap-y);
-    padding-block: var(--spacing-section-padding-y);
+    --band-h: 18rem; /* what the strip takes on a phone, roughly */
+    margin-inline: calc(50% - 50vw);
   }
 
-  .hero-portrait { grid-area: 1 / 1 / 2 / 2; }
-  .hero-intro    { grid-area: 2 / 1 / 3 / 2; }
-  .hero-meta     { grid-area: 3 / 1 / 4 / 2; }
-
-  .hero-intro {
+  /*
+   * The canvas and the strip fill the first screen under the header together:
+   * the strip lands on the window's bottom edge. Bounded both ways, so a very
+   * short or very tall window doesn't squash or stretch the painting.
+   */
+  .hero-canvas {
+    position: relative;
+    isolation: isolate;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    row-gap: var(--spacing-hero-intro-gap);
-    height: 100%;
+    align-items: flex-end;
+    height: clamp(22rem, calc(100svh - var(--spacing-header-height) - var(--band-h)), 52rem);
+    overflow: hidden;
+    background-color: var(--color-fill-strong);
   }
 
-  /* on a phone the portrait takes the full width, with no height ceiling */
-  .hero-portrait img {
+  .hero-art {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .hero-art img {
     display: block;
     width: 100%;
-    aspect-ratio: 4 / 5;
+    height: 100%;
     object-fit: cover;
-    /* Figma has no radius token for this yet */
-    border-radius: 1.75rem;
+    object-position: center 30%;
   }
 
+  .hero-canvas__text {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2vw, 1.75rem);
+    padding-block: 0 clamp(1.75rem, 3.5vw, 3.5rem);
+  }
+
+  /*
+   * The name and the caption are a negative of the painting: a light grey in
+   * 'difference' turns dark over light paint and light over dark, so both
+   * read on every colour they cross. Grey rather than white — a full white
+   * inverts red into a loud cyan; grey keeps the inversion muted.
+   */
+  .hero-name,
+  .hero-credit {
+    color: #c4c4c4;
+    mix-blend-mode: difference;
+  }
+
+  .hero-credit { align-self: flex-end; }
+
+  /* phone: the caption goes to the canvas's top-left, clear of the name in two
+     lines; the longest value takes the strip's full width, like the action */
+  @media (width < 48rem) {
+    .hero-credit {
+      position: absolute;
+      top: calc(var(--spacing) * 5);
+      left: var(--spacing-page-padding-x);
+      right: var(--spacing-page-padding-x);
+    }
+    .hero-cell--work { grid-column: 1 / -1; }
+  }
+
+  /* One small tier under the canvas — the footer's label/value pair — so the
+     only large thing on the first screen is the name. */
+  .hero-band {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--spacing-grid-gap);
+    row-gap: calc(var(--spacing) * 7);
+    align-items: start;
+    padding-block: clamp(1.75rem, 3vw, 2.75rem);
+  }
+
+  .hero-cell {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 2);
+    padding-right: calc(var(--spacing) * 8);
+  }
+  .hero-cell dt {
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    font-weight: var(--text-ui--font-weight);
+    color: var(--color-text-secondary);
+  }
+  .hero-cell dd {
+    font-size: var(--text-text);
+    line-height: var(--text-text--line-height);
+    font-weight: var(--text-text--font-weight);
+    color: var(--color-text-primary);
+  }
+
+  /*
+   * The accent action: a square cell with a label above, a hairline, filled on
+   * hover — neither content nor a pill control, a kind of its own, shared only
+   * with the contact section's Telegram. Keep the two in step.
+   */
+  .hero-cta {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 6);
+    min-height: calc(var(--spacing) * 26);
+    padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5);
+    outline: 1px solid var(--color-text-primary);
+    outline-offset: -1px;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: background-color var(--duration-hover) var(--ease-out),
+                color var(--duration-hover) var(--ease-out);
+  }
+  .hero-cta:hover {
+    background-color: var(--color-fill-strong);
+    color: var(--color-text-inverse);
+  }
+  .hero-cta:active {
+    opacity: 0.88;
+    transition-duration: var(--duration-press);
+  }
+  .hero-cta:focus-visible {
+    outline: 2px solid var(--color-accent-strong);
+    outline-offset: 2px;
+  }
+
+  .hero-cta__label {
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    opacity: 0.7;
+  }
+  .hero-cta__text {
+    font-family: var(--font-display);
+    font-size: var(--text-display-lg);
+    font-weight: var(--text-display-lg--font-weight);
+    line-height: 1.1;
+  }
+  .hero-cta__arrow {
+    display: inline-block;
+    transition: translate var(--duration-hover) var(--ease-out);
+  }
+  .hero-cta:hover .hero-cta__arrow { translate: 0.25rem 0; }
+
+  /* from here exactly the section header's grid: four equal columns, no gap */
   @media (width >= 48rem) {
-    .hero {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: repeat(2, auto);
+    .hero { --band-h: 10.5rem; }
+
+    .hero-band {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: 0;
     }
 
-    .hero-intro    { grid-area: 1 / 1 / 2 / 2; }
-    .hero-portrait { grid-area: 1 / 2 / 2 / 3; justify-self: end; width: fit-content; }
-    .hero-meta     { grid-area: 2 / 1 / 3 / 3; }
-
-    /* from here the portrait lives by its height ceiling, width follows from it */
-    .hero-portrait img {
-      width: auto;
-      max-height: 25rem;
+    /* pulled up by its own padding: its label lands on the neighbours' line */
+    .hero-cta {
+      grid-column: 4;
+      margin-top: calc(var(--spacing) * -4);
     }
   }
 
-  @media (width >= 64rem) {
-    /* the intro unfolds across both rows, the text moves under the portrait */
-    .hero-intro { grid-area: 1 / 1 / 3 / 2; }
-
-    .hero-meta {
-      grid-area: 2 / 2 / 3 / 3;
-      justify-self: end;
-      max-width: 27.5rem;
-      text-align: right;
-    }
-  }
-
-  @media (width >= 80rem) {
-    .hero-intro { justify-content: flex-end; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-cta__arrow { transition: none; }
   }
 }
 </style>

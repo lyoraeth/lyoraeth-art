@@ -31,12 +31,15 @@
 
   "hero": {
     "name": "Danil Klimov",
-    "role": "Frontend developer.",
-    "stack": "Vue, TypeScript, Nuxt, GSAP.",
+    "role_label": "Role",
+    "role": "Frontend developer",
+    "stack_label": "Stack",
+    "stack": "Vue, TypeScript, Nuxt, GSAP",
+    "work_label": "Work",
+    "work": "St. Petersburg, office or remote. Open to offers",
+    "cta_label": "Contact",
     "cta": "Get in touch",
-    "about": "About me, briefly",
-    "meta": "St. Petersburg, office or remote. Open to offers. I write about websites.",
-    "latest": "Latest post:"
+    "credit": "Lyubov Popova. Painterly Architectonic. 1918"
   },
 
   "experience": {

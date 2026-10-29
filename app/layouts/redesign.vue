@@ -56,6 +56,10 @@ const noticeText = computed(() =>
   }
 
   html.shell-redesign body {
+    /* The hero breaks out of the wrapper to 100vw, which a classic scrollbar
+       makes wider than the page. clip, not hidden: hidden makes the body a
+       scroll container and the sticky header stops sticking. */
+    overflow-x: clip;
     background-color: var(--color-surface-page);
     color: var(--color-text-primary);
 

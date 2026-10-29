@@ -130,6 +130,8 @@ export default defineNuxtConfig({
     // Portrait variants: cached long, but not immutable — the file names carry
     // no hash, so a new photo has to be able to replace them.
     '/face/**':        { headers: { 'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' } },
+    // The hero frame: same terms as the portrait, a new frame keeps the names.
+    '/hero/**':        { headers: { 'Cache-Control': 'public, max-age=604800, stale-while-revalidate=86400' } },
     '/favicon-light.svg': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon-dark.svg':  { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/favicon.ico':    { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
