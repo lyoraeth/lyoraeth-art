@@ -297,17 +297,13 @@ test.describe('work', () => {
     await expect(cards.first().locator('a')).toHaveAttribute('href', /\/work\//)
   })
 
-  test('hover swaps the teaser for the excerpt', async ({ page }) => {
-    const card = page.locator('.work-card').first()
-    await card.scrollIntoViewIfNeeded()
-
-    await expect(card.locator('.work-card__state--full')).toBeHidden()
-    await card.hover()
-    // both states share one grid cell, so the swap must not resize the card
-    const before = (await card.boundingBox())!.height
-    await expect(card.locator('.work-card__state--full')).toBeVisible()
-    await expect(card.locator('.work-card__state--short')).toBeHidden()
-    expect((await card.boundingBox())!.height).toBe(before)
+  test('each card shows its cover in a 4:3 frame, or a plain plate without one', async ({ page }) => {
+    const media = page.locator('.work-card__media')
+    await expect(media).toHaveCount(4)
+    for (const frame of await media.all()) {
+      const box = (await frame.boundingBox())!
+      expect(box.width / box.height).toBeCloseTo(4 / 3, 1)
+    }
   })
 })
 
@@ -456,16 +452,12 @@ test.describe('client-side navigation', () => {
 test.describe('cards on touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
 
-  test('a tap opens the card, and hover states never latch', async ({ page }) => {
+  test('a tap opens the card', async ({ page }) => {
     await page.goto('/')
     await ready(page)
 
     const card = page.locator('.work-card').first()
     await card.scrollIntoViewIfNeeded()
-
-    // the resting state is what a touch device sees, before and after the tap
-    await expect(card.locator('.work-card__state--short')).toBeVisible()
-    await expect(card.locator('.work-card__state--full')).toBeHidden()
 
     await card.tap()
     await page.waitForURL(/\/work\//)

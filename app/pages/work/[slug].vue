@@ -302,7 +302,6 @@ onMounted(() => {
     font-size: var(--text-body-lg);
     padding: 0;
     border: none;
-    border-radius: var(--radius-3xl);
     outline: 1px solid var(--color-border-default);
     background: none;
     overflow: hidden;
@@ -433,7 +432,6 @@ onMounted(() => {
     max-height: 80vh;
     width: auto;
     height: auto;
-    border-radius: var(--radius-2xl);
     cursor: zoom-in;
   }
 

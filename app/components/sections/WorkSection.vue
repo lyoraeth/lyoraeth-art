@@ -40,12 +40,7 @@ const total = computed(() => items.value.length)
       </NuxtLink>
     </div>
 
-    <!--
-      auto-rows-fr levels the cards against the tallest one, both within a row
-      and across rows: fractions in a container with no set height resolve to
-      the largest content. The floor of 320px lives in the card.
-    -->
-    <div class="layout-grid gap-grid-gap auto-rows-fr">
+    <div class="layout-grid gap-x-grid-gap gap-y-10">
       <WorkCard
         v-for="item in shown"
         :key="item._id"

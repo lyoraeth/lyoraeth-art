@@ -66,7 +66,7 @@ const grouped = computed(() => {
         <div class="year-divider__line" />
       </div>
 
-      <div class="layout-grid gap-grid-gap auto-rows-fr">
+      <div class="layout-grid gap-x-grid-gap gap-y-10">
         <WorkCard
           v-for="item in items"
           :key="item._id"

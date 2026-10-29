@@ -345,7 +345,6 @@ onMounted(() => {
 
   .post-cover {
     margin-bottom: calc(var(--spacing) * 10);
-    border-radius: var(--radius-3xl);
     overflow: hidden;
     outline: 1px solid var(--color-border-default);
   }

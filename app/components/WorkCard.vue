@@ -2,229 +2,150 @@
 import type { WorkItem } from '../../server/api/work.get'
 
 /**
- * Work card. At rest it shows the teaser; on hover a fill sweeps out from the
- * pointer and the excerpt takes the teaser's place.
+ * Work card: the case's cover, then a line of stack and year, the title and
+ * the teaser. The whole card is the link.
+ *
+ * Square on purpose. The site's shapes come in three kinds: content (pictures,
+ * cards) is square; controls (pills: "See all", "Send", CV) are round; the
+ * accent action — the hero's "Get in touch" and the contact section's
+ * Telegram — is a square cell of its own.
+ *
+ * The picture is the work's poster — the client's brand colour and mark, so a
+ * row of cards reads as one set — or its cover until it has one. A work with
+ * neither (an NDA project) gets a plain dark plate in its
+ * place, so a row of cards keeps its rhythm; the plate repeats nothing, the
+ * title is right under it.
  */
 const props = defineProps<{ item: WorkItem }>()
 
-const { t } = useI18n()
 const loc = useLoc()
 const localePath = useLocalePath()
 const cardLink = useCardLink(() => `/work/${props.item.slug}`)
 
 /** The design fits three; the CMS holds as many as the project earned. */
 const tags = computed(() => (props.item.tags ?? []).slice(0, 3))
+const title = computed(() => loc(props.item.title))
 
-/*
- * The fill spreads as a circle from wherever the pointer entered. Coordinates
- * are written once on entry — the circle starts from that point regardless, so
- * there is nothing to recompute on every move.
- */
-function onPointerEnter(event: PointerEvent) {
-  const card = event.currentTarget as HTMLElement
-  const rect = card.getBoundingClientRect()
-  card.style.setProperty('--x', `${event.clientX - rect.left}px`)
-  card.style.setProperty('--y', `${event.clientY - rect.top}px`)
-}
+/** The poster if the work has one, the case's cover otherwise. */
+const picture = computed(() => (props.item.posterUrl
+  ? { src: props.item.posterUrl, alt: props.item.posterAlt ?? title.value }
+  : props.item.coverUrl ? { src: props.item.coverUrl, alt: props.item.coverAlt ?? title.value } : null))
 </script>
 
 <template>
-  <article class="work-card" v-on="cardLink" @pointerenter="onPointerEnter">
-    <span class="work-card__fill" aria-hidden="true" />
+  <article class="work-card" v-on="cardLink">
+    <div class="work-card__media">
+      <SanityPicture
+        v-if="picture"
+        :src="picture.src"
+        :alt="picture.alt"
+        family="full"
+        sizes="(min-width: 96rem) 25vw, (min-width: 80rem) 50vw, calc(100vw - 3rem)"
+      />
+    </div>
 
-    <div class="work-card__header">
-      <div v-if="tags.length" class="work-card__tags type-ui">
-        <span class="work-card__tags-text">{{ tags.join(' • ') }}</span>
-      </div>
-      <p v-if="item.year" class="work-card__date type-ui">{{ item.year }}</p>
+    <div class="work-card__meta type-ui">
+      <span v-if="tags.length" class="work-card__tags">{{ tags.join(' • ') }}</span>
+      <span v-if="item.year">{{ item.year }}</span>
     </div>
 
     <h3 class="work-card__title type-display-md">
-      <NuxtLink :to="localePath(`/work/${item.slug}`)" class="work-card__link">
-        {{ loc(item.title) }}
-      </NuxtLink>
+      <NuxtLink :to="localePath(`/work/${item.slug}`)" class="work-card__link">{{ title }}</NuxtLink>
     </h3>
 
-    <div class="work-card__stack">
-      <div class="work-card__state work-card__state--short">
-        <p class="type-body-lg">{{ loc(item.teaser) }}</p>
-      </div>
-
-      <div class="work-card__state work-card__state--full">
-        <p class="type-body-lg">{{ loc(item.excerpt) }}</p>
-
-        <!-- not interactive: the whole card is the link, a second target would
-             only get in the way -->
-        <span class="work-card__action type-ui" aria-hidden="true">
-          <span>{{ t('work.view_case') }}</span>
-        </span>
-      </div>
-    </div>
+    <p v-if="item.teaser" class="work-card__teaser type-text">{{ loc(item.teaser) }}</p>
   </article>
 </template>
 
 <style scoped>
 /* In the components layer, so utility classes in the markup still win. */
 @layer components {
-  /*
-   * Cards are all as tall as the tallest one and never shorter than 320px: the
-   * grid's auto-rows-fr does the levelling, min-height sets the floor.
-   *
-   * Hovering doesn't move the height — both states share one cell of the inner
-   * grid and swap by visibility, so the card always occupies the taller one.
-   */
   .work-card {
-    position: relative;
     display: flex;
     flex-direction: column;
-    gap: calc(var(--spacing) * 6);
-    min-height: calc(var(--spacing) * 80);
-    padding: calc(var(--spacing) * 8);
-    border-radius: var(--radius-3xl);
-    background-color: var(--color-surface-raised);
-    overflow: hidden;
+    gap: calc(var(--spacing) * 2);
     cursor: pointer;
   }
 
-  .work-card__fill {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background-color: var(--color-fill-strong);
-    clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
-    transition: clip-path var(--duration-sweep) var(--ease-out);
-    pointer-events: none;
-    /* decoration — never part of what gets selected */
-    user-select: none;
-  }
-
-  .work-card__link {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .work-card__header,
-  .work-card__title,
-  .work-card__stack {
+  /* 4:3, cropped from the top: a case cover is a page screenshot, and its
+     head is the part that says which site it is */
+  .work-card__media {
     position: relative;
-    z-index: 10;
-  }
-
-  .work-card__header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    /* the picture stands apart from its caption; the caption's lines stay tight */
+    margin-bottom: calc(var(--spacing) * 3);
+    background-color: var(--color-fill-strong);
   }
 
   /*
-   * Capped rather than left to grow with the tag count: a project with more
-   * tags than fit doesn't wrap to a second line or push the date over, it
-   * just truncates. Overflow lives on the text span, not the pill itself —
-   * a flex item needs min-width: 0 before overflow: hidden does anything,
-   * the pill's own default min-width would otherwise stretch to fit it.
+   * The frame: the blog card's hairline, the same colour, gone dark on hover.
+   * Drawn on a layer above the picture — an outline on the box itself would
+   * sit under the image.
    */
-  .work-card__tags {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    max-width: 240px;
-    padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2);
-    border-radius: calc(infinity * 1px);
-    outline: 1px solid var(--color-border-raised);
-    color: var(--color-text-secondary);
-    transition: color var(--duration-ambient) var(--ease-out), outline-color var(--duration-ambient) var(--ease-out);
+  .work-card__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--color-border-raised);
+    pointer-events: none;
+    transition: border-color var(--duration-hover) var(--ease-out);
+  }
+  .work-card__media :deep(picture) { display: contents; }
+  .work-card__media :deep(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    transition: scale var(--duration-sweep) var(--ease-out);
   }
 
-  .work-card__tags-text {
+  .work-card__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 4);
+    color: var(--color-text-secondary);
+  }
+
+  /* one line: a long stack truncates instead of pushing the year over */
+  .work-card__tags {
     min-width: 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
 
-  .work-card__date {
-    color: var(--color-text-secondary);
-    transition: color var(--duration-ambient) var(--ease-out);
-  }
+  .work-card__title { color: var(--color-text-primary); }
 
-  .work-card__title {
-    color: var(--color-text-primary);
+  .work-card__link {
+    color: inherit;
+    text-decoration: none;
     transition: color var(--duration-hover) var(--ease-out);
   }
 
-  .work-card__stack {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
-    margin-top: auto;
-  }
-
-  .work-card__state {
-    grid-area: 1 / 1;
-    display: flex;
-    flex-direction: column;
-    transition: opacity var(--duration-hover) var(--ease-out), translate var(--duration-hover) var(--ease-out),
-                visibility var(--duration-hover) var(--ease-out);
-  }
-
-  .work-card__state--short {
-    justify-content: flex-end;
-    color: var(--color-text-primary);
-  }
-
-  .work-card__state--full {
-    align-items: flex-start;
-    gap: calc(var(--spacing) * 6);
-    color: var(--color-text-inverse);
-    visibility: hidden;
-    opacity: 0;
-    translate: 0 -0.25rem;
-    pointer-events: none;
-  }
-
-  .work-card__action {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: calc(var(--spacing) * 1.5);
-    height: calc(var(--spacing) * 10);
-    padding-inline: calc(var(--spacing) * 3);
-    border-radius: calc(infinity * 1px);
-    background-color: var(--color-surface-hover);
-    color: var(--color-text-primary);
-    pointer-events: none;
-  }
+  .work-card__teaser { color: var(--color-text-secondary); }
 
   /*
    * Hover states only where a pointer can hover. On touch :hover latches after
-   * a tap, which would leave a card stuck open behind the navigation.
+   * a tap, which would leave a card stuck in its hover state.
    */
   @media (hover: hover) {
-  .work-card:hover .work-card__fill {
-      clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
-    }
-  .work-card:hover :is(.work-card__tags, .work-card__date) {
-      color: var(--color-text-secondary-inversed);
-    }
-  .work-card:hover .work-card__tags {
-      outline-color: var(--color-border-raised-inversed);
-    }
-  .work-card:hover .work-card__title {
-      color: var(--color-text-inverse);
-    }
-  .work-card:hover .work-card__state--short {
-      visibility: hidden;
-      opacity: 0;
-      translate: 0 0.25rem;
-      pointer-events: none;
-    }
-  .work-card:hover .work-card__state--full {
-      visibility: visible;
-      opacity: 1;
-      translate: 0 0;
-      pointer-events: auto;
-    }
+    .work-card:hover .work-card__media :deep(img) { scale: 1.03; }
+    .work-card:hover .work-card__media::after { border-color: var(--color-fill-strong); }
+    .work-card:hover .work-card__link { color: var(--color-accent-strong); }
+  }
+
+  /* the keyboard sees what the pointer does, plus the focus ring on the link */
+  .work-card:has(.work-card__link:focus-visible) .work-card__media::after { border-color: var(--color-fill-strong); }
+  .work-card:has(.work-card__link:focus-visible) .work-card__link { color: var(--color-accent-strong); }
+  .work-card__link:focus-visible {
+    outline: 2px solid var(--color-accent-strong);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .work-card__media :deep(img) { transition: none; }
   }
 }
 </style>

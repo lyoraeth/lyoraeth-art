@@ -53,6 +53,21 @@ export default defineType({
       group: 'media',
       altHint: 'Add alt text — the site falls back to the project title otherwise',
     }),
+    defineField({
+      name: 'poster',
+      title: 'Card poster',
+      description: 'The picture on the work card in listings, 4:3 (e.g. 1600×1200): the client brand colour with its mark in the middle, so a row of cards reads as one set. The case page keeps the cover. Without a poster the card shows the cover.',
+      type: 'image',
+      group: 'media',
+      fields: [
+        {
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          description: 'Optional — the title is right under the card.',
+        },
+      ],
+    }),
 
     defineField({
       name: 'tags',

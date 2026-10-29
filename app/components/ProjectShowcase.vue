@@ -75,12 +75,11 @@ const title = computed(() => loc(props.item.title))
     border-top: 1px solid var(--color-border-default);
   }
 
-  /* Framed like a case cover: the same radius and hairline, the image itself
+  /* Framed like a case cover: square, with the same hairline, the image itself
      left uncropped so the screenshot reads as the real window it is. */
   .project-showcase__media {
     display: block;
     overflow: hidden;
-    border-radius: var(--radius-3xl);
     outline: 1px solid var(--color-border-default);
     background-color: var(--color-surface-raised);
   }

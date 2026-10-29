@@ -22,7 +22,9 @@ export default defineCachedEventHandler(async event => {
       showLink,
       year,
       "coverUrl": cover.asset->url,
-      "coverAlt": cover.alt
+      "coverAlt": cover.alt,
+      "posterUrl": poster.asset->url,
+      "posterAlt": poster.alt
     }
   `)
 }, { maxAge: 60 * 5, name: 'work-list', getKey: event => String(getQuery(event).limit ?? '3') })
@@ -41,6 +43,10 @@ export interface WorkItem {
   year?:       number
   coverUrl:    string | null
   coverAlt:    string | null
+  /** The card's own picture (brand colour and mark); the card falls back to
+   *  the cover without one. */
+  posterUrl:   string | null
+  posterAlt:   string | null
   // Not selected by this endpoint's own GROQ projection (the listing has no
   // use for them) — only work/[slug].get.ts's WorkDetail actually populates
   // these; optional here so the type doesn't promise what the list query

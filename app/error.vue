@@ -46,7 +46,6 @@ onMounted(() => {
     width: 100%;
     max-width: 180px;
     height: auto;
-    border-radius: var(--radius-3xl);
     outline: 1px solid var(--color-border-default);
   }
 }

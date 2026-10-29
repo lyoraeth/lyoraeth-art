@@ -53,11 +53,13 @@ export default defineTask({
       const rows = await client.fetch<{
         _type:   string
         cover:   { url: string | null; width: number | null } | null
+        poster:  { url: string | null; width: number | null } | null
         gallery: { url: string | null; width: number | null }[] | null
       }[]>(`
         *[_type in ["work", "post", "project"] && !(_id in path("drafts.**"))]{
           _type,
           "cover": cover.asset->{ url, "width": metadata.dimensions.width },
+          "poster": poster.asset->{ url, "width": metadata.dimensions.width },
           "gallery": gallery[].image.asset->{ url, "width": metadata.dimensions.width }
         }
       `)
@@ -99,6 +101,8 @@ export default defineTask({
       for (const row of rows) {
         addCms(row.cover?.url, row.cover?.width, row._type === 'project' ? ['full'] : ['cover', 'full'])
         for (const g of row.gallery ?? []) addCms(g?.url, g?.width, ['full'])
+        // a work card's poster: drawn at the card's 4:3, never cropped
+        addCms(row.poster?.url, row.poster?.width, ['full'])
       }
     }
 
