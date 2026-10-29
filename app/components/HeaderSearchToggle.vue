@@ -30,7 +30,7 @@ function onButtonClick() {
 
 function submit() {
   const g = groups.value
-  const first = g.work[0] ?? g.writing[0] ?? g.pages[0]
+  const first = g.project[0] ?? g.work[0] ?? g.writing[0] ?? g.pages[0]
   if (first) navigateTo(first.href)
 }
 

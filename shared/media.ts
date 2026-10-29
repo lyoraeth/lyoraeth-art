@@ -97,3 +97,78 @@ export function sanityAssetHash(urlOrId: string | null | undefined): string | nu
   const m = urlOrId.match(/(?:^image-|\/)([0-9a-f]{40})-\d+x\d+[.-]/)
   return m ? m[1]! : null
 }
+
+/**
+ * Animated sources skip the encoder: its output is a still, so the pipeline
+ * keeps only a first-frame poster in the usual variants, and the source is
+ * stored as is next to them under `animatedBasename`. The client shows the
+ * poster first and swaps the animation in once it has loaded.
+ */
+export type AnimatedKind = 'webp' | 'gif'
+
+/** `{hash}-anim.{kind}` — the stored original of an animated source. */
+export function animatedBasename(hash: string, kind: AnimatedKind): string {
+  return `${hash}-anim.${kind}`
+}
+
+/** The kind and hash back out of an `animatedBasename`, or null for any other
+ *  file name in the media directory. */
+export function parseAnimatedBasename(name: string): { hash: string; kind: AnimatedKind } | null {
+  const m = name.match(/^([0-9a-f]{40})-anim\.(webp|gif)$/)
+  return m ? { hash: m[1]!, kind: m[2] as AnimatedKind } : null
+}
+
+/**
+ * Whether the bytes are an animated WebP or GIF, by header alone — nothing is
+ * decoded, so a still `.webp`/`.gif` and an animated one are told apart before
+ * any tool touches the file. A single-frame GIF is still, not animated.
+ */
+export function detectAnimation(bytes: Uint8Array): AnimatedKind | null {
+  return isAnimatedWebp(bytes) ? 'webp' : isAnimatedGif(bytes) ? 'gif' : null
+}
+
+function ascii(bytes: Uint8Array, from: number, to: number): string {
+  return String.fromCharCode(...bytes.subarray(from, to))
+}
+
+/** `RIFF….WEBP` + a `VP8X` chunk whose flags byte has the animation bit (0x02). */
+function isAnimatedWebp(bytes: Uint8Array): boolean {
+  if (bytes.length < 21) return false
+  return ascii(bytes, 0, 4) === 'RIFF' && ascii(bytes, 8, 12) === 'WEBP'
+    && ascii(bytes, 12, 16) === 'VP8X' && (bytes[20]! & 0x02) !== 0
+}
+
+/** Walks the GIF's blocks and counts image descriptors — more than one is an
+ *  animation. A truncated file ends the walk with whatever was counted. */
+function isAnimatedGif(bytes: Uint8Array): boolean {
+  const head = ascii(bytes, 0, 6)
+  if (head !== 'GIF87a' && head !== 'GIF89a') return false
+
+  // sub-blocks: a run of length-prefixed chunks ended by a zero length
+  const skipSubBlocks = (at: number): number => {
+    while (at < bytes.length && bytes[at] !== 0) at += bytes[at]! + 1
+    return at + 1
+  }
+
+  const flags = bytes[10] ?? 0
+  let pos = 13 + (flags & 0x80 ? 3 * 2 ** ((flags & 0x07) + 1) : 0)
+  let frames = 0
+
+  while (pos < bytes.length) {
+    const block = bytes[pos]
+    if (block === 0x3B) break
+    if (block === 0x21) {
+      pos = skipSubBlocks(pos + 2)
+    }
+    else if (block === 0x2C) {
+      if (++frames > 1) return true
+      const local = bytes[pos + 9] ?? 0
+      pos += 10 + (local & 0x80 ? 3 * 2 ** ((local & 0x07) + 1) : 0)
+      pos = skipSubBlocks(pos + 1) // the LZW minimum code size, then the data
+    }
+    else {
+      break
+    }
+  }
+  return false
+}

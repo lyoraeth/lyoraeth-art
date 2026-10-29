@@ -17,6 +17,7 @@ export default defineConfig({
           .title('Content')
           .items([
             S.listItem().title('Work').schemaType('work').child(S.documentTypeList('work')),
+            S.listItem().title('Projects').schemaType('project').child(S.documentTypeList('project')),
             S.listItem().title('Posts').schemaType('post').child(S.documentTypeList('post')),
             S.listItem().title('Comments').schemaType('comment').child(S.documentTypeList('comment')),
             S.divider(),

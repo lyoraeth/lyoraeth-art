@@ -52,6 +52,27 @@ describe('useToc', () => {
     ])
   })
 
+  it('lists a heading with inline markup by its plain text, and links to the id the renderer stamps', () => {
+    const { result } = withSetup(() => useToc({
+      markdown: () => '## The `config.ini` keys\n\n### **Bold** and [linked](x.md)\n',
+      introLabel: () => 'Introduction',
+      content: () => '',
+    }))
+    expect(result.toc.value.slice(1)).toEqual([
+      { level: 2, text: 'The config.ini keys', id: 'the-configini-keys' },
+      { level: 3, text: 'Bold and linked', id: 'bold-and-linkedxmd' },
+    ])
+  })
+
+  it('does not list a "##" line inside a fenced code block', () => {
+    const { result } = withSetup(() => useToc({
+      markdown: () => '## Real\n\n```toml\n## just a comment\n```\n',
+      introLabel: () => 'Introduction',
+      content: () => '',
+    }))
+    expect(result.toc.value.map(e => e.text)).toEqual(['Introduction', 'Real'])
+  })
+
   it('is just the intro entry for markdown with no h2/h3 headings (the page hides a 1-entry TOC itself)', () => {
     const { result } = withSetup(() => useToc({
       markdown: () => 'Just a paragraph, no headings.',

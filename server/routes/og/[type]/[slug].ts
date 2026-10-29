@@ -3,7 +3,7 @@ import { Resvg } from '@resvg/resvg-js'
 import { createSanityClient } from '../../../utils/sanity'
 import { OG_FONTS, ogCard } from '../../../utils/ogTemplate'
 
-/** Satori/resvg dynamic OG image for post & work detail pages — the branded
+/** Satori/resvg dynamic OG image for post, work & project detail pages — the branded
  *  link-preview card used as og:image when a document has no cover (see
  *  useArticleSeo). 1200×630, light theme, bilingual via ?l=ru|en. Cached 1h.
  *
@@ -18,7 +18,7 @@ import { OG_FONTS, ogCard } from '../../../utils/ogTemplate'
  *  image/png) — Telegram's link-preview fetcher just hung on it forever.
  *  A string cached this way round-trips perfectly; the outer handler below
  *  decodes it back to bytes on every request, cached or not. */
-const renderOgImage = defineCachedFunction(async (type: 'writing' | 'work', slug: string, locale: 'en' | 'ru') => {
+const renderOgImage = defineCachedFunction(async (type: 'writing' | 'work' | 'project', slug: string, locale: 'en' | 'ru') => {
   const { sanityProjectId, sanityDataset } = useRuntimeConfig()
   if (!sanityProjectId) throw createError({ statusCode: 503, message: 'CMS not configured' })
   const client = createSanityClient(sanityProjectId, sanityDataset)
@@ -36,8 +36,10 @@ const renderOgImage = defineCachedFunction(async (type: 'writing' | 'work', slug
     caption = topic ? [topic] : []
   }
   else {
+    // work and project share a shape here (title + teaser), and `type` is
+    // already the Sanity _type name for both
     const doc = await client.fetch<{ title: { en: string; ru?: string }; teaser?: { en: string; ru?: string } | null } | null>(
-      `*[_type == "work" && coalesce(slug.current, _id) == $s][0]{ title, teaser }`, { s: slug },
+      `*[_type == $t && coalesce(slug.current, _id) == $s][0]{ title, teaser }`, { t: type, s: slug },
     )
     if (!doc) throw createError({ statusCode: 404 })
     title   = (locale === 'ru' && doc.title.ru ? doc.title.ru : doc.title.en) ?? ''
@@ -61,7 +63,7 @@ export default defineEventHandler(async event => {
   const slug    = decodeURIComponent(slugRaw).replace(/\.png$/, '')
   const locale  = getQuery(event).l === 'ru' ? 'ru' : 'en'
 
-  if (type !== 'writing' && type !== 'work') throw createError({ statusCode: 404 })
+  if (type !== 'writing' && type !== 'work' && type !== 'project') throw createError({ statusCode: 404 })
 
   const base64 = await renderOgImage(type, slug, locale)
 

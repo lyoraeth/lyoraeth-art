@@ -72,7 +72,7 @@ const GALLERY = [{
 
 describe('useMarkdown() gallery images', () => {
   it('resolves gallery:key to a self-hosted <picture> with all four formats', () => {
-    const { renderPost } = useMarkdown(GALLERY)
+    const { renderPost } = useMarkdown({ gallery: GALLERY })
     const html = renderPost('![Diagram](gallery:flow-1)')
     expect(html).toContain('<figure class="post-figure"><picture>')
     expect(html).toContain('type="image/jxl"')
@@ -86,31 +86,71 @@ describe('useMarkdown() gallery images', () => {
   })
 
   it('turns {ar=16/9 fit=cover pos=top} into a whitelisted inline style', () => {
-    const { renderPost } = useMarkdown(GALLERY)
+    const { renderPost } = useMarkdown({ gallery: GALLERY })
     const html = renderPost('![x](gallery:flow-1){ar=16/9 fit=cover pos=top}')
     expect(html).toContain('style="aspect-ratio:16/9;object-fit:cover;object-position:top"')
   })
 
   it('ignores fit/pos without a ratio, and drops an unknown pos value', () => {
-    const { renderPost } = useMarkdown(GALLERY)
+    const { renderPost } = useMarkdown({ gallery: GALLERY })
     expect(renderPost('![x](gallery:flow-1){fit=cover pos=top}')).not.toContain('aspect-ratio')
     expect(renderPost('![x](gallery:flow-1){ar=4/3 pos=evil;}')).not.toContain('object-position')
   })
 
   it('drops an unknown key as a comment rather than emitting a broken image', () => {
-    const { renderPost } = useMarkdown(GALLERY)
+    const { renderPost } = useMarkdown({ gallery: GALLERY })
     const html = renderPost('![x](gallery:does-not-exist)')
     expect(html).toContain('<!-- gallery: does-not-exist not found -->')
     expect(html).not.toContain('<img')
   })
 
   it('leaves a plain markdown image untouched', () => {
-    const { renderPost } = useMarkdown(GALLERY)
+    const { renderPost } = useMarkdown({ gallery: GALLERY })
     const html = renderPost('![x](https://x.test/a.png)')
     expect(html).toContain('src="https://x.test/a.png"')
     expect(html).not.toContain('<picture>')
   })
 })
 
+describe('useMarkdown({ resolveLink })', () => {
+  it('rewrites a link’s target, keeping its text, markup and title', () => {
+    const { renderPost } = useMarkdown({ resolveLink: href => `/docs/${href.replace(/\.md$/, '')}` })
+    const html = renderPost('See [the **user** guide](guide.md "Open it").')
+    expect(html).toContain('<a href="/docs/guide" title="Open it">the <strong>user</strong> guide</a>')
+  })
+
+  it('renders a link as plain text when the resolver returns null', () => {
+    const { renderPost } = useMarkdown({ resolveLink: () => null })
+    const html = renderPost('A [dead link](../../outside.md) here.')
+    expect(html).toContain('A dead link here.')
+    expect(html).not.toContain('<a ')
+  })
+
+  it('escapes whatever the resolver returns, quotes included', () => {
+    const { renderPost } = useMarkdown({ resolveLink: () => '/x" onmouseover="alert(1)' })
+    const html = renderPost('[a](b.md)')
+    expect(html).toContain('href="/x&quot; onmouseover=&quot;alert(1)"')
+    expect(html).not.toContain('onmouseover="alert')
+  })
+
+  it('still opens an external target in a new tab', () => {
+    const { renderPost } = useMarkdown({ resolveLink: href => href })
+    expect(renderPost('[x](https://example.com)')).toContain('href="https://example.com" target="_blank" rel="noopener noreferrer"')
+  })
+
+  it('leaves links exactly as written when no resolver is given', () => {
+    const { renderPost } = useMarkdown()
+    expect(renderPost('[a](guide.md)')).toContain('<a href="guide.md">a</a>')
+  })
+})
+
 // vitest runs outside Nuxt, so auto-imports don't resolve — import manually
 import { useMarkdown, slugifyHeading } from '../../app/composables/useMarkdown'
+
+describe('useMarkdown tables', () => {
+  it('wraps a table in a scroll box so a wide one cannot widen the page', () => {
+    const html = useMarkdown().renderPost('| a | b |\n| - | - |\n| 1 | 2 |\n')
+    expect(html).toMatch(/<div class="table-scroll"><table>[\s\S]*<\/table>\s*<\/div>/)
+    expect(html).toContain('<th>a</th>')
+  })
+})

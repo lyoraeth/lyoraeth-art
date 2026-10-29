@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import {
-  MEDIA_FORMATS, effectiveWidths, mediaBasename, sanityAssetHash,
+  MEDIA_FORMATS, animatedBasename, detectAnimation, effectiveWidths, mediaBasename, sanityAssetHash,
   type MediaFamily,
 } from '#shared/media'
 
@@ -44,15 +44,19 @@ export default defineTask({
     const sources: Source[] = []
     const tmpFiles: string[] = []
 
-    // CMS images: covers (both families — the case study crops below xl) and
-    // post body-gallery images (full only — inline text-column images).
+    // CMS images: covers (both families — the case study crops below xl),
+    // project covers (full only — the showcase never crops them) and body-
+    // gallery images of posts and projects (full only — inline text-column
+    // images).
     if (cfg.sanityProjectId) {
       const client = createSanityClient(cfg.sanityProjectId, cfg.sanityDataset)
       const rows = await client.fetch<{
+        _type:   string
         cover:   { url: string | null; width: number | null } | null
         gallery: { url: string | null; width: number | null }[] | null
       }[]>(`
-        *[_type in ["work", "post"] && !(_id in path("drafts.**"))]{
+        *[_type in ["work", "post", "project"] && !(_id in path("drafts.**"))]{
+          _type,
           "cover": cover.asset->{ url, "width": metadata.dimensions.width },
           "gallery": gallery[].image.asset->{ url, "width": metadata.dimensions.width }
         }
@@ -70,8 +74,22 @@ export default defineTask({
           load: async () => {
             const res = await fetch(url)
             if (!res.ok) throw new Error(`fetch ${url} → ${res.status}`)
+            const bytes = new Uint8Array(await res.arrayBuffer())
+
+            // An animated source is stored as is, and only its first frame goes
+            // through the encoder — the variants are the poster.
+            const kind = detectAnimation(bytes)
+            if (kind) {
+              const stored = join(root, animatedBasename(hash, kind))
+              if (!await exists(stored)) await writeFile(stored, bytes)
+              const frame = join(tmpdir(), `media-src-${hash}-frame.${kind}`)
+              await extractFirstFrame(bytes, kind, frame)
+              tmpFiles.push(frame)
+              return frame
+            }
+
             const file = join(tmpdir(), `media-src-${hash}.png`)
-            await writeFile(file, Buffer.from(await res.arrayBuffer()))
+            await writeFile(file, bytes)
             tmpFiles.push(file)
             return file
           },
@@ -79,7 +97,7 @@ export default defineTask({
       }
 
       for (const row of rows) {
-        addCms(row.cover?.url, row.cover?.width, ['cover', 'full'])
+        addCms(row.cover?.url, row.cover?.width, row._type === 'project' ? ['full'] : ['cover', 'full'])
         for (const g of row.gallery ?? []) addCms(g?.url, g?.width, ['full'])
       }
     }
@@ -137,7 +155,8 @@ export default defineTask({
     let pruned = 0
     if (referenced.size > 0) {
       for (const name of await readdir(root).catch(() => [] as string[])) {
-        if (name === '_raw') continue
+        // `_`-named entries are not variants: the raw sources, the docs cache
+        if (name.startsWith('_')) continue
         const hash = name.split('-')[0]
         if (hash && !referenced.has(hash)) {
           await rm(join(root, name), { force: true })

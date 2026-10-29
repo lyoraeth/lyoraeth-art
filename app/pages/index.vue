@@ -9,6 +9,7 @@ definePageMeta({ layout: 'redesign' })
          element node to swap. A Fragment root (multiple nodes, or a v-if root)
          leaves the incoming page unmounted on a client-side navigation. -->
     <HeroSection />
+    <ProjectsSection />
     <WorkSection />
     <ExperienceSection />
     <WritingSection />

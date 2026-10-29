@@ -1,8 +1,8 @@
-/** Shared OG/Twitter meta for the two article-shaped pages (writing + work).
- *  Sets `useSeoMeta` and returns `ogImage` / `pageUrl` so each page can reuse
- *  them inside its own JSON-LD (which stays page-specific). */
+/** Shared OG/Twitter meta for the article-shaped pages (writing, work and
+ *  project). Sets `useSeoMeta` and returns `ogImage` / `pageUrl` so each page
+ *  can reuse them inside its own JSON-LD (which stays page-specific). */
 export function useArticleSeo(opts: {
-  type:        'writing' | 'work'
+  type:        'writing' | 'work' | 'project'
   title:       () => string
   description: () => string
   coverUrl:    () => string | null | undefined

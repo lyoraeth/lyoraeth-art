@@ -108,6 +108,14 @@ export default defineNuxtConfig({
     // its own scheduler); also runnable by hand via `nitro task run`.
     experimental: { tasks: true },
     scheduledTasks: { '*/5 * * * *': ['media:sync'] },
+    // The docs mirror's cache survives a restart: without it every deploy
+    // starts cold, and a GitHub outage at that moment leaves the docs with
+    // nothing to show. It lives in the media directory — the one volume the
+    // container already keeps on the host — under a `_` name the sync task's
+    // prune leaves alone. A separate mount rather than Nitro's default cache,
+    // so the other cached handlers don't carry a response across a deploy.
+    // The path is relative to the working directory, like `mediaRoot`.
+    storage: { 'docs-cache': { driver: 'fs', base: 'media/_docs-cache' } },
   },
 
   routeRules: {

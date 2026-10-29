@@ -7,10 +7,18 @@ function seedWork(items: unknown[]) {
 function seedPosts(items: unknown[]) {
   nuxtMocks.state.set('search-posts', { value: items })
 }
+function seedProjects(items: unknown[]) {
+  nuxtMocks.state.set('search-projects', { value: items })
+}
 
 const workItem = (over: Record<string, unknown> = {}) => ({
   _id: 'w1', slug: 'crm-rebuild', year: 2025, tags: ['CRM', 'Vue'],
   title: { en: 'CRM rebuild', ru: 'Переделка CRM' },
+  ...over,
+})
+const projectItem = (over: Record<string, unknown> = {}) => ({
+  _id: 'pr1', slug: 'polynya', year: 2026, tags: ['Rust', 'Windows'],
+  title: { en: 'Polynya', ru: 'Полынья' },
   ...over,
 })
 const postItem = (over: Record<string, unknown> = {}) => ({
@@ -27,7 +35,7 @@ describe('useSiteSearch', () => {
     seedWork([workItem()])
     const { search, minQueryLength } = useSiteSearch(fakeLocalePath)
     expect(minQueryLength).toBe(2)
-    expect(search('c')).toEqual({ work: [], writing: [], pages: [] })
+    expect(search('c')).toEqual({ project: [], work: [], writing: [], pages: [] })
   })
 
   it('matches work items by title in either language, regardless of active locale', () => {
@@ -42,6 +50,17 @@ describe('useSiteSearch', () => {
     seedWork([workItem()])
     const { search } = useSiteSearch(fakeLocalePath)
     expect(search('vue').work).toHaveLength(1)
+  })
+
+  it('matches projects by title in either language, or by tag, and links to /projects/<slug>', () => {
+    seedProjects([projectItem()])
+    const { search } = useSiteSearch(fakeLocalePath)
+    expect(search('polynya').project).toHaveLength(1)
+    expect(search('полынья').project).toHaveLength(1) // ru title, active locale is en
+    expect(search('rust').project).toHaveLength(1)
+    expect(search('rust').project[0]!.href).toBe('/projects/polynya')
+    expect(search('rust').project[0]!.meta).toBe('2026')
+    expect(search('nonexistent').project).toHaveLength(0)
   })
 
   it('matches posts by title, topic, or tag', () => {
@@ -71,10 +90,10 @@ describe('useSiteSearch', () => {
     expect(ready.value).toBe(false)
     await ensureLoaded()
     expect(ready.value).toBe(true)
-    expect(nuxtMocks.fetch).toHaveBeenCalledTimes(2) // posts + work
+    expect(nuxtMocks.fetch).toHaveBeenCalledTimes(3) // posts + work + projects
 
     await ensureLoaded()
-    expect(nuxtMocks.fetch).toHaveBeenCalledTimes(2) // still 2 — no refetch
+    expect(nuxtMocks.fetch).toHaveBeenCalledTimes(3) // still 3 — no refetch
   })
 
   it('still marks the search ready after a failed fetch, rather than leaving the panel stuck loading', async () => {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ProjectItem } from '../../server/api/project.get'
+
 /**
  * Header of the light shell: brand, navigation with search, language and CV,
  * and the phone menu it owns.
@@ -42,7 +44,17 @@ function navTo(hash: string, page?: string) {
   return `${localePath('/')}#${hash}`
 }
 
+// The same request (and key) as the homepage section, so it costs nothing
+// extra there. With no project published the nav leaves the entry out: it
+// would lead to an empty page.
+const { data: projects } = await useFetch<ProjectItem[]>('/api/project', {
+  query:   { limit: 0 },
+  key:     'projects-all',
+  default: () => [] as ProjectItem[],
+})
+
 const links = computed(() => [
+  ...(projects.value.length ? [{ label: t('nav.projects'), to: navTo('projects', '/projects') }] : []),
   { label: t('nav.work'), to: navTo('work', '/work') },
   { label: t('nav.experience'), to: navTo('experience') },
   { label: t('nav.writing'), to: navTo('writing', '/writing') },
@@ -51,7 +63,7 @@ const links = computed(() => [
 
 function submitSearch() {
   const g = searchGroups.value
-  const first = g.work[0] ?? g.writing[0] ?? g.pages[0]
+  const first = g.project[0] ?? g.work[0] ?? g.writing[0] ?? g.pages[0]
   if (first) navigateTo(first.href)
   closeResults()
 }

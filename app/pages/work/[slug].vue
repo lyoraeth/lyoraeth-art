@@ -488,19 +488,6 @@ onMounted(() => {
     margin-inline: 0;
   }
 }
-
-/* ── Prose (body) — same rules as the blog post's .post-body. ── */
-.post-body {
-  color: var(--color-text-primary);
-  line-height: 1.5;
-  hyphens: auto;
-  font-kerning: normal;
-  font-feature-settings: 'kern' 1, 'liga' 1;
-}
-
-/* Every paragraph indents, lead included — no exceptions. */
-:deep(.post-body p) { margin: 0 0 1.25rem; text-indent: 1.5em; }
-:deep(.post-body p:last-child) { margin-bottom: 0; }
 </style>
 
 <style>

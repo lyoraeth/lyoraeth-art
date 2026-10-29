@@ -12,6 +12,7 @@
 
 @import "tailwindcss";
 @import "./design-system.css";
+@import "./prose.css";
 
 @layer legacy {
   /* ── Base ────────────────────────────────────────────────────────────────── */

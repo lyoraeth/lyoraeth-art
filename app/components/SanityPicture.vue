@@ -52,6 +52,18 @@ const sources = computed<PicSource[]>(() => {
 
 const pictureRef = ref<HTMLPictureElement>()
 
+// An animated image keeps its poster until the animation has loaded, then the
+// animation takes over. Art-directed pictures (`both`) stay on the poster:
+// the narrow layout crops to 4:3, which an animation as stored cannot be.
+const { animations, animationUrl, preload } = useAnimatedMedia()
+const animated = ref<string | null>(null)
+const wanted = computed(() => (props.family === 'both' ? null : animationUrl(hash.value)))
+watch([wanted, animations], async () => {
+  const url = wanted.value
+  if (!url || animated.value === url) return
+  if (await preload(url)) animated.value = url
+}, { immediate: true })
+
 // <picture> commits to the first matching <source> and does NOT fall through
 // when that resource 404s — a variant the sync task hasn't encoded yet.
 // Dropping the <source>s on the img's error hands over to <img src>, the
@@ -71,7 +83,7 @@ onMounted(() => {
   <!-- display: contents keeps <picture> transparent to layout -->
   <picture v-if="src" ref="pictureRef" style="display: contents">
     <source
-      v-for="s in sources"
+      v-for="s in animated ? [] : sources"
       :key="(s.media ?? '') + s.type"
       :media="s.media"
       :type="s.type"
@@ -79,7 +91,7 @@ onMounted(() => {
       :sizes="sizes"
     >
     <img
-      :src="src"
+      :src="animated ?? src"
       :alt="alt"
       :sizes="sizes"
       :width="sourceWidth ?? undefined"

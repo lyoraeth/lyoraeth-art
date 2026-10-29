@@ -20,6 +20,17 @@ async function ready(page: Page) {
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === 'true')
 }
 
+/*
+ * Projects live in the CMS, and the pipeline's e2e runs against the real
+ * (published) dataset — until a project is published there's nothing for these
+ * tests to look at. They skip rather than fail for that case, the same way the
+ * case-cover tests skip for a work item with no cover.
+ */
+async function hasProjects(page: Page) {
+  const res = await page.request.get('/api/project?limit=1')
+  return res.ok() && (await res.json()).length > 0
+}
+
 // ── Console error / warning collector ────────────────────────────────────────
 
 test.describe('runtime errors', () => {
@@ -64,7 +75,8 @@ test.describe('header', () => {
 
   test('brand, navigation and search are rendered', async ({ page }) => {
     await expect(page.locator(`${bar} img`)).toBeVisible()
-    await expect(page.locator(`${bar} nav a`)).toHaveCount(4)
+    // Projects is in the nav only while at least one is published
+    await expect(page.locator(`${bar} nav a`)).toHaveCount((await hasProjects(page)) ? 5 : 4)
     await expect(page.locator('#site-search')).toBeAttached()
   })
 
@@ -93,6 +105,145 @@ test.describe('hero', () => {
     expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0)
 
     await expect(page.locator('.hero-meta a')).toHaveAttribute('href', /\/writing\//)
+  })
+})
+
+test.describe('projects', () => {
+  test.beforeEach(async ({ page }) => {
+    test.skip(!(await hasProjects(page)), 'no project published in the CMS yet')
+    await page.goto('/')
+    await ready(page)
+  })
+
+  test('the section leads the catalogue, and each showcase opens its landing page', async ({ page }) => {
+    // before Work in the page order, not just present
+    await expect(page.locator('#projects ~ #work')).toHaveCount(1)
+
+    const showcases = page.locator('#projects .project-showcase')
+    expect(await showcases.count()).toBeGreaterThanOrEqual(1)
+
+    const title = showcases.first().locator('h3 a')
+    await expect(title).toHaveAttribute('href', /\/projects\/[^/]+$/)
+    // the screenshot is a decorative duplicate of that link — out of the tab order
+    await expect(showcases.first().locator('a[aria-hidden="true"]')).toHaveAttribute('tabindex', '-1')
+  })
+
+  test('a landing page renders its title, links and no console errors', async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', err => errors.push(err.message))
+
+    const href = await page.locator('#projects .project-showcase h3 a').first().getAttribute('href')
+    await page.goto(href!)
+    await ready(page)
+
+    await expect(page.locator('main h1')).toBeVisible()
+    // download and the repository are the actions every project has; every link
+    // that leaves the site opens in a new tab and must not hand over `window.opener`
+    const external = page.locator('.project-links a[target="_blank"]')
+    expect(await external.count()).toBeGreaterThanOrEqual(2)
+    for (const link of await external.all()) await expect(link).toHaveAttribute('rel', /noopener/)
+    expect(errors, `Console errors:\n${errors.join('\n')}`).toHaveLength(0)
+  })
+})
+
+/*
+ * The docs section needs more than a published project: its pages are fetched
+ * from GitHub when asked for. So these tests look for a project that has docs
+ * *and* whose docs index actually loads — a runner that can't reach GitHub
+ * skips them, the same as a dataset with no project.
+ */
+async function docsProject(page: Page): Promise<string | null> {
+  const list = await page.request.get('/api/project?limit=0')
+  if (!list.ok()) return null
+  for (const project of await list.json() as { slug: string; hasDocs: boolean }[]) {
+    if (!project.hasDocs) continue
+    if ((await page.request.get(`/api/project/${project.slug}/docs`)).ok()) return project.slug
+  }
+  return null
+}
+
+test.describe('project docs', () => {
+  let slug: string
+  type DocsIndex = { sections: { pages: { key: string; landing: boolean }[] }[]; headings: Record<string, { en: { text: string; id: string }[] }> }
+
+  test.beforeEach(async ({ page }) => {
+    const found = await docsProject(page)
+    test.skip(!found, 'no project with reachable docs')
+    slug = found!
+  })
+
+  async function index(page: Page): Promise<DocsIndex> {
+    return (await page.request.get(`/api/project/${slug}/docs`)).json()
+  }
+
+  test('the bare docs address opens the first page, with the section tree beside it', async ({ page }) => {
+    await page.goto(`/projects/${slug}/docs`)
+    await ready(page)
+
+    // redirected to a page of its own, not left on an address with no content
+    await expect(page).toHaveURL(url => url.pathname.startsWith(`/projects/${slug}/docs/`))
+    await expect(page.locator('main h1')).toHaveCount(1)
+
+    const tree = page.locator('aside .docs-nav__link')
+    expect(await tree.count()).toBeGreaterThan(1)
+    await expect(page.locator('aside .docs-nav__link[aria-current="page"]')).toHaveCount(1)
+  })
+
+  test('clicking a page in the tree renders it client-side, no root-node warnings', async ({ page }) => {
+    const warnings: string[] = []
+    page.on('console', m => {
+      if (/single root node|non-element root|cannot be animated/i.test(m.text())) warnings.push(m.text())
+    })
+
+    await page.goto(`/projects/${slug}/docs`)
+    await ready(page)
+    const first = new URL(page.url()).pathname
+
+    // the first tree link that leads to a docs page other than this one
+    // (the README entry leads to the landing page)
+    const target = page.locator(`aside .docs-nav__link[href*="/docs/"]:not([href="${first}"])`).first()
+    const href = await target.getAttribute('href')
+    await target.click()
+    await page.waitForURL(url => url.pathname === href)
+    await expect(page.locator('main h1')).toHaveCount(1)
+    await expect(page.locator('aside .docs-nav__link[aria-current="page"]')).toHaveAttribute('href', href!)
+
+    expect(warnings).toEqual([])
+  })
+
+  test('search finds a heading and jumps to its anchor', async ({ page }) => {
+    const data = await index(page)
+    const pageKey = data.sections.flatMap(s => s.pages).find(p => !p.landing && data.headings[p.key]?.en.length)?.key
+    test.skip(!pageKey, 'the docs have no headings to search for')
+    const heading = data.headings[pageKey!]!.en[0]!
+
+    await page.goto(`/projects/${slug}/docs`)
+    await ready(page)
+    await page.locator('aside input[type="search"]').fill(heading.text)
+
+    const hit = page.locator(`aside .docs-results__link[href$="#${heading.id}"]`).first()
+    await expect(hit).toBeVisible()
+    await hit.click()
+    await page.waitForURL(url => url.pathname.endsWith(`/docs/${pageKey}`) && url.hash === `#${heading.id}`)
+    await expect(page.locator(`[id="${heading.id}"]`)).toBeInViewport()
+  })
+
+  test('fenced code is highlighted once the page has mounted', async ({ page }) => {
+    const data = await index(page)
+    const keys = data.sections.flatMap(s => s.pages).filter(p => !p.landing).map(p => p.key)
+
+    for (const key of keys) {
+      await page.goto(`/projects/${slug}/docs/${key}`)
+      await ready(page)
+      const known = ['bash', 'powershell', 'toml', 'json', 'rust', 'javascript', 'typescript', 'python', 'yaml', 'ini', 'html', 'css', 'go', 'csharp']
+      const blocks = await page.locator(known.map(l => `.docs-body pre > code.language-${l}`).join(', ')).count()
+      if (blocks === 0) continue
+
+      // a language the highlighter ships a grammar for ends up with coloured spans
+      await expect.poll(() => page.locator('.docs-body pre > code[data-highlighted] span').count()).toBeGreaterThan(0)
+      return
+    }
+    test.skip(true, 'none of the docs has a fenced code block in a known language')
   })
 })
 
@@ -244,12 +395,20 @@ test.describe('client-side navigation', () => {
     // each hop is a fresh load then a *clicked* (client-side) navigation —
     // the click is what exercises <Transition>, goBack() just churns the
     // homepage reveal animation and detaches cards mid-click
-    for (const [from, cardLink, dest] of [
+    const hops: (readonly [string, string, RegExp])[] = [
       ['/',        '.post-card a', /\/writing\/[^/]+$/],
       ['/',        '.work-card a', /\/work\/[^/]+$/],
       ['/writing', '.post-card a', /\/writing\/[^/]+$/],
       ['/work',    '.work-card a', /\/work\/[^/]+$/],
-    ] as const) {
+    ]
+    if (await hasProjects(page)) {
+      hops.push(
+        ['/',         '.project-showcase h3 a', /\/projects\/[^/]+$/],
+        ['/projects', '.project-showcase h3 a', /\/projects\/[^/]+$/],
+      )
+    }
+
+    for (const [from, cardLink, dest] of hops) {
       await page.goto(from)
       await ready(page)
       await page.locator(cardLink).first().click()

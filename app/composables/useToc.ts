@@ -1,3 +1,5 @@
+import { extractHeadings } from '#shared/markdown'
+
 export interface TocEntry { id: string; text: string; level: 2 | 3 | 'intro' }
 
 /** Table of contents for a markdown article: builds the entry list from the
@@ -20,12 +22,10 @@ export function useToc(opts: {
 
     entries.push({ level: 'intro', text: opts.introLabel(), id: 'post-body-start' })
 
-    const re = /^(#{2,3})\s+(.+)$/gm
-    let m
-    while ((m = re.exec(raw)) !== null) {
-      const text = m[1] ? m[2]?.trim() ?? '' : ''
-      if (text) entries.push({ level: m[1]!.length as 2 | 3, text, id: slugifyHeading(text) })
-    }
+    // same extraction the docs index uses: inline markup stripped from the
+    // label, the id still taken from the raw heading (what the renderer
+    // stamps), and a "## comment" inside a code fence is not a heading
+    entries.push(...extractHeadings(raw))
     return entries
   })
 

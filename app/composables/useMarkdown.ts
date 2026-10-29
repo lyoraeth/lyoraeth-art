@@ -1,13 +1,12 @@
 import { Marked, Renderer } from 'marked'
 import { mediaSources, sanityAssetHash } from '#shared/media'
+import { slugifyHeading } from '#shared/markdown'
 import type { GalleryImage } from '../../server/api/post/[slug].get'
 
-/** Turns a heading's text into a stable anchor id — shared by the renderer
- *  (which stamps the id onto <h2>/<h3>) and the TOC (which links to it), so
- *  both sides always agree. */
-export function slugifyHeading(text: string) {
-  return text.toLowerCase().replace(/[^a-z0-9а-яёa-z\s-]/gi, '').trim().replace(/\s+/g, '-')
-}
+// Defined in #shared/markdown so the server's docs index derives heading ids
+// the same way; re-exported here because the TOC and the tests reach it
+// through this module.
+export { slugifyHeading }
 
 // Quotes included: used inside HTML attributes (image href/alt/title) as well
 // as text content, and an unescaped `"` there would close the attribute early.
@@ -48,10 +47,18 @@ function imageStyle(attrs: string): string {
  *  `renderPost` that also opens external links in a new tab and prepends the
  *  intro anchor the TOC scrolls to.
  *
- * @param gallery - the post's `gallery` array; `gallery:key` references
+ * @param options.gallery - the post's `gallery` array; `gallery:key` references
  * resolve against it. Omit for content that has none (legal pages).
+ * @param options.resolveLink - rewrites every link's target before it is
+ * rendered; returning null renders the link as plain text. Omit to leave
+ * links as written (posts, legal pages) — only the docs mirror needs this,
+ * because relative links there point at files in someone else's repo.
  */
-export function useMarkdown(gallery: GalleryImage[] | null = null) {
+export function useMarkdown(options: {
+  gallery?:     GalleryImage[] | null
+  resolveLink?: (href: string) => string | null
+} = {}) {
+  const { gallery = null, resolveLink } = options
   const byKey = new Map((gallery ?? []).map(g => [g.key, g]))
 
   const md = new Marked({
@@ -84,6 +91,11 @@ export function useMarkdown(gallery: GalleryImage[] | null = null) {
       },
     }],
     renderer: {
+      // A wide table scrolls inside its own box instead of widening the page:
+      // `overflow` has no effect on a <table> itself, so it needs a wrapper.
+      table(token) {
+        return `<div class="table-scroll">${Renderer.prototype.table.call(this, token)}</div>`
+      },
       heading({ tokens, text, depth }) {
         const inner = this.parser.parseInline(tokens)
         if (depth === 2 || depth === 3) {
@@ -91,6 +103,16 @@ export function useMarkdown(gallery: GalleryImage[] | null = null) {
           return `<h${depth} id="${id}">${inner}</h${depth}>\n`
         }
         return `<h${depth}>${inner}</h${depth}>\n`
+      },
+      link({ href, title, tokens }) {
+        // `false` hands the link back to marked's own renderer — identical
+        // output to before for every caller that passes no resolveLink
+        if (!resolveLink) return false
+        const text = this.parser.parseInline(tokens)
+        const target = resolveLink(href)
+        if (target === null) return text
+        const titleAttr = title ? ` title="${escapeHtml(title)}"` : ''
+        return `<a href="${escapeHtml(target)}"${titleAttr}>${text}</a>`
       },
       image({ href, title, text }) {
         const caption = title ? `<figcaption class="post-caption">${escapeHtml(title)}</figcaption>` : ''

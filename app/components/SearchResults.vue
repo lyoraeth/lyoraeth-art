@@ -11,7 +11,21 @@ const { t } = useI18n()
 
 <template>
   <div class="search-panel" :aria-label="t('search.label')">
-    <template v-if="groups.work.length || groups.writing.length || groups.pages.length">
+    <template v-if="groups.project.length || groups.work.length || groups.writing.length || groups.pages.length">
+      <div v-if="groups.project.length" class="search-panel__group">
+        <p class="search-panel__group-label type-ui">{{ t('projects.title') }}</p>
+        <NuxtLink
+          v-for="r in groups.project"
+          :key="r.key"
+          :to="r.href"
+          class="search-panel__option"
+          @click="emit('select')"
+        >
+          <span>{{ r.title }}</span>
+          <span v-if="r.meta" class="search-panel__meta">{{ r.meta }}</span>
+        </NuxtLink>
+      </div>
+
       <div v-if="groups.work.length" class="search-panel__group">
         <p class="search-panel__group-label type-ui">{{ t('work.title') }}</p>
         <NuxtLink

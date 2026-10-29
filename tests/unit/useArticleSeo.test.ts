@@ -2,6 +2,7 @@ import { nuxtMocks, resetNuxtMocks } from './_nuxt-mocks'
 import { describe, it, expect, beforeEach } from 'vitest'
 
 function setup(overrides: Partial<{
+  type:        'writing' | 'work' | 'project'
   coverUrl:    string | null
   coverWidth:  number | null
   coverHeight: number | null
@@ -11,7 +12,7 @@ function setup(overrides: Partial<{
   nuxtMocks.seoMeta.mockClear() // isolate this setup() call's own useSeoMeta call, even within one test
 
   const result = useArticleSeo({
-    type:        'writing',
+    type:        overrides.type ?? 'writing',
     title:       () => 'A post title',
     description: () => 'A description',
     coverUrl:    () => overrides.coverUrl ?? null,
@@ -29,6 +30,11 @@ describe('useArticleSeo', () => {
   it('falls back to the generated 1200×630 card when there is no cover', () => {
     const { result } = setup()
     expect(result.ogImage.value).toBe('https://lyoraeth.art/og/writing/some-post?l=en')
+  })
+
+  it('builds the generated card URL from the page type, so a project gets its own', () => {
+    const { result } = setup({ type: 'project' })
+    expect(result.ogImage.value).toBe('https://lyoraeth.art/og/project/some-post?l=en')
   })
 
   it('uses the cover, resized, when one exists with known dimensions', () => {

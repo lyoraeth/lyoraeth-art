@@ -71,7 +71,7 @@ useHead({
 
 const formatDate = useFormatDate()
 
-const { renderPost } = useMarkdown(post.value?.gallery ?? null)
+const { renderPost } = useMarkdown({ gallery: post.value?.gallery })
 const bodyHtml = computed(() => {
   if (!post.value) return ''
   const raw = locale.value === 'ru' ? post.value.body.ru : post.value.body.en
@@ -128,8 +128,18 @@ function guardBodyPictures() {
   }
 }
 
-onMounted(() => nextTick(guardBodyPictures))
-watch(bodyHtml, () => nextTick(guardBodyPictures))
+// animated gallery images: the poster first, the animation once it has loaded
+const { animations, upgradePictures } = useAnimatedMedia()
+const upgradeBodyPictures = () => upgradePictures(document.querySelector('.post-body') ?? document)
+watch(animations, () => nextTick(upgradeBodyPictures))
+
+function wirePictures() {
+  guardBodyPictures()
+  upgradeBodyPictures()
+}
+
+onMounted(() => nextTick(wirePictures))
+watch(bodyHtml, () => nextTick(wirePictures))
 
 /* ── TOC ──
    One data source, two renderings: a sticky sidebar at xl (its own grid
@@ -472,143 +482,4 @@ onMounted(() => {
     background-color: var(--color-border-default);
   }
 }
-
-/*
- * ── Prose (body) ──
- * Width and centring come from .post-column (design-system.css), applied
- * throughout this article to everything that isn't meant to run the full
- * width — header, TOC below xl, this body, references, rating, comments.
- */
-.post-body {
-  color: var(--color-text-primary);
-  line-height: 1.5;
-  hyphens: auto;
-  font-kerning: normal;
-  font-feature-settings: 'kern' 1, 'liga' 1;
-}
-
-/* Every paragraph indents, lead included — no exceptions. */
-:deep(.post-body p) { margin: 0 0 1.25rem; text-indent: 1.5em; }
-:deep(.post-body p:last-child) { margin-bottom: 0; }
-
-:deep(.post-body h2),
-:deep(.post-body h3) {
-  color: var(--color-text-primary);
-  font-family: var(--font-display);
-  font-weight: 600;
-  margin: 2.5rem 0 0.75rem;
-}
-:deep(.post-body h2) {
-  font-size: var(--text-display-xl);
-  line-height: var(--text-display-xl--line-height);
-  letter-spacing: var(--text-display-xl--letter-spacing);
-}
-:deep(.post-body h3) {
-  font-size: var(--text-display-lg);
-  line-height: var(--text-display-lg--line-height);
-  letter-spacing: var(--text-display-lg--letter-spacing);
-}
-
-:deep(.post-body hr) {
-  border: none;
-  border-top: 1px solid var(--color-border-default);
-  margin: 2rem 0;
-}
-
-:deep(.post-body strong) { color: var(--color-text-primary); font-weight: 600; }
-:deep(.post-body em) { font-style: italic; }
-
-:deep(.post-body blockquote) {
-  border-left: 2px solid var(--color-accent-strong);
-  margin: 1.75rem 0;
-  padding: 0.125rem 0 0.125rem 1.25rem;
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
-
-:deep(.post-body code) {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.875em;
-  background-color: var(--color-surface-hover);
-  border-radius: 0.25rem;
-  padding: 0.1em 0.4em;
-  color: var(--color-accent-strong);
-}
-
-:deep(.post-body pre) {
-  background-color: var(--color-surface-panel);
-  border-radius: var(--radius-2xl);
-  padding: 1rem 1.25rem;
-  overflow-x: auto;
-  margin: 1.5rem 0;
-}
-:deep(.post-body pre code) {
-  background: none;
-  padding: 0;
-  font-size: 0.875rem;
-  color: var(--color-text-primary);
-}
-
-/* Renders as inert text until mermaid.run() replaces it with an <svg> —
-   see renderMermaid() in the page script. */
-:deep(.post-body .mermaid) {
-  display: flex;
-  justify-content: center;
-  margin: 1.5rem 0;
-  overflow-x: auto;
-}
-
-:deep(.post-body a) {
-  color: var(--color-accent-strong);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color var(--duration-hover) var(--ease-out);
-}
-:deep(.post-body a:hover) { color: var(--color-accent-strong-hover); }
-
-:deep(.post-body .post-figure) { margin: 2rem 0; }
-/* gallery images wrap the img in <picture> for the format fallback */
-:deep(.post-body .post-figure picture) { display: contents; }
-:deep(.post-body .post-img) {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: var(--radius-2xl);
-  outline: 1px solid var(--color-border-default);
-}
-:deep(.post-body .post-caption) {
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  text-align: center;
-  margin-top: 0.5rem;
-  font-style: italic;
-}
-
-/* list-style: revert — Preflight zeroes it globally, which left every
-   marker invisible even though the items themselves rendered fine. */
-:deep(.post-body ul),
-:deep(.post-body ol) {
-  list-style: revert;
-  margin: 0 0 1.25rem 1.5rem;
-}
-:deep(.post-body li) { margin-bottom: 0.375rem; }
-
-:deep(.post-body table) {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-  font-size: var(--text-ui);
-}
-:deep(.post-body th),
-:deep(.post-body td) {
-  padding: 0.625rem 0.75rem;
-  border-bottom: 1px solid var(--color-border-default);
-  text-align: left;
-  vertical-align: top;
-}
-:deep(.post-body th) {
-  color: var(--color-text-primary);
-  font-weight: 600;
-}
-:deep(.post-body td) { color: var(--color-text-secondary); }
 </style>

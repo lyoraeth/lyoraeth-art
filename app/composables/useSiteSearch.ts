@@ -1,8 +1,9 @@
 import type { PostItem } from '../../server/api/posts.get'
 import type { WorkItem } from '../../server/api/work.get'
+import type { ProjectItem } from '../../server/api/project.get'
 
 /** Small and fixed enough that a dedicated search endpoint isn't worth it — the
- *  whole catalog fits in two requests, fetched once and filtered client-side. */
+ *  whole catalog fits in three requests, fetched once and filtered client-side. */
 const RESULT_LIMIT = 5
 
 /** Below this, a query is almost always a stray keystroke rather than intent. */
@@ -26,6 +27,7 @@ export interface SearchResult {
 }
 
 export interface SearchGroups {
+  project: SearchResult[]
   work:    SearchResult[]
   writing: SearchResult[]
   pages:   SearchResult[]
@@ -41,12 +43,13 @@ export function useSiteSearch(localePath = useLocalePath()) {
   const { t } = useI18n()
   const loc = useLoc()
 
-  const posts   = useState<PostItem[]>('search-posts', () => [])
-  const work    = useState<WorkItem[]>('search-work', () => [])
+  const posts    = useState<PostItem[]>('search-posts', () => [])
+  const work     = useState<WorkItem[]>('search-work', () => [])
+  const projects = useState<ProjectItem[]>('search-projects', () => [])
   const loading = useState('search-loading', () => false)
   const loaded  = useState('search-loaded', () => false)
 
-  /** Fetches the two lists once per session; later calls are a no-op. `loaded`
+  /** Fetches the three lists once per session; later calls are a no-op. `loaded`
    *  only flips once the request actually settles — the field opens the panel
    *  on focus, well before that, and a query typed in the gap must not show
    *  "nothing found" for lists that just haven't arrived yet. */
@@ -54,12 +57,14 @@ export function useSiteSearch(localePath = useLocalePath()) {
     if (loaded.value || loading.value) return
     loading.value = true
     try {
-      const [postsRes, workRes] = await Promise.all([
+      const [postsRes, workRes, projectsRes] = await Promise.all([
         $fetch<PostItem[]>('/api/posts', { query: { limit: 0 } }),
         $fetch<WorkItem[]>('/api/work', { query: { limit: 0 } }),
+        $fetch<ProjectItem[]>('/api/project', { query: { limit: 0 } }),
       ])
       posts.value = postsRes
       work.value = workRes
+      projects.value = projectsRes
     }
     catch {
       // a failed fetch still counts as settled — search just stays empty,
@@ -88,7 +93,20 @@ export function useSiteSearch(localePath = useLocalePath()) {
 
   function search(query: string): SearchGroups {
     const q = query.trim().toLowerCase()
-    if (q.length < MIN_QUERY_LENGTH) return { work: [], writing: [], pages: [] }
+    if (q.length < MIN_QUERY_LENGTH) return { project: [], work: [], writing: [], pages: [] }
+
+    const matchedProjects = projects.value
+      .filter(p =>
+        bothLoc(p.title).some(s => s.includes(q))
+        || p.tags.some(tag => tag.toLowerCase().includes(q)),
+      )
+      .slice(0, RESULT_LIMIT)
+      .map((p): SearchResult => ({
+        key:   p._id,
+        href:  localePath(`/projects/${p.slug}`),
+        title: loc(p.title),
+        meta:  p.year ? String(p.year) : null,
+      }))
 
     const matchedWork = work.value
       .filter(w =>
@@ -121,7 +139,7 @@ export function useSiteSearch(localePath = useLocalePath()) {
       .filter(p => p.en.toLowerCase().includes(q) || p.ru.toLowerCase().includes(q))
       .map((p): SearchResult => ({ key: p.key, href: p.href, title: p.title, meta: null }))
 
-    return { work: matchedWork, writing: matchedPosts, pages: matchedPages }
+    return { project: matchedProjects, work: matchedWork, writing: matchedPosts, pages: matchedPages }
   }
 
   return { ensureLoaded, search, ready: loaded, minQueryLength: MIN_QUERY_LENGTH }

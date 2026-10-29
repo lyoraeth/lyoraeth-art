@@ -1,10 +1,10 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { mkdir, rm } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { randomBytes } from 'node:crypto'
-import type { MediaFamily, MediaFormat } from '#shared/media'
+import type { AnimatedKind, MediaFamily, MediaFormat } from '#shared/media'
 
 const run = promisify(execFile)
 
@@ -55,7 +55,8 @@ const JXL_ARGS = ['-d', '1.8', '-e', '7', '-p']
 
 async function ffmpeg(input: string, vf: string, extra: string[], out: string): Promise<void> {
   await mkdir(dirname(out), { recursive: true })
-  await run('ffmpeg', ['-y', '-loglevel', 'error', '-i', input, '-vf', vf, ...extra, out])
+  // one frame: a GIF would otherwise be encoded whole
+  await run('ffmpeg', ['-y', '-loglevel', 'error', '-i', input, '-vf', vf, '-frames:v', '1', ...extra, out])
 }
 
 /**
@@ -87,4 +88,30 @@ export async function encodeVariant(
   }
 
   await ffmpeg(source, filterChain(family, width, format === 'webp'), ENCODER_ARGS[format], out)
+}
+
+/**
+ * The first frame of an animated source as a file `ffmpeg` reads as a still,
+ * for the poster variants. A GIF is read as is (`ffmpeg` takes its first
+ * frame); an animated WebP is not decodable by `ffmpeg` at all, so `webpmux`
+ * cuts frame 1 out into a single-frame WebP first.
+ *
+ * @param bytes - the animated source
+ * @param kind - which format `bytes` is, from `detectAnimation`
+ * @param out - destination path for the first-frame file
+ */
+export async function extractFirstFrame(bytes: Uint8Array, kind: AnimatedKind, out: string): Promise<void> {
+  await mkdir(dirname(out), { recursive: true })
+  if (kind === 'gif') {
+    await writeFile(out, bytes)
+    return
+  }
+  const src = `${out}.src`
+  try {
+    await writeFile(src, bytes)
+    await run('webpmux', ['-get', 'frame', '1', src, '-o', out])
+  }
+  finally {
+    await rm(src, { force: true })
+  }
 }
