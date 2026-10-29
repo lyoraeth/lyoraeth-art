@@ -40,6 +40,10 @@ export default defineTask({
       width:     number
       families:  MediaFamily[]
       load:      () => Promise<string> // resolves to a local file path
+      /** Only for sources that may be animated (a .webp or .gif asset):
+       *  makes sure the animated original is stored even when every variant
+       *  already exists — `load` only runs when one is missing. */
+      probe?:    () => Promise<void>
     }
     const sources: Source[] = []
     const tmpFiles: string[] = []
@@ -64,26 +68,57 @@ export default defineTask({
         }
       `)
 
+      /*
+       * Sanity's CDN negotiates the format by Accept: a client that doesn't
+       * say it takes WebP gets an animated WebP as a PNG of its first frame.
+       * A browser says it, a server fetch (Accept: anything) doesn't — so the
+       * pipeline asks for the formats it handles explicitly. A still original
+       * comes back in its own format either way.
+       */
+      const fetchAsset = async (url: string) => {
+        const res = await fetch(url, { headers: { Accept: 'image/webp,image/gif,image/png,image/jpeg,image/*;q=0.8' } })
+        if (!res.ok) throw new Error(`fetch ${url} → ${res.status}`)
+        return new Uint8Array(await res.arrayBuffer())
+      }
+
+      /** Stores the original of an animated source; returns its kind, or null
+       *  for a still one (recorded too, so it isn't fetched again). */
+      const storeIfAnimated = async (hash: string, bytes: Uint8Array) => {
+        const kind = detectAnimation(bytes)
+        if (!kind) {
+          await writeFile(join(root, `${hash}-still`), '')
+          return null
+        }
+        const stored = join(root, animatedBasename(hash, kind))
+        if (!await exists(stored)) await writeFile(stored, bytes)
+        return kind
+      }
+
       const seen = new Set<string>()
       const addCms = (url: string | null | undefined, width: number | null | undefined, families: MediaFamily[]) => {
         const hash = sanityAssetHash(url)
         if (!hash || !url || !width || seen.has(hash)) return
         seen.add(hash)
+        const mayAnimate = /\.(?:webp|gif)(?:\?|$)/i.test(url)
         sources.push({
           hash,
           width,
           families,
+          probe: mayAnimate
+            ? async () => {
+              const known = await exists(join(root, `${hash}-still`))
+                || await exists(join(root, animatedBasename(hash, 'webp')))
+                || await exists(join(root, animatedBasename(hash, 'gif')))
+              if (!known) await storeIfAnimated(hash, await fetchAsset(url))
+            }
+            : undefined,
           load: async () => {
-            const res = await fetch(url)
-            if (!res.ok) throw new Error(`fetch ${url} → ${res.status}`)
-            const bytes = new Uint8Array(await res.arrayBuffer())
+            const bytes = await fetchAsset(url)
 
             // An animated source is stored as is, and only its first frame goes
             // through the encoder — the variants are the poster.
-            const kind = detectAnimation(bytes)
+            const kind = mayAnimate ? await storeIfAnimated(hash, bytes) : null
             if (kind) {
-              const stored = join(root, animatedBasename(hash, kind))
-              if (!await exists(stored)) await writeFile(stored, bytes)
               const frame = join(tmpdir(), `media-src-${hash}-frame.${kind}`)
               await extractFirstFrame(bytes, kind, frame)
               tmpFiles.push(frame)
@@ -129,6 +164,8 @@ export default defineTask({
 
     for (const src of sources) {
       if (capped) break
+      // cheap once settled: a marker or a stored animation answers it on disk
+      await src.probe?.().catch((error: unknown) => console.error('[media:sync] probe', src.hash, error))
       let loaded: string | null = null
 
       for (const family of src.families) {
