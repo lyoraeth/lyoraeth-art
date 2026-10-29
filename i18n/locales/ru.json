@@ -198,10 +198,10 @@
       "По вакансии: ссылка на компанию и вилка.",
       "По проекту: что уже есть и к какому сроку."
     ],
+    "telegram_label": "Быстрее всего",
     "telegram": "Telegram",
     "cv": "CV",
     "github": "GitHub",
-    "form_note": "Или через форму — отвечу на указанный контакт.",
     "from_label": "Telegram или e-mail",
     "from_placeholder": "{'@'}example",
     "message_label": "О чём речь",

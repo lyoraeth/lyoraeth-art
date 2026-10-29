@@ -144,8 +144,6 @@
   --spacing-footer-padding-top: clamp(6.5rem, 4.77rem + 6.8858vw, 12rem);
   /* runs the other way: 16px on a phone, 4px on a wide screen */
   --spacing-footer-bar-padding-y: clamp(0.25rem, 1.2359rem - 0.939vw, 1rem);
-  /* zero below 1024, grows only above it */
-  --spacing-contact-intro-padding-y: clamp(0rem, -6.2439rem + 9.7561vw, 4rem);
   /* maxes out at 1024 */
   --spacing-contact-field-padding-x: clamp(1rem, 0.6768rem + 1.2862vw, 1.5rem);
 

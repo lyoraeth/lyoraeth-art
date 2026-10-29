@@ -103,6 +103,16 @@ async function onSubmit() {
   }
 }
 
+/**
+ * The message field grows with its text instead of carrying a resize grip.
+ * Height is reset first, so it also shrinks when text is deleted.
+ */
+function autoGrow(event: Event) {
+  const el = event.target as HTMLTextAreaElement
+  el.style.height = 'auto'
+  el.style.height = `${el.scrollHeight}px`
+}
+
 /* ── Analytics ────────────────────────────────────────────────────────────── */
 
 let started = false
@@ -116,13 +126,13 @@ function onFormStart() {
 <template>
   <section
     id="contact"
-    class="layout-grid gap-y-grid-gap py-section-padding-y"
+    class="contact layout-grid gap-y-grid-gap py-section-padding-y"
     aria-labelledby="contact-title"
   >
     <div
-      class="col-span-4 md:col-span-8 lg:col-span-3 xl:col-span-5 2xl:col-span-7 gap-6 flex flex-col pt-contact-intro-padding-y"
+      class="contact-intro col-span-4 md:col-span-8 lg:col-span-3 xl:col-span-5 2xl:col-span-7 gap-6 flex flex-col"
     >
-      <h2 id="contact-title" class="type-display-2xl text-text-primary">{{ t('contact.title') }}</h2>
+      <h2 id="contact-title" class="contact-title text-text-primary">{{ t('contact.title') }}</h2>
 
       <p class="type-body-lg text-text-primary">
         <template v-for="(line, i) in lead" :key="i">
@@ -130,28 +140,21 @@ function onFormStart() {
         </template>
       </p>
 
-      <div class="flex flex-row gap-3 pt-4">
+      <div class="flex flex-col items-start gap-4 pt-4">
+        <!-- the hero's square action: the fastest channel is a cell, not a pill -->
         <a
           v-if="telegramUrl"
           :href="telegramUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="py-4 px-9 inline-flex items-center justify-center bg-accent-strong hover:bg-accent-strong-hover active:bg-accent-default gap-1.5 type-cta text-text-inverse rounded-full"
+          class="contact-telegram"
           @click="track(EV.ctaClick)"
         >
-          <span class="h-5 w-5 flex items-center justify-center">
-            <svg class="w-4 h-3.5" viewBox="0 0 16 14" fill="currentColor" aria-hidden="true">
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M1.09992 6.02691C5.39488 4.05119 8.25885 2.74867 9.69185 2.11936C13.7834 0.322542 14.6335 0.0104165 15.1877 0.000109891C15.3095 -0.00215693 15.5821 0.0297341 15.7586 0.180964C15.9076 0.30866 15.9486 0.481158 15.9683 0.602228C15.9879 0.723297 16.0123 0.999097 15.9929 1.2146C15.7712 3.6743 14.8118 9.64335 14.3237 12.3983C14.1172 13.564 13.7105 13.9548 13.3169 13.9931C12.4613 14.0762 11.8116 13.3961 10.9829 12.8225C9.68624 11.9251 8.9537 11.3664 7.69503 10.4907C6.24043 9.47859 7.18338 8.92233 8.01236 8.01324C8.22931 7.77533 11.999 4.15509 12.0719 3.82668C12.0811 3.7856 12.0895 3.6325 12.0034 3.55166C11.9172 3.47081 11.7901 3.49846 11.6983 3.52045C11.5683 3.55161 9.4968 4.99723 5.48389 7.8573C4.89591 8.2836 4.36333 8.49131 3.88616 8.48042C3.36012 8.46842 2.34822 8.16638 1.59598 7.90821C0.673328 7.59154 -0.0599784 7.42412 0.00387615 6.88633C0.0371355 6.60621 0.402482 6.31974 1.09992 6.02691Z"
-              />
-            </svg>
-          </span>
-          <span>{{ t('contact.telegram') }}</span>
+          <span class="contact-telegram__label">{{ t('contact.telegram_label') }}</span>
+          <span class="contact-telegram__text">{{ t('contact.telegram') }} <span class="contact-telegram__arrow" aria-hidden="true">→</span></span>
         </a>
 
-        <div class="flex flex-row items-center gap-1">
+        <div class="contact-pills flex flex-row items-center gap-1">
           <a
             v-if="cvUrl"
             :href="cvUrl"
@@ -193,14 +196,12 @@ function onFormStart() {
       styled, say "Please fill in this field", and vanish on their own.
     -->
     <form
-      class="col-span-4 md:col-span-8 lg:col-start-5 lg:col-span-4 xl:col-start-7 xl:col-span-6 2xl:col-start-8 2xl:col-span-5 gap-4 flex flex-col"
+      class="contact-form col-span-4 md:col-span-8 lg:col-start-5 lg:col-span-4 xl:col-start-7 xl:col-span-6 2xl:col-start-8 2xl:col-span-5 gap-4 flex flex-col"
       novalidate
       @submit.prevent="onSubmit"
       @focusin="onFormStart"
     >
-      <p class="text-text-decorative type-ui">{{ t('contact.form_note') }}</p>
-
-      <div class="contact-field flex flex-col gap-2 pt-3" :data-invalid="errors.from || undefined">
+      <div class="contact-field flex flex-col gap-2" :data-invalid="errors.from || undefined">
         <label for="contact-from" class="type-ui text-text-primary">{{ t('contact.from_label') }}</label>
         <input
           id="contact-from"
@@ -224,25 +225,26 @@ function onFormStart() {
           ref="messageField"
           v-model="message"
           name="message"
-          rows="4"
+          rows="3"
           :placeholder="t('contact.message_placeholder')"
           :aria-invalid="Boolean(errors.message)"
           aria-describedby="contact-message-error"
           class="contact-input contact-input--message"
-          @input="errors.message = ''"
+          @input="errors.message = ''; autoGrow($event)"
         />
         <p id="contact-message-error" class="contact-error"><span>{{ errors.message }}</span></p>
       </div>
 
-      <div class="pt-4 gap-4 flex flex-col">
-        <!-- the captcha's space is taken up front, so the form doesn't jump
-             when the widget resolves -->
+      <div class="contact-actions">
+        <!-- Shown only when Cloudflare actually asks for a check
+             (interaction-only), so no space is held for it: the rare check
+             moves the form once rather than leaving a hole in it every time. -->
         <div class="contact-captcha">
           <NuxtTurnstile
             ref="turnstile"
             v-model="token"
             :site-key="turnstileContactSiteKey || undefined"
-            :options="{ theme: 'light' }"
+            :options="{ theme: 'light', appearance: 'interaction-only' }"
           />
         </div>
 
@@ -299,34 +301,62 @@ function onFormStart() {
 /* In the components layer, so utility classes in the markup still win. */
 @layer components {
   /*
-   * Real inputs behind the mock's styling: highlighted on :focus rather than
-   * :active, which on a field lasts only while the button is held.
+   * Fields as the lines of a blank, not a stack of boxes: a label above and a
+   * hairline under the text — no box to fight whatever ground the section is
+   * on. Highlighted on :focus rather than :active, which on a field lasts only
+   * while the button is held. The focus ring stays on the line itself.
    */
   .contact-input {
     width: 100%;
-    padding-inline: var(--spacing-contact-field-padding-x);
-    padding-block: calc(var(--spacing) * 3);
-    border-radius: var(--radius-2xl);
-    outline: 1px solid var(--color-border-default);
-    background-color: var(--color-surface-field);
+    padding: calc(var(--spacing) * 2) 0 calc(var(--spacing) * 3);
+    border-bottom: 1px solid var(--color-border-raised);
+    background-color: transparent;
     color: var(--color-text-primary);
     font-size: var(--text-text);
     line-height: var(--text-text--line-height);
     font-weight: var(--text-text--font-weight);
-    transition: outline-color var(--duration-hover) var(--ease-out);
+    outline: none;
+    transition: border-color var(--duration-hover) var(--ease-out);
 
     &::placeholder {
       color: var(--color-text-secondary);
     }
 
     &:focus {
-      outline-color: var(--color-border-input);
+      border-bottom-color: var(--color-text-primary);
     }
   }
 
+  /* starts at three lines and grows with the text (see autoGrow) — no grip */
   .contact-input--message {
-    min-height: calc(var(--spacing) * 40);
-    resize: vertical;
+    resize: none;
+    overflow: hidden;
+  }
+
+  /*
+   * The page's closing word, at the hero name's scale — but one word can't
+   * wrap the way the name does, so the size is also capped by the column:
+   * the intro is a container and the title takes at most its width
+   * (8 letters of this face run about 7.8em).
+   */
+  .contact-intro { container-type: inline-size; }
+  .contact-title {
+    font-family: var(--font-display);
+    font-size: min(var(--text-display-3xl), 12.5cqi);
+    font-weight: var(--text-display-3xl--font-weight);
+    line-height: var(--text-display-3xl--line-height);
+    letter-spacing: var(--text-display-3xl--letter-spacing);
+  }
+
+  /*
+   * The title and the form start on one line — measured on the letters, not
+   * the boxes: at this size the title's half-leading alone is ~0.05em, so both
+   * the title and the form's first label are trimmed to their cap height.
+   * Where text-box isn't supported the boxes align instead, a few px off.
+   */
+  .contact-title,
+  .contact-form > .contact-field:first-child > label {
+    text-box: trim-start cap alphabetic;
   }
 
   .contact-consent {
@@ -391,7 +421,32 @@ function onFormStart() {
     align-items: center;
     width: calc(var(--spacing) * 75);
     max-width: 100%;
-    min-height: calc(var(--spacing) * 16);
+  }
+  /* nothing to show until Cloudflare asks (the widget puts its iframe in only
+     then): until that, the box takes no row and adds no gap */
+  .contact-captcha:not(:has(iframe)) { display: none; }
+
+  /* stacked on a phone; from 768 consent and the button share a row — the
+     consent still comes before the send, explicit, it just stops being a floor
+     of its own. Layout lives here, not in utilities: a utility display would
+     win over the grid below. */
+  .contact-actions {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 4);
+    padding-top: calc(var(--spacing) * 4);
+  }
+
+  @media (width >= 48rem) {
+    .contact-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: calc(var(--spacing) * 8);
+      /* top, not centre: the checkbox and the button start on one line, a
+         long consent text grows downwards */
+      align-items: start;
+    }
+    .contact-actions > :is(.contact-captcha, .contact-status) { grid-column: 1 / -1; }
   }
 
   /*
@@ -430,8 +485,58 @@ function onFormStart() {
   }
 
   .contact-field[data-invalid] .contact-input {
-    outline-color: var(--color-text-critical);
+    border-bottom-color: var(--color-text-critical);
   }
+
+  /*
+   * The accent action, the same kind as the hero's "Get in touch": a square
+   * cell with a label above, a hairline, filled on hover — shared only by the
+   * two of them, keep them in step. It also keeps the fastest channel from
+   * being a second filled pill next to the form's own button.
+   */
+  .contact-telegram {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 6);
+    width: min(100%, 22rem);
+    min-height: calc(var(--spacing) * 26);
+    padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5);
+    outline: 1px solid var(--color-text-primary);
+    outline-offset: -1px;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: background-color var(--duration-hover) var(--ease-out),
+                color var(--duration-hover) var(--ease-out);
+  }
+  .contact-telegram:hover {
+    background-color: var(--color-fill-strong);
+    color: var(--color-text-inverse);
+  }
+  .contact-telegram:active {
+    opacity: 0.88;
+    transition-duration: var(--duration-press);
+  }
+  .contact-telegram__label {
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    opacity: 0.7;
+  }
+  .contact-telegram__text {
+    font-family: var(--font-display);
+    font-size: var(--text-display-lg);
+    font-weight: var(--text-display-lg--font-weight);
+    line-height: 1.1;
+  }
+  .contact-telegram__arrow {
+    display: inline-block;
+    transition: translate var(--duration-hover) var(--ease-out);
+  }
+  .contact-telegram:hover .contact-telegram__arrow { translate: 0.25rem 0; }
+
+  /* the pills carry their own side padding: pulled back by it, their text
+     lines up with the cell's edge above */
+  .contact-pills { margin-left: calc(var(--spacing) * -3); }
 
   /* an empty outcome takes no space: no padding, no border, nothing */
   .contact-status {

@@ -194,10 +194,10 @@
       "For a role: a link to the company and the range.",
       "For a project: what exists already and by when."
     ],
+    "telegram_label": "Fastest",
     "telegram": "Telegram",
     "cv": "CV",
     "github": "GitHub",
-    "form_note": "Or through the form — I'll reply to whatever you leave.",
     "from_label": "Telegram or e-mail",
     "from_placeholder": "{'@'}example",
     "message_label": "What it's about",

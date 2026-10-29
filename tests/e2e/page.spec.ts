@@ -471,6 +471,16 @@ test.describe('contact form', () => {
     await page.locator('#contact').scrollIntoViewIfNeeded()
   })
 
+  // one word at the hero name's scale can't wrap: its size is capped by the
+  // column, and it must never run past it
+  test('the title fits its column at every width', async ({ page }) => {
+    for (const width of [360, 768, 1024, 1280, 1760]) {
+      await page.setViewportSize({ width, height: 900 })
+      const [scroll, client] = await page.locator('#contact-title').evaluate(el => [el.scrollWidth, el.clientWidth])
+      expect(scroll, `at ${width}px`).toBeLessThanOrEqual(client)
+    }
+  })
+
   test('an empty form explains every field and focuses the first', async ({ page }) => {
     await page.locator('#contact button[type=submit]').click()
 
