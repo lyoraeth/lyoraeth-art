@@ -42,7 +42,7 @@ function onPointerEnter(event: PointerEvent) {
 
       <!-- not interactive: the whole card is the link already -->
       <span class="post-card__action type-ui" aria-hidden="true">
-        {{ t('writing.read') }}
+        {{ t('writing.read') }} <span class="post-card__arrow">→</span>
       </span>
     </div>
   </article>
@@ -51,6 +51,10 @@ function onPointerEnter(event: PointerEvent) {
 <style scoped>
 /* In the components layer, so utility classes in the markup still win. */
 @layer components {
+  /*
+   * A hairline frame, square like the site's other content cards: a post has
+   * no picture, so the card reads as a page or a catalogue entry.
+   */
   .post-card {
     position: relative;
     display: flex;
@@ -58,10 +62,11 @@ function onPointerEnter(event: PointerEvent) {
     gap: calc(var(--spacing) * 6);
     min-height: calc(var(--spacing) * 80);
     padding: calc(var(--spacing) * 8);
-    border-radius: var(--radius-3xl);
-    background-color: var(--color-surface-raised);
+    outline: 1px solid var(--color-border-raised);
+    outline-offset: -1px;
     overflow: hidden;
     cursor: pointer;
+    transition: outline-color var(--duration-sweep) var(--ease-out);
   }
 
   .post-card__fill {
@@ -118,16 +123,15 @@ function onPointerEnter(event: PointerEvent) {
     transition: color var(--duration-hover) var(--ease-out);
   }
 
+  /* plain text, no pill: the whole card is the link, and a rounded pill
+     would be the one round thing in a square card */
   .post-card__action {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: calc(var(--spacing) * 1.5);
     height: calc(var(--spacing) * 10);
-    padding-inline: calc(var(--spacing) * 3);
-    border-radius: calc(infinity * 1px);
-    background-color: var(--color-surface-hover);
-    color: var(--color-text-primary);
+    color: var(--color-text-inverse);
     pointer-events: none;
 
     visibility: hidden;
@@ -135,6 +139,11 @@ function onPointerEnter(event: PointerEvent) {
     translate: 0 -0.25rem;
     transition: opacity var(--duration-hover) var(--ease-out), translate var(--duration-hover) var(--ease-out),
                 visibility var(--duration-hover) var(--ease-out);
+  }
+
+  .post-card__arrow {
+    display: inline-block;
+    transition: translate var(--duration-hover) var(--ease-out);
   }
 
   /*
@@ -155,6 +164,13 @@ function onPointerEnter(event: PointerEvent) {
       visibility: visible;
       opacity: 1;
       translate: 0 0;
+    }
+  /* the hairline would stay drawn over the dark fill */
+  .post-card:hover {
+      outline-color: var(--color-fill-strong);
+    }
+  .post-card:hover .post-card__arrow {
+      translate: 0.25rem 0;
     }
   }
 }
