@@ -4,6 +4,10 @@ import { Resend } from 'resend'
  *  Parses the report envelope and emails a digest via Resend (best-effort).
  *  Always answers 204, even on malformed/empty bodies. */
 export default defineEventHandler(async event => {
+  // The dev server trips the policy on its own (HMR, devtools) — those reports
+  // say nothing about production and must not land in the inbox.
+  if (import.meta.dev) return sendNoContent(event)
+
   const config = useRuntimeConfig(event)
 
   const raw = await readRawBody(event)
