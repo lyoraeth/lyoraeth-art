@@ -80,12 +80,12 @@
         ]
       },
       {
-        "period": "Dancecolor web studio · November 2025 — July 2026",
+        "period": "Dancecolor web studio · November 2025 — October 2026",
         "title": "Four projects, every one of them inherited",
         "description": [
           "Spliteks — a Bitrix portal that arrived as a single main.css and a single main.js. I broke it into modules and moved it to SCSS and TypeScript. The build was rewritten on Gulp: Vite and Bitrix's requirements never met. PageSpeed went from 69 to 89, part of that from the markup and the way images were handled. The hardest piece was a GSAP animation that had to hold its behaviour through zoom and resize.",
           "Apple Inside — a shared foundation for A+ product pages: assembling a new one went from two days to three or six hours.",
-          "Legacy CRM had neither a repository nor any access beyond FTP, so I built the repository, wrote a sync utility, and worked through it from then on. Reckful — search in the header and fixes from review notes; a small contribution at the scale of that project."
+          "Legacy CRM had neither a repository nor any access beyond FTP, so I built the repository, wrote a sync utility, and worked through it from then on. Reckful — a Nuxt 4 storefront for a sports nutrition brand. In summer I built the header search; in autumn I came back to close a backlog before an industry competition: a four-level catalog menu through two redesigns, a cart with the promo code inside the checkout button, an urgent promo mechanic shipped within a day."
         ]
       }
     ]
