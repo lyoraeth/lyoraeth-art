@@ -24,7 +24,7 @@
 
 <p align="center">
   <img src="readme/hero.png" width="49%" alt="Home page: hero">
-  <img src="readme/mobile-landscape.png" width="49%" alt="Mobile version">
+  <img src="readme/mobile.png" width="49%" alt="Mobile version">
 </p>
 <p align="center">
   <img src="readme/work.png" width="49%" alt="Work section">

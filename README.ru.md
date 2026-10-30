@@ -24,7 +24,7 @@
 
 <p align="center">
   <img src="readme/hero.png" width="49%" alt="Главная страница: хиро">
-  <img src="readme/mobile-landscape.png" width="49%" alt="Мобильная версия">
+  <img src="readme/mobile.png" width="49%" alt="Мобильная версия">
 </p>
 <p align="center">
   <img src="readme/work.png" width="49%" alt="Раздел работ">
