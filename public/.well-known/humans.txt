@@ -6,7 +6,7 @@
 
 
 /* SITE */
-  References: Pangram Pangram, Siteinspire, dstudio.agency, mostlyserious, ParaType, "Duwy" (Natasha Belova, Korsa)
+  References: Pangram Pangram, Siteinspire, dstudio.agency, mostlyserious, ParaType, Pear, Partify (heartbeat)
   Design system: token-driven (CSS custom properties via Tailwind @theme).
 
 
